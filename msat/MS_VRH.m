@@ -11,7 +11,7 @@ function [Cave,rhave]=CIJ_VRH(VF,varargin)
 
 %--check the input
    if length(varargin)~=length(VF)*2
-      error('There must be as many C,rho argument pairs as elements in VF') ;
+      error('MS:VRHargs', 'There must be as many C,rho argument pairs as elements in VF') ;
    end   
 
 %--normalise VF
