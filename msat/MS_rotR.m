@@ -7,7 +7,7 @@
 %  Output is the rotated Cij elastic stiffness tensor                  
 %
 
-function [CR] = CIJ_rotR(C,R)
+function [CR] = MS_rotR(C,R)
 
 [CC] = cij2cijkl(C) ;
 

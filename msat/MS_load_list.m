@@ -1,6 +1,6 @@
 %CIJ_load_list - Load a list of CIJs, in a specific format
 %
-% [x,C,rho] = CIJ_load_list(fname)
+% [x,C,rho] = MS_load_list(fname)
 %
 % Outputs
 % x is the independent variable (the first column in the file, 
@@ -13,7 +13,7 @@
 % x, c11,c12,...,c16,c22,...,c26,c33,...,c66,rho 
 %
 
-function [x,C,rho] = CIJ_load_list(fname) ;
+function [x,C,rho] = MS_load_list(fname) ;
 
 
 ecdata=load(fname) ;

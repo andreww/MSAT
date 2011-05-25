@@ -1,4 +1,5 @@
-% CIJ_sphere : Plot a spherical plot from a set of elastic constants
+% CIJ_sphere : Plot a spherical plot of phasevels/anisotropy from a set of 
+%              elastic constants.
 %   
 % Usage: CIJ_sphere(CC,rh,mode,...)
 %     mode can be 'p'(-wave) or 's'(-wave).
@@ -6,14 +7,17 @@
 %
 %        cmap = jet(64) ; % colourmap
 %        icmapflip = 1 ; % reverse the sense of the colourscale     
-%        scale=0.08 ; % FSW vector length
-%        dirs = [] ;  % directions of interest
-%        dlen = 1.5 ; % length of doi vectors 
+%        FSWTickLength=0.08 ; % Fast shear wave vector length
+%
 %        plotlabels = 1 ;
 %        plotaxes = 1 ;
 %        nofig = 0 ; % suppress the figure command, so plot can be sub-plotted
 %        nocbar = 0 ; % suppress the colorbar
 %        cax = NaN ; % colour axis, define to use - default is auto
+%        dirs = [] ;  % directions of interest, this should be a vector of azi, 
+%                       inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4]
+%        dlen = 1.5 ; % length of doi vectors 
+%
 %
 % (C) James Wookey, December 2007.	
 
@@ -23,18 +27,17 @@
 %  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 %-------------------------------------------------------------------------------
 
-function CIJ_sphere(CC,rh,mode,varargin);
+function MS_sphere(CC,rh,mode,varargin);
 
 cmap = jet(64) ;
 icmapflip = 1 ; % reverse the sense of the colourscale
-scale=0.08 ;
+FSWTickLength=0.08 ;
 dirs = [] ;
 dlen = 1.5 ;
 plotlabels = 1 ;
 plotaxes = 1 ;
 nofig = 0 ;
 nocbar = 0 ;
-
 cax = NaN ; % define to use
 
 % check the inputs: CC
@@ -45,6 +48,8 @@ if isnumeric(CC)
 else   
    error('CC must be a 6x6 matrix')
 end
+
+[isgood] = MS_checkC(CC) ;
 
 % check the inputs: rh
 if isnumeric(rh)
@@ -63,7 +68,7 @@ else
    error('Mode must be ''S''(-wave) or ''P''(-wave) ')
 end     
 
-% process the optional arguments
+% process the optional arguments, these are EVAL'ed in turn
 for i=1:length(varargin) 
    eval(varargin{i}) ; 
 end    
@@ -89,7 +94,7 @@ end
 
 %% load the triangulation
 load SPHTR3.mat ;
-[SF,avs,vs1,vs2,vp] = CIJ_phasevels_local(CC,rh,inc,az) ;
+[SF,avs,vs1,vs2,vp] = MS_phasevels(CC,rh,inc,az) ;
 
 if strcmp(lower(mode),'p')
    trisurf(faces,x,y,z,vp) ;
@@ -128,8 +133,8 @@ if strcmp(lower(mode),'s')
    nv = length(x) ;
    for iv=1:nv
       XI=1.01.*[x(iv) y(iv) z(iv)] ;
-      X1 = XI-scale.*SF(iv,:);
-      X2 = XI+scale.*SF(iv,:);
+      X1 = XI-FSWTickLength.*SF(iv,:);
+      X2 = XI+FSWTickLength.*SF(iv,:);
       plot3(XI(1),XI(2),XI(3),'ko','MarkerSize',4,'MarkerFaceColor','k')
       plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'k-','LineWidth',2)
    end
@@ -170,93 +175,6 @@ return
 % ------------------------------ SUBROUTINES ----------------------------------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% CIJ_phasevels - calculate the phase velocity details for a set of elastic 
-%                 constants - localised version
-%
-% (C) James Wookey, May 2007.	
-%   
-% Based on EMATRIX6 by D. Mainprice. Re-coded in MATLAB by JW
-%
-% Reference: Mainprice D. (1990). An efficient
-%            FORTRAN program to calculate seismic anisotropy from
-%            the lattice preferred orientation of minerals.
-%            Computers & Gesosciences,vol16,pp385-393.
-%
-%
-function [SF,avs,vs1,vs2,vp] = CIJ_phasevels_local(C_in,rh_in,inc_in,azi_in)
-
-%	** protect the inputs
-		C = C_in ;
-		rh = rh_in ;
-
-		if (length(inc_in)~=length(azi_in))
-			error('AZI and INC must be scalars or vectors of the same dimension');
-		end	
-
-%  ** convert to MB file units (Mbars)
-      C(:,:) = C(:,:) / 1.d8 ;
-
-%  ** density normalise
-      C(:,:) = C(:,:) .* (rh./1000.d0) ;
-      rh = rh ./ 1000.d0 ;
-
-		avs = zeros(size(azi_in)) ;
-		vp = zeros(size(azi_in)) ;
-		vs1 = zeros(size(azi_in)) ;
-		vs2 = zeros(size(azi_in)) ;
-		SF = zeros(length(azi_in),3) ;
-      
-%	** start looping
-	for ipair = 1:length(inc_in)
-		azi = azi_in(ipair) ;
-		inc = inc_in(ipair) ;
-
-%  ** create the cartesian vector
-		XI = cart2(1,inc,azi) ;
-
-%  ** compute phase velocities		
-		[V,EIGVEC]=velo(XI,rh,C) ;
-		
-%  ** pull out the eigenvectors
-		P  = EIGVEC(:,1) ;
-      S1 = EIGVEC(:,2) ;
-
-		if ~isreal(S1)
-			S1
-			fprintf('%f,%f\n',inc,azi)
-			C_in
-			error('bad') ;
-		end
-      S2 = EIGVEC(:,3) ;
-
-%  ** calculate projection onto propagation plane      
-      S1N = cross(XI,S1) ;
-      S1P = cross(XI,S1N);
-
-%  ** rotate into y-z plane to calculate angles
-      [S1PR] = V_rot3(S1P,0,0,azi) ;
-		[S1PRR] = V_rot3(S1PR,0,inc,0) ;
-
-		ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
-
-%  ** transform angle to between -90 and 90
-      if (ph < -90.), ph = ph + 180.;,end
-      if (ph >  90.), ph = ph - 180.;,end
-
-%	** calculate some useful values
-		dVS =  (V(2)-V(3)) ;
-      VSmean = (V(2)+V(3))/2.0 ;
-
-      avs(ipair) = 100.0*(dVS/VSmean) ;
-      vp(ipair) =  V(1) ;
-      vs1(ipair) = V(2) ;
-      vs2(ipair) = V(3) ;
-		
-		SF(ipair,:) = S1P(:) ;
-	end % ipair = 1:length(inc_in)
-		
-return
-%=======================================================================================  
 
 %=======================================================================================  
 function [VR] = V_rot3(V,alp,bet,gam)
@@ -276,7 +194,6 @@ VR = V * RR ;
  
 return
 %=======================================================================================  
-
 
 %=======================================================================================  
 	function [X] = cart2(irev,inc,azm)

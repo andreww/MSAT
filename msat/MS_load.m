@@ -1,5 +1,5 @@
 % [C,rho] = CIJ_load(str)
-function [C,rho] = CIJ_load(str) ;
+function [C,rho] = MS_load(str) ;
 
 C = zeros(6,6) ;
 

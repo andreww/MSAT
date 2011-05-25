@@ -9,7 +9,7 @@
 %  however probably be seen as a null result anyway.
 
 %===============================================================================
-function [fast_eff,tlag_eff]=effective_splitting(f,spol,fast,tlag)
+function [fast_eff,tlag_eff]=MS_effective_splitting(f,spol,fast,tlag)
 %===============================================================================
 %  check inputs are the same size   
    if ~isequal(length(fast),length(tlag))

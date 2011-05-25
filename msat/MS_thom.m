@@ -1,14 +1,17 @@
 %   CIJ_THOM - generate elastic constants from Thomsen parameters
 %
-%   [C]=CIJ_thom(vp,vs,rh,eps,gam,del)
+%   [C]=MS_thom(vp,vs,rh,eps,gam,del)
 %
 %   Inputs: 
 %       rh  : Density (kg/m2 or g/cm3) (automatic conversion < 50) 
 %       vp  : m/s or km/s (input is automatically to m/s converted if < 50)
 %       vs  : m/s or km/s (input is automatically to m/s converted if < 50)
 %       eps, gam, del : Dimensionless
+%
+%   Output:
+%        C : Stiffness tensor (6x6 notation, GPa)
 
-function [C]=CIJ_thom(vp,vs,rh,eps,gam,del)
+function [C]=MS_thom(vp,vs,rh,eps,gam,del)
 
 %  convert to assumed units
    if rh<50, rh=rh*1e3;, end
@@ -27,8 +30,7 @@ function [C]=CIJ_thom(vp,vs,rh,eps,gam,del)
    dsrmt = (btm*btm - 4.0*ctm) ;
    
 	if dsrmt < 0
-		error(['WARNING: S-velocity too high or delta ' ...
-	          'too negative for Thomsen routine Re-input parameters']) ;
+		error('WARNING: S-velocity too high or delta too negative for Thomsen routine.') ;
 	end
    
    C(1,3) = -btm/2.0 + sqrt(dsrmt)/2.0 ;
@@ -44,5 +46,8 @@ function [C]=CIJ_thom(vp,vs,rh,eps,gam,del)
          C(j,i) = C(i,j) ;
       end
    end
+
+%  convert to GPa
+   C = C.*rh./1e9 ;
 
 return

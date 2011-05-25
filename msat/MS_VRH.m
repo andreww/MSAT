@@ -7,7 +7,7 @@
 %
 %  (c) James Wookey, 2006
 %
-function [Cave,rhave]=CIJ_VRH(VF,varargin)
+function [Cave,rhave]=MS_VRH(VF,varargin)
 
 %--check the input
    if length(varargin)~=length(VF)*2

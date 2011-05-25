@@ -1,12 +1,13 @@
-%  [CC,rh]=tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi)
+%  [CC,rh]=MS_tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi)
 %
 %  Calculate anisotropic elastic constants for an isotropic material containing
 %  spheroidal inclusions with a symmetry axis aligned with the x1-direction.
 %
-%  From the theory of Tandon and Weng (1984). 
+%  From the theory of Tandon and Weng (1984), based on original FORTRAN code by Mike
+%  Kendall.  
 %
 %  Input parameters:
-%       vp,vs,rho : isotropic parameters of the matrix (m/s, kg/m3)
+%       vp,vs,rho : isotropic parameters of the matrix (km/s, kg/m3)
 %             del : aspect ratio of spheroids:
 %                      del < 1 = smarties
 %                      del = 1 = spheres
@@ -15,16 +16,18 @@
 %  vpi, vsi, rhoi : isotropic parameters of the inclusions
 %
 %  Output parameters:
-%     CC : Elastic constants (actually Aij, density normalised)
-%     rh : aggregate density
+%     CC : Elastic constants (GPa)
+%     rh : aggregate density (kg/m3)
 %
-%  Based on FORTRAN code by Mike Kendall, translated into matlab
-%  by James Wookey, 2006
+
  
-function [CC,rh]=tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi) ;
+function [CC,rh]=MS_tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi) ;
 
 %  weighted average density
    rh = (1.0-c)*rho + c*rhoi ;
+
+   vp = vp * 1e3 ; % convert to m/s 
+   vs = vs * 1e3 ; % convert to m/s
 
    amu = vs*vs*rho ;
    amui = vsi*vsi*rhoi ;
@@ -132,5 +135,5 @@ for i=1:6
 end
    
 
-% apply density normalisation
-      CC = CC ./ rh ;
+% convert to GPA
+CC = CC./1e9 ; 

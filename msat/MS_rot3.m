@@ -14,9 +14,9 @@
 %
 %
 
-function [CR] = CIJ_rot3(C,alp,bet,gam)
+function [CR] = MS_rot3(C,alp,bet,gam)
 
-[CC] = cij2cijkl(C) ;
+[CC] = MS_cij2cijkl(C) ;
 
 %  Make rotation matrix
 a = alp * pi/180. ;
@@ -28,7 +28,6 @@ R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
 R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
 
 RR =  R3 * R2 * R1;
- 
  
 % rotate the elastic contants
 for M=1:3
@@ -55,7 +54,7 @@ for M=1:3
  end
 end
 
-[CR] = cijkl2cij(CCR) ;
+[CR] = MS_cijkl2cij(CCR) ;
 
 return
 

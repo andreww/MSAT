@@ -1,7 +1,8 @@
 %-------------------------------------------------------------------------------
 %                  MSAT - Matlab Seismic Anisotropy Toolkit 
 %-------------------------------------------------------------------------------
-% MS_checkC - check consistency of a stiffness matrix, for use in MSAT codes
+% MS_checkC - check consistency of a stiffness matrix against various criteria
+% for use in MSAT codes
 %-------------------------------------------------------------------------------
 % [] = MS_checkC(C,...)
 %
@@ -25,17 +26,25 @@
 % (C) James Wookey, 2011
 function [isgood] = MS_checkC(C,varargin)
 
-
 %  ** set defaults
-      symchk = 1 ;
-      zerochk = 1;
-      thresh = 1e-6 ;
       warn = 0 ;
-            
+      fast = 0 ;
+
+      thresh = 1e-6 ;
+
+      symchk = 1 ;
+      zerochk = 1 ;
+      magchk = 1 ;
+
+      magrng = [50 2000] ;
+      
 %  ** process the optional arguments
       iarg = 1 ;
       while iarg<=(length(varargin))
          switch varargin{iarg}
+            case 'fast'
+               fast = 1 ;
+               iarg = iarg + 1 ;
             case 'warn'
                warn = 1 ;
                iarg = iarg + 1 ;
@@ -45,8 +54,14 @@ function [isgood] = MS_checkC(C,varargin)
             case 'nozerochk'
                zerochk = 0 ;
                iarg = iarg + 1 ;
+            case 'nomagchk'
+               magchk = 0 ;
+               iarg = iarg + 1 ;
             case 'thresh'
-               check_symmetry = varargin{iarg+1}
+               thresh = varargin{iarg+1}
+               iarg = iarg + 2 ;
+            case 'magrange'
+               magrange = varargin{iarg+1}
                iarg = iarg + 2 ;
             otherwise 
                error('Unknown flag') ;   
@@ -63,9 +78,14 @@ function [isgood] = MS_checkC(C,varargin)
       [nr nc] = size(C) ;
       if (nr~=6 | nc~=6)
          isgood = 0;
-		   error('Stiffness matrix error: Appears not to be a 2D matrix')
+		   error('Stiffness matrix error: Appears not to be a 6x6 matrix')
 		end
 
+%  ** if fast checking is selected, we're done here.       
+      if fast, return, end
+
+%  ** otherwise, perform more elaborate tests.
+      
 %  ** check symmetry    
       if symchk
          D=C-C';
@@ -93,7 +113,8 @@ function [isgood] = MS_checkC(C,varargin)
          end
       end
 
-%  ** check sensible magnitudes.	Make sure C(3,3). 
+%  ** check sensible magnitudes.	Make sure C(3,3) and C(4,4) are between 
+%     magrange(1) and magrange(2) GPa
             
 		
 return

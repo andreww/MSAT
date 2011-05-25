@@ -1,10 +1,18 @@
-% CIJ_phasevels - calculate the phase velocity details for a set of elastic 
+%-------------------------------------------------------------------------------
+%                  MSAT - Matlab Seismic Anisotropy Toolkit 
+%-------------------------------------------------------------------------------
+% MS_phasevels - calculate the phase velocity details for a set of elastic 
 %                 constants
-%
-% [pol,avs,vs1,vs2,vp] = CIJ_phasevels(C,rh,inc,azi)
+%-------------------------------------------------------------------------------
+% [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
 %
 %	Inputs:
-%		inc and azi may be scalars, or vectors of the same size.
+%     
+%     C = Stiffness tensor, in 6x6 Voigt notation, units of GPa, symmetry is
+%            enforced.
+%     rh = density (units of kg/m^3)
+%
+%		* inc and azi may be scalars, or vectors of the same size. *
 %
 %     AZI = angle from +ve 1-axis in x1-x2 plane                              
 %           (deg, +ve c'wise looking at origin from 3-axis)                  
@@ -13,56 +21,51 @@
 %
 %  Outputs: 
 %
-%     'vp'  = P-wave velocity
-%     'vs1' = fast shear-wave velocity
-%     'vs2' = slow shear-wave velocity
-%     'avs' = shear-wave anisotropy
 %     'pol' = angle in plane normal to raypath of FSW                           
 %            (deg, zero is x3 direction, +ve c'wise looking along             
 %            raypath at origin)  
+%     'avs' = shear-wave anisotropy
+%     'vs1' = fast shear-wave velocity (m/s)
+%     'vs2' = slow shear-wave velocity (m/s)
+%     'vp'  = P-wave velocity (m/s)
 % 
-% (C) James Wookey, May 2007.	
-%   
+%  See source code for further notes
+
+% (C) James Wookey, 2007-2011
+% Notes:   
 % Based on EMATRIX6 by D. Mainprice. Re-coded in MATLAB by JW
 %
 % Reference: Mainprice D. (1990). An efficient
 %            FORTRAN program to calculate seismic anisotropy from
 %            the lattice preferred orientation of minerals.
-%            Computers & Gesosciences,vol16,pp385-393.
+%            Computers & Gesosciences, vol16, pp385-393.
 %
 %
-function [pol,avs,vs1,vs2,vp] = CIJ_phasevels(C_in,rh_in,inc_in,azi_in)
+function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
 
-%	** protect the inputs
-		C = C_in ;
-		rh = rh_in ;
-
-		if (length(inc_in)~=length(azi_in))
+		if (length(inc)~=length(azi))
 			error('AZI and INC must be scalars or vectors of the same dimension');
 		end	
 
-%  ** convert to MB file units (Mbars)
-      C(:,:) = C(:,:) / 1.d8 ;
-
-%  ** density normalise
-      C(:,:) = C(:,:) .* (rh./1000.d0) ;
-      rh = rh ./ 1000.d0 ;
-
-		avs = zeros(size(azi_in)) ;
-		vp = zeros(size(azi_in)) ;
-		vs1 = zeros(size(azi_in)) ;
-		vs2 = zeros(size(azi_in)) ;
-		pol = zeros(size(azi_in)) ;
-		S1 = zeros(length(azi_in),3) ;
-		S1P = zeros(length(azi_in),3) ;
+%  ** convert GPa to MB file units (Mbars), density to g/cc
+      C(:,:) = C(:,:) * 0.01 ;
+      rh = rh ./ 1e3 ;
+      
+		avs = zeros(size(azi)) ;
+		vp = zeros(size(azi)) ;
+		vs1 = zeros(size(azi)) ;
+		vs2 = zeros(size(azi)) ;
+		pol = zeros(size(azi)) ;
+		S1 = zeros(length(azi),3) ;
+		S1P = zeros(length(azi),3) ;
 
 %	** start looping
-	for ipair = 1:length(inc_in)
-		azi = azi_in(ipair) ;
-		inc = inc_in(ipair) ;
+	for ipair = 1:length(inc)
+		cazi = azi(ipair) ;
+		cinc = inc(ipair) ;
 
 %  ** create the cartesian vector
-		XI = cart2(1,inc,azi) ;
+		XI = cart2(1,cinc,cazi) ;
 
 %  ** compute phase velocities		
 		[V,EIGVEC]=velo(XI,rh,C) ;
@@ -73,7 +76,7 @@ function [pol,avs,vs1,vs2,vp] = CIJ_phasevels(C_in,rh_in,inc_in,azi_in)
 
 		if ~isreal(S1)
 			S1
-			fprintf('%f,%f\n',inc,azi)
+			fprintf('%f,%f\n',cinc,cazi)
 			C_in
 			error('bad') ;
 		end
@@ -84,8 +87,8 @@ function [pol,avs,vs1,vs2,vp] = CIJ_phasevels(C_in,rh_in,inc_in,azi_in)
       S1P = cross(XI,S1N);
 
 %  ** rotate into y-z plane to calculate angles
-      [S1PR] = V_rot3(S1P,0,0,azi) ;
-	  [S1PRR] = V_rot3(S1PR,0,inc,0) ;
+      [S1PR] = V_rot3(S1P,0,0,cazi) ;
+	  [S1PRR] = V_rot3(S1PR,0,cinc,0) ;
 
 	   ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
 
