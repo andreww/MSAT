@@ -2,16 +2,14 @@
 %                  MSAT - Matlab Seismic Anisotropy Toolkit 
 %-------------------------------------------------------------------------------
 % MS_checkC - check consistency of a stiffness matrix against various criteria
-% for use in MSAT codes
 %-------------------------------------------------------------------------------
+%
 % [ isgood ] = MS_checkC(C,...)
 %
 %	Inputs:
-%     
 %     C = Stiffness tensor for checking
 %
 %  Outputs:
-%
 %     isgood = 1 for OK
 %
 %  Options:

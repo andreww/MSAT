@@ -1,19 +1,23 @@
-function [ varargout ] = MS_decomp( C )
+%-------------------------------------------------------------------------------
+%                  MSAT - Matlab Seismic Anisotropy Toolkit 
+%-------------------------------------------------------------------------------
 %
 %  Apply a decomposition of the elasticity tensor C, after: 
 %     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
 %
 %  Assumes that C is in its optimal orientation for decomposition
 %
-%  [Ciso] = CIJ_brow_chev_decomp(C)
+%  [Ciso] = MS_decomp(C)
 %     Isotropic projection of the elastic tensor.
 %
-%  [Ciso,Chex] = CIJ_brow_chev_decomp(C)
+%  [Ciso,Chex] = MS_decomp(C)
 %     Isotropic, and hexagonal parts of the elastic tensor
 %
-%  [Ciso,Chex,Ctet,Cort,Cmon,Ctri] = CIJ_brow_chev_decomp(C)
+%  [Ciso,Chex,Ctet,Cort,Cmon,Ctri] = MS_decomp(C)
 %     All parts of the elastic tensor
 %   
+function [ varargout ] = MS_decomp( C )
+
    i=nargout ;
    
    if (nargout==6), i=5;, end

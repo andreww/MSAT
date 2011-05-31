@@ -1,23 +1,25 @@
-function [ P ] = MS_norms( varargin )
+%-------------------------------------------------------------------------------
+%                  MSAT - Matlab Seismic Anisotropy Toolkit 
+%-------------------------------------------------------------------------------
 %
 %  Calculate the percentages of the original matrix norm represented by the
 %  individual decompositions of an elasticity tensor. 
 %
 %  See Browaeys and Chevrot (GJI, v159, 667-678, 2004), and function
-%     CIJ_brow_chev_decomp()
+%     MS_decomp()
 %
-%  [P] = CIJ_brow_chev_norms(C,Ciso)
+%  [P] = MS_norms(C,Ciso)
 %     Isotropic part (scalar)
 %
-%  [P] = CIJ_brow_chev_norms(C,Ciso,Chex)
+%  [P] = MS_norms(C,Ciso,Chex)
 %     Isotropic, and hexagonal parts of the elastic tensor (vector)
 %
-%  [P] = CIJ_brow_chev_norms(C,Ciso,Chex,Ctet,Cort,Cmon,Ctri)
+%  [P] = MS_norms(C,Ciso,Chex,Ctet,Cort,Cmon,Ctri)
 %     All parts of the elastic tensor (vector)
 %   
    
-   
-   
+function [ P ] = MS_norms( varargin )
+      
 %if (nargin~=(nargout+1)), ...
 %   error('Must be one more input than output, see help.'), end
 

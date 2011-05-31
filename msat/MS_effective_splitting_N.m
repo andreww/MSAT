@@ -5,7 +5,7 @@
 %  
 %  Fast and tlag can be scalars or vectors but must all be the same length  
 %  spol and f must be scalars. CAUTION! The method gives unstable results when
-%  the source polarisation is near the effecive fast direction. This would,
+%  the source polarisation is near the effective fast direction. This would,
 %  however probably be seen as a null result anyway.
 
 %===============================================================================

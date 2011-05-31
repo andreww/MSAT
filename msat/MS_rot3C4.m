@@ -16,7 +16,6 @@
 
 function [CR] = MS_rot3C4(C,alp,bet,gam)
 
-
 %  Make rotation matrix
 a = alp * pi/180. ;
 b = bet * pi/180. ;

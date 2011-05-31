@@ -1,10 +1,14 @@
-function [ CR ] = MS_axes( C )
+%-------------------------------------------------------------------------------
+%                  MSAT - Matlab Seismic Anisotropy Toolkit 
+%-------------------------------------------------------------------------------
 %
 %  Calculate the principle axes of elasticity tensor C, after: 
 %     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
 %  
 %  Report the vectors, and rotate C into the correct orientation. 
-%     [CR]=CIJ_brow_chev_axes(C)
+%     [CR]=MS_axes(C)
+
+function [ CR ] = MS_axes( C )
 
 det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
                     % of the best guess axes 
@@ -109,9 +113,9 @@ end
 
 if irot
 %  check axes
-   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
+   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) 
    if (length(find(dps>det_thresh))>0)
-      warning('CIJ_brow_chev_axes: Improper rotation matrix resulted, not rotating.') ;
+      warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
       CR=C ;
       return
    end
@@ -128,7 +132,7 @@ if irot
 
    % check rotation matrix
    if (abs(det(RR))-1)>det_thresh ;
-       warning('CIJ_brow_chev_axes: Improper rotation matrix resulted, not rotating.') ;
+       warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
        fprintf('Determinant = %20.18f\n',det(RR))
        CR=C ;
        return 
