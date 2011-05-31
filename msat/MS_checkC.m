@@ -4,11 +4,15 @@
 % MS_checkC - check consistency of a stiffness matrix against various criteria
 % for use in MSAT codes
 %-------------------------------------------------------------------------------
-% [] = MS_checkC(C,...)
+% [ isgood ] = MS_checkC(C,...)
 %
 %	Inputs:
 %     
 %     C = Stiffness tensor for checking
+%
+%  Outputs:
+%
+%     isgood = 1 for OK
 %
 %  Options:
 %     Various checks can be disabled/enabled by specifying extra options:
@@ -16,6 +20,7 @@
 %        'warn' - warn only on more sophisticated errors than size/type
 %        'nosymchk' - disable upper, lower symmetry checking
 %        'nozerochk' - disable top left / trace zero checking 
+%        'nopdefchk' - disable positive definiteness check 
 % 
 %     Various control parameters can be set by adding parameter,value pairs 
 %     to the arguments
@@ -23,7 +28,7 @@
 %
 %  See source code for further notes
 
-% (C) James Wookey, 2011
+% (C) James Wookey and Andrew Walker, 2011
 function [isgood] = MS_checkC(C,varargin)
 
 %  ** set defaults
@@ -34,9 +39,7 @@ function [isgood] = MS_checkC(C,varargin)
 
       symchk = 1 ;
       zerochk = 1 ;
-      magchk = 1 ;
-
-      magrng = [50 2000] ;
+      pdefchk = 1 ;
       
 %  ** process the optional arguments
       iarg = 1 ;
@@ -54,14 +57,11 @@ function [isgood] = MS_checkC(C,varargin)
             case 'nozerochk'
                zerochk = 0 ;
                iarg = iarg + 1 ;
-            case 'nomagchk'
+            case 'nopdef'
                magchk = 0 ;
                iarg = iarg + 1 ;
             case 'thresh'
                thresh = varargin{iarg+1}
-               iarg = iarg + 2 ;
-            case 'magrange'
-               magrange = varargin{iarg+1}
                iarg = iarg + 2 ;
             otherwise 
                error('Unknown flag') ;   
@@ -113,9 +113,18 @@ function [isgood] = MS_checkC(C,varargin)
          end
       end
 
-%  ** check sensible magnitudes.	Make sure C(3,3) and C(4,4) are between 
-%     magrange(1) and magrange(2) GPa
-            
-		
+%  ** check that matrix is positive definite
+      if pdefchk
+         try
+            X=chol(C) ;
+         catch ME   
+            isgood = 0;
+            if warn
+               warning('Stiffness matrix warning: not positive definite')
+            else
+               error('Stiffness matrix error: not positive definite')
+            end
+         end               
+      end
 return
 %=======================================================================================  
