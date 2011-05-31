@@ -94,7 +94,7 @@ end
 
 %% load the triangulation
 load SPHTR3.mat ;
-[SF,avs,vs1,vs2,vp] = MS_phasevels(CC,rh,inc,az) ;
+[SF,avs,vs1,vs2,vp] = phasevels_local(CC,rh,inc,az) ;
 
 if strcmp(lower(mode),'p')
    trisurf(faces,x,y,z,vp) ;
@@ -128,7 +128,7 @@ if strcmp(lower(mode),'s')
       inc(ind) = din(idir)*180/pi ;
    end
    
-   [SF,avs,vs1,vs2,vp] = CIJ_phasevels_local(CC,rh,inc,az) ;
+   [SF,avs,vs1,vs2,vp] = phasevels_local(CC,rh,inc,az) ;
    %% calculate PM vectors
    nv = length(x) ;
    for iv=1:nv
@@ -257,4 +257,89 @@ return
 		end
 
       return
+
+%=======================================================================================  
+
+% phasevels - calculate the phase velocity details for a set of elastic 
+%                 constants - localised version
+%
+% (C) James Wookey, May 2007.	
+%   
+% Based on EMATRIX6 by D. Mainprice. Re-coded in MATLAB by JW
+%
+% Reference: Mainprice D. (1990). An efficient
+%            FORTRAN program to calculate seismic anisotropy from
+%            the lattice preferred orientation of minerals.
+%            Computers & Gesosciences,vol16,pp385-393.
+%
+%
+function [SF,avs,vs1,vs2,vp] = phasevels_local(C,rh,inc,azi)
+
+
+		if (length(inc)~=length(azi))
+			error('AZI and INC must be scalars or vectors of the same dimension');
+		end	
+
+%  ** convert GPa to MB file units (Mbars), density to g/cc
+      C(:,:) = C(:,:) * 0.01 ;
+      rh = rh ./ 1e3 ;
+      
+		avs = zeros(size(azi)) ;
+		vp = zeros(size(azi)) ;
+		vs1 = zeros(size(azi)) ;
+		vs2 = zeros(size(azi)) ;
+		pol = zeros(size(azi)) ;
+		S1 = zeros(length(azi),3) ;
+		S1P = zeros(length(azi),3) ;
+      
+%	** start looping
+	for ipair = 1:length(inc)
+		cazi = azi(ipair) ;
+		cinc = inc(ipair) ;
+
+%  ** create the cartesian vector
+		XI = cart2(1,cinc,cazi) ;
+
+%  ** compute phase velocities		
+		[V,EIGVEC]=velo(XI,rh,C) ;
+		
+%  ** pull out the eigenvectors
+		P  = EIGVEC(:,1) ;
+      S1 = EIGVEC(:,2) ;
+
+		if ~isreal(S1)
+			S1
+			fprintf('%f,%f\n',cinc,cazi)
+			C_in
+			error('bad') ;
+		end
+      S2 = EIGVEC(:,3) ;
+
+%  ** calculate projection onto propagation plane      
+      S1N = cross(XI,S1) ;
+      S1P = cross(XI,S1N);
+
+%  ** rotate into y-z plane to calculate angles
+      [S1PR] = V_rot3(S1P,0,0,cazi) ;
+		[S1PRR] = V_rot3(S1PR,0,cinc,0) ;
+
+		ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
+
+%  ** transform angle to between -90 and 90
+      if (ph < -90.), ph = ph + 180.;,end
+      if (ph >  90.), ph = ph - 180.;,end
+
+%	** calculate some useful values
+		dVS =  (V(2)-V(3)) ;
+      VSmean = (V(2)+V(3))/2.0 ;
+
+      avs(ipair) = 100.0*(dVS/VSmean) ;
+      vp(ipair) =  V(1) ;
+      vs1(ipair) = V(2) ;
+      vs2(ipair) = V(3) ;
+		
+		SF(ipair,:) = S1P(:) ;
+	end % ipair = 1:length(inc_in)
+		
+return
 %=======================================================================================  

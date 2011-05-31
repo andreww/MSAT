@@ -16,45 +16,43 @@
 
 function [CR] = MS_rot3(C,alp,bet,gam)
 
-[CC] = MS_cij2cijkl(C) ;
-
-%  Make rotation matrix
+%  Make 6x6 rotation matrices
 a = alp * pi/180. ;
 b = bet * pi/180. ;
 g = gam * pi/180. ;
 
-R1 = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
-R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
-R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+% These are from Bower Chapter 3, section 3.2. Note that that e2 and e3 matrices
+% in that section contain a number of errors; these have been corrected. 
 
-RR =  R3 * R2 * R1;
- 
-% rotate the elastic contants
-for M=1:3
- for N=1:3
-  for R=1:3
-   for S=1:3
-    CSUM = 0.0 ;
-    for I=1:3
-     for J=1:3
-      for K=1:3
-       for L=1:3
-        AA = RR(M,I)*RR(N,J)*RR(R,K)*RR(S,L) ;
-        CSUM = CSUM + AA * CC(I,J,K,L) ;
-       end
-      end
-     end
-    end
-    if (abs(CSUM) < 10.0) 
-     CSUM=0.0 ;
-    end
-    CCR(M,N,R,S) = CSUM ;
-   end
-  end
- end
-end
+c = cos(a) ; s = sin(a) ;
+R1 = [ 1      0      0      0      0      0 ; ...
+       0     c^2    s^2   2*c*s    0      0 ; ...
+       0     s^2    c^2  -2*c*s    0      0 ; ...
+       0    -c*s    c*s  c^2-s^2   0      0 ; ...
+       0      0      0      0      c     -s ; ...
+       0      0      0      0      s      c ] 
 
-[CR] = MS_cijkl2cij(CCR) ;
+c = cos(b) ; s = sin(b) ;
+R2 = [c^2     0     s^2     0   -2*c*s    0 ; ...
+       0      1      0      0      0      0 ; ...
+      s^2     0     c^2     0    2*c*s    0 ; ...
+       0      0      0      c      0      s ; ...
+      c*s     0    -c*s     0   c^2-s^2   0 ; ...
+       0      0      0     -s      0      c ] ;
+
+c = cos(g) ; s = sin(g) ;
+R3 = [c^2    s^2     0      0      0    2*c*s ; ...
+      s^2    c^2     0      0      0   -2*c*s ; ...
+       0      0      1      0      0      0 ; ...
+       0      0      0      c      s      0 ; ...
+       0      0      0     -s      c      0 ; ...
+     -c*s    c*s     0      0      0   c^2-s^2 ] 
+              
+RR =  R3 * R2 * R1 ;
+
+
+CR = RR * C * transpose(RR) ;
+
 
 return
 

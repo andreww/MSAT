@@ -9,37 +9,16 @@
 
 function [CR] = MS_rotR(C,R)
 
-[CC] = cij2cijkl(C) ;
-
-RR =  R;
- 
- 
-% rotate the elastic contants
-for M=1:3
- for N=1:3
-  for R=1:3
-   for S=1:3
-    CSUM = 0.0 ;
-    for I=1:3
-     for J=1:3
-      for K=1:3
-       for L=1:3
-        AA = RR(M,I)*RR(N,J)*RR(R,K)*RR(S,L) ;
-        CSUM = CSUM + AA * CC(I,J,K,L) ;
-       end
-      end
-     end
-    end
-    if (abs(CSUM) < 10.0) 
-     CSUM=0.0 ;
-    end
-    CCR(M,N,R,S) = CSUM ;
-   end
-  end
- end
-end
-
-[CR] = cijkl2cij(CCR) ;
+% form the K matrix (based on Bowers 'Applied Mechanics of Solids' chapter 3)
+K = [R(1,1).^2      R(1,2).^2      R(1,3).^2             2.*R(1,2).*R(1,3)             2.*R(1,3).*R(1,1)              2.*R(1,1).*R(1,2) ; ...
+     R(2,1).^2      R(2,2).^2      R(2,3).^2             2.*R(2,2).*R(2,3)             2.*R(2,3).*R(2,1)              2.*R(2,1).*R(2,2) ; ...
+     R(3,1).^2      R(3,2).^2      R(3,3).^2             2.*R(3,2).*R(3,3)             2.*R(3,3).*R(3,1)              2.*R(3,1).*R(3,2) ; ...
+R(2,1).*R(3,1) R(2,2).*R(3,2) R(2,3).*R(3,3) R(2,2).*R(3,3)+R(2,3).*R(3,2) R(2,3).*R(3,1)+R(2,1).*R(3,3)  R(2,1).*R(3,2)+R(2,2).*R(3,1) ; ...
+R(3,1).*R(1,1) R(3,2).*R(1,2) R(3,3).*R(1,3) R(3,2).*R(1,3)+R(3,3).*R(1,2) R(3,3).*R(1,1)+R(3,1).*R(1,3)  R(3,1).*R(1,2)+R(3,2).*R(1,1) ; ...
+R(1,1).*R(2,1) R(1,2).*R(2,2) R(1,3).*R(2,3) R(1,2).*R(2,3)+R(1,3).*R(2,2) R(1,3).*R(2,1)+R(1,1).*R(2,3)  R(1,1).*R(2,2)+R(1,2).*R(2,1)] ;
+      
+% apply the rotation
+CR = K * C * transpose(K) ;
 
 return
 
