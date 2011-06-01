@@ -1,7 +1,7 @@
-% CIJ_sphere : Plot a spherical plot of phasevels/anisotropy from a set of 
+% MS_sphere : Plot a spherical plot of phasevels/anisotropy from a set of 
 %              elastic constants.
 %   
-% Usage: CIJ_sphere(CC,rh,mode,...)
+% Usage: MS_sphere(CC,rh,mode,...)
 %     mode can be 'p'(-wave) or 's'(-wave).
 %     extra arguments are EVALed; parameters that can be (re)set are:
 %
@@ -19,7 +19,7 @@
 %        dlen = 1.5 ; % length of doi vectors 
 %
 %
-% (C) James Wookey, December 2007.	
+% (C) James Wookey, 2007-2011.	
 
 %-------------------------------------------------------------------------------
 %  This software is distributed in the hope that it will be useful,
