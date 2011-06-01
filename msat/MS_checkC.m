@@ -69,10 +69,16 @@ function [isgood] = MS_checkC(C,varargin)
       isgood = 1 ;
 
 %  ** start with basic checks
-		if ~ismatrix(C)
+      try % ismatrix is quite new, so suppress Undef func error.
+          if ~ismatrix(C)
 		   isgood = 0 ;
-		   error('Stiffness matrix error: Appears not to be a 2D matrix')
-	   end
+	       error('Stiffness matrix error: Appears not to be a 2D matrix')
+          end
+      catch e
+          if ~strcmp(e.identifier, 'MATLAB:UndefinedFunction')
+              rethrow(e)
+          end
+      end
       [nr nc] = size(C) ;
       if (nr~=6 | nc~=6)
          isgood = 0;
