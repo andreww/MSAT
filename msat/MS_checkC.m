@@ -71,8 +71,9 @@ function [isgood] = MS_checkC(C,varargin)
 %  ** start with basic checks
       try % ismatrix is quite new, so suppress Undef func error.
           if ~ismatrix(C)
-		   isgood = 0 ;
-	       error('Stiffness matrix error: Appears not to be a 2D matrix')
+		    isgood = 0 ;
+	       error('MS:CHECKCNotMatrix', ...
+	         'Stiffness matrix error: Appears not to be a 2D matrix')
           end
       catch e
           if ~strcmp(e.identifier, 'MATLAB:UndefinedFunction')
@@ -82,7 +83,8 @@ function [isgood] = MS_checkC(C,varargin)
       [nr nc] = size(C) ;
       if (nr~=6 | nc~=6)
          isgood = 0;
-		   error('Stiffness matrix error: Appears not to be a 6x6 matrix')
+		   error('MS:CHECKCnot6x6',...
+		      'Stiffness matrix error: Appears not to be a 6x6 matrix')
 		end
 
 %  ** if fast checking is selected, we're done here.       
@@ -96,9 +98,11 @@ function [isgood] = MS_checkC(C,varargin)
          if (length(find(abs(D)>thresh))>0)
             isgood = 0;
             if warn
-               warning('Stiffness matrix warning: non-symmetric')
+               warning('MS:CHECKCnotsym_W',...
+                  'Stiffness matrix warning: non-symmetric')
             else
-               error('Stiffness matrix error: non-symmetric')
+               error('MS:CHECKCnotsym',...
+                  'Stiffness matrix error: non-symmetric')
             end   
          end   
       end
@@ -110,9 +114,11 @@ function [isgood] = MS_checkC(C,varargin)
          if (length(find(abs(isopart)<thresh))>0)
             isgood = 0;
             if warn
-               warning('Stiffness matrix warning: zeros in trace or top left')
+               warning('MS:CHECKCbadzeros_W',...
+                  'Stiffness matrix warning: zeros in trace or top left')
             else
-               error('Stiffness matrix error: zeros in trace or top left')
+               error('MS:CHECKCbadzeros',...
+                  'Stiffness matrix error: zeros in trace or top left')
             end   
          end
       end
@@ -124,9 +130,11 @@ function [isgood] = MS_checkC(C,varargin)
          catch ME   
             isgood = 0;
             if warn
-               warning('Stiffness matrix warning: not positive definite')
+               warning('MS:CHECKCnotposdef_W',...
+                  'Stiffness matrix warning: not positive definite')
             else
-               error('Stiffness matrix error: not positive definite')
+               error('MS:CHECKCnotposdef',...
+                  'Stiffness matrix error: not positive definite')
             end
          end               
       end
