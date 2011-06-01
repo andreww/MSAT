@@ -570,24 +570,42 @@ footnotes: function () {
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_unwind_0_180">MS_unwind_0_180</h2>
+<h2 id="_ms_tandon_and_weng">MS_tandon_and_weng</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>UNWIND_0_180 - Unwind an angle until it is between 0_180 degrees</tt></pre>
+<pre><tt>[CC,rh]=tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[angle] = unwind_0_180(angle_in)</tt></pre>
+<pre><tt>Calculate anisotropic elastic constants for an isotropic material containing
+spheroidal inclusions with a symmetry axis aligned with the x1-direction.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>This (obviously) assumes a 180 degree periodicity. Angle can be a scalar
-or a vector.</tt></pre>
+<pre><tt>From the theory of Tandon and Weng (1984).</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Created by James Wookey on 2007-05-08.</tt></pre>
+<pre><tt>Input parameters:
+     vp,vs,rho : isotropic parameters of the matrix (m/s, kg/m3)
+           del : aspect ratio of spheroids:
+                    del &lt; 1 = smarties
+                    del = 1 = spheres
+                    del &gt; 1 = cigars
+             c : volume fractions of inclusions
+vpi, vsi, rhoi : isotropic parameters of the inclusions</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Output parameters:
+   CC : Elastic constants (actually Aij, density normalised)
+   rh : aggregate density</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Based on FORTRAN code by Mike Kendall, translated into matlab
+by James Wookey, 2006</tt></pre>
 </div></div>
 </div>
 </div>
@@ -595,7 +613,7 @@ or a vector.</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-06-01 13:14:13 BST
+Last updated 2011-06-01 13:10:50 BST
 </div>
 </div>
 </body>

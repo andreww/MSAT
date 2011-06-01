@@ -570,24 +570,23 @@ footnotes: function () {
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_unwind_0_180">MS_unwind_0_180</h2>
+<h2 id="_ms_effective_splitting_n">MS_effective_splitting_N</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>UNWIND_0_180 - Unwind an angle until it is between 0_180 degrees</tt></pre>
+<pre><tt>EFFECT_SPLITTING_N - N-layer effective splitting operator calculation from
+Silver and Savage (GJI, v119 pp 949-963, 1994)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[angle] = unwind_0_180(angle_in)</tt></pre>
+<pre><tt>[fast_eff,tlag_eff]=effective_splitting_N(f,spol,fast,tlag)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>This (obviously) assumes a 180 degree periodicity. Angle can be a scalar
-or a vector.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Created by James Wookey on 2007-05-08.</tt></pre>
+<pre><tt>Fast and tlag can be scalars or vectors but must all be the same length
+spol and f must be scalars. CAUTION! The method gives unstable results when
+the source polarisation is near the effecive fast direction. This would,
+however probably be seen as a null result anyway.</tt></pre>
 </div></div>
 </div>
 </div>
@@ -595,7 +594,7 @@ or a vector.</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-06-01 13:14:13 BST
+Last updated 2011-06-01 13:10:50 BST
 </div>
 </div>
 </body>

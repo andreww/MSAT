@@ -1,4 +1,4 @@
-== MSAT function documentation listi
+== MSAT function documentation list
 
 * link:./MS_VRH.html[MS_VRH]
 * link:./MS_Vrot3.html[MS_Vrot3]

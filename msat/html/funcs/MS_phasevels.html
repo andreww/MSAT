@@ -570,24 +570,57 @@ footnotes: function () {
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_unwind_0_180">MS_unwind_0_180</h2>
+<h2 id="_ms_phasevels">MS_phasevels</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>UNWIND_0_180 - Unwind an angle until it is between 0_180 degrees</tt></pre>
+<pre><tt>CIJ_phasevels - calculate the phase velocity details for a set of elastic
+                constants</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[angle] = unwind_0_180(angle_in)</tt></pre>
+<pre><tt>[pol,avs,vs1,vs2,vp] = CIJ_phasevels(C,rh,inc,azi)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>This (obviously) assumes a 180 degree periodicity. Angle can be a scalar
-or a vector.</tt></pre>
+<pre><tt>Inputs:
+        inc and azi may be scalars, or vectors of the same size.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Created by James Wookey on 2007-05-08.</tt></pre>
+<pre><tt>AZI = angle from +ve 1-axis in x1-x2 plane
+      (deg, +ve c'wise looking at origin from 3-axis)
+INC = angle from x1-x2 plane towards x3
+      (deg, zero is in x1-x2 plane)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Outputs:</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>'vp'  = P-wave velocity
+'vs1' = fast shear-wave velocity
+'vs2' = slow shear-wave velocity
+'avs' = shear-wave anisotropy
+'pol' = angle in plane normal to raypath of FSW
+       (deg, zero is x3 direction, +ve c'wise looking along
+       raypath at origin)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>(C) James Wookey, May 2007.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Based on EMATRIX6 by D. Mainprice. Re-coded in MATLAB by JW</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Reference: Mainprice D. (1990). An efficient
+           FORTRAN program to calculate seismic anisotropy from
+           the lattice preferred orientation of minerals.
+           Computers &amp; Gesosciences,vol16,pp385-393.</tt></pre>
 </div></div>
 </div>
 </div>
@@ -595,7 +628,7 @@ or a vector.</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-06-01 13:14:13 BST
+Last updated 2011-06-01 13:10:50 BST
 </div>
 </div>
 </body>

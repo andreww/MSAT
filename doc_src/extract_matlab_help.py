@@ -36,14 +36,24 @@ def asciidoc_index(files, path='./funcs'):
 
     index_name = 'index.txt'
     find = open(os.path.join(path, index_name), 'w')
-    find.write('== MSAT function documentation listi\n\n')
+    find.write('== MSAT function documentation list\n\n')
     for file in files:
         fname = os.path.basename(os.path.splitext(file)[0])
         find.write('* link:./' + fname + '.html[' + fname + ']\n')
 
     find.close()
+
+def matlabtoc_index(files, name='./helptoc.xml_funcs'):
         
-    
+    index_name = name
+    find = open(index_name, 'w')
+    for file in files:
+        fname = os.path.basename(os.path.splitext(file)[0])
+        find.write('        <tocitem target="./funcs/' + 
+            fname + '.html" image="$toolbox/matlab/icons/help_fx.png">' +
+            fname + '</tocitem>\n')
+
+    find.close()
 
 if __name__ == '__main__':
     import sys
@@ -51,3 +61,4 @@ if __name__ == '__main__':
         matlab2asciidoc(filename)
 
     asciidoc_index(sys.argv[1:])
+    matlabtoc_index(sys.argv[1:])
