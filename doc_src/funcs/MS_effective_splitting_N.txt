@@ -1,0 +1,11 @@
+== MS_effective_splitting_N
+
+ EFFECT_SPLITTING_N - N-layer effective splitting operator calculation from
+ Silver and Savage (GJI, v119 pp 949-963, 1994)  
+
+ [fast_eff,tlag_eff]=effective_splitting_N(f,spol,fast,tlag)
+  
+  Fast and tlag can be scalars or vectors but must all be the same length  
+  spol and f must be scalars. CAUTION! The method gives unstable results when
+  the source polarisation is near the effecive fast direction. This would,
+  however probably be seen as a null result anyway.

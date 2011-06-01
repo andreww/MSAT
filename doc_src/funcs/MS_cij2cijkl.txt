@@ -1,0 +1,4 @@
+== MS_cij2cijkl
+
+ convert 21 constant Cij matrix to 81 constant Cijkl tensor
+ [CC] = cij2cijkl(C)

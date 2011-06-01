@@ -1,0 +1,4 @@
+Getting Started with the Matlab Seismic Anisotropy Toolbox
+==========================================================
+
+ToDo: Write the getting started guide!

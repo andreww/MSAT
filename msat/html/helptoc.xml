@@ -14,8 +14,31 @@
         <!-- Icon images used for these entries are also stored in -->
         <!-- matlabroot/toolbox/matlab/icons -->
         <!-- A Getting Started Guide usually comes first -->
-        <tocitem target="text.html">MyToolbox Toolbox
-        </tocitem>
+        <tocitem target="MSATstart.html" image="$toolbox/matlab/icons/greenarrowicon.gif">Getting Started</tocitem>
+        <tocitem target="MSATguide.html" image="$toolbox/matlab/icons/greenarrowicon.gif">User Guide</tocitem>
+	<tocitem target="./funcs/index.html" image="$toolbox/matlab/icons/help_fx.png">Functions 
+        <tocitem target="./funcs/MS_VRH.html" image="$toolbox/matlab/icons/help_fx.png">MS_VRH</tocitem>
+        <tocitem target="./funcs/MS_Vrot3.html" image="$toolbox/matlab/icons/help_fx.png">MS_Vrot3</tocitem>
+        <tocitem target="./funcs/MS_brow_chev_axes.html" image="$toolbox/matlab/icons/help_fx.png">MS_brow_chev_axes</tocitem>
+        <tocitem target="./funcs/MS_brow_chev_decomp.html" image="$toolbox/matlab/icons/help_fx.png">MS_brow_chev_decomp</tocitem>
+        <tocitem target="./funcs/MS_brow_chev_norms.html" image="$toolbox/matlab/icons/help_fx.png">MS_brow_chev_norms</tocitem>
+        <tocitem target="./funcs/MS_cij2cijkl.html" image="$toolbox/matlab/icons/help_fx.png">MS_cij2cijkl</tocitem>
+        <tocitem target="./funcs/MS_cijkl2cij.html" image="$toolbox/matlab/icons/help_fx.png">MS_cijkl2cij</tocitem>
+        <tocitem target="./funcs/MS_effective_splitting_N.html" image="$toolbox/matlab/icons/help_fx.png">MS_effective_splitting_N</tocitem>
+        <tocitem target="./funcs/MS_list.html" image="$toolbox/matlab/icons/help_fx.png">MS_list</tocitem>
+        <tocitem target="./funcs/MS_load.html" image="$toolbox/matlab/icons/help_fx.png">MS_load</tocitem>
+        <tocitem target="./funcs/MS_load_list.html" image="$toolbox/matlab/icons/help_fx.png">MS_load_list</tocitem>
+        <tocitem target="./funcs/MS_phasevels.html" image="$toolbox/matlab/icons/help_fx.png">MS_phasevels</tocitem>
+        <tocitem target="./funcs/MS_rot3.html" image="$toolbox/matlab/icons/help_fx.png">MS_rot3</tocitem>
+        <tocitem target="./funcs/MS_rotR.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotR</tocitem>
+        <tocitem target="./funcs/MS_sphere.html" image="$toolbox/matlab/icons/help_fx.png">MS_sphere</tocitem>
+        <tocitem target="./funcs/MS_tandon_and_weng.html" image="$toolbox/matlab/icons/help_fx.png">MS_tandon_and_weng</tocitem>
+        <tocitem target="./funcs/MS_thom.html" image="$toolbox/matlab/icons/help_fx.png">MS_thom</tocitem>
+        <tocitem target="./funcs/MS_unwind_0_180.html" image="$toolbox/matlab/icons/help_fx.png">MS_unwind_0_180</tocitem>
+        <tocitem target="./funcs/MS_unwind_360.html" image="$toolbox/matlab/icons/help_fx.png">MS_unwind_360</tocitem>
+        <tocitem target="./funcs/MS_unwind_pm_180.html" image="$toolbox/matlab/icons/help_fx.png">MS_unwind_pm_180</tocitem>
+        <tocitem target="./funcs/MS_unwind_pm_90.html" image="$toolbox/matlab/icons/help_fx.png">MS_unwind_pm_90</tocitem>
+	</tocitem>
        
     </tocitem>
 </toc>

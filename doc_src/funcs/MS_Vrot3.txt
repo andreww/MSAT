@@ -1,0 +1,17 @@
+== MS_Vrot3
+
+ Script to rotate a ROW 3-vector by 3 angles:
+
+ alp = clockwise about 1-axis (looking at origin, == yaw)
+ bet = clockwise about 2-axis (looking at origin, == -dip)
+ gam = clockwise about 3-axis (looking at origin, == azimuth)
+
+ [VR] = CIJ_rot3(V,alp,bet,gam)
+
+  Inputs: the vector, 3 angles (degrees)
+
+  Output is the rotated vector                 
+
+  NOTE: The rotations are applied in order, ie: alpha, then beta then gamma
+
+
