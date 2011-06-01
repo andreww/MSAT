@@ -1,0 +1,11 @@
+== MS_VRH
+
+  [Cave,rhave]=CIJ_VRH(VF,C1,rho1,C2,rho2,...)
+
+  n phase Voigt-Reuss-Hill average of elastic tensors (C1, C2 etc) and
+  densities (rho1, rho2 etc). VF is a vector of volume fractions. There should
+  be a C,rho argument pair for each entry in this vector. The sum of the 
+  elements of VF is normalised to 1 before averaging.  
+
+  (c) James Wookey, 2006
+

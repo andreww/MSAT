@@ -1,0 +1,17 @@
+== MS_brow_chev_decomp
+
+
+  Apply a decomposition of the elasticity tensor C, after: 
+     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
+
+  Assumes that C is in its optimal orientation for decomposition
+
+  [Ciso] = CIJ_brow_chev_decomp(C)
+     Isotropic projection of the elastic tensor.
+
+  [Ciso,Chex] = CIJ_brow_chev_decomp(C)
+     Isotropic, and hexagonal parts of the elastic tensor
+
+  [Ciso,Chex,Ctet,Cort,Cmon,Ctri] = CIJ_brow_chev_decomp(C)
+     All parts of the elastic tensor
+   

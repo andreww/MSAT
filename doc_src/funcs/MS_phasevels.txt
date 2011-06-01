@@ -1,0 +1,35 @@
+== MS_phasevels
+
+ CIJ_phasevels - calculate the phase velocity details for a set of elastic 
+                 constants
+
+ [pol,avs,vs1,vs2,vp] = CIJ_phasevels(C,rh,inc,azi)
+
+	Inputs:
+		inc and azi may be scalars, or vectors of the same size.
+
+     AZI = angle from +ve 1-axis in x1-x2 plane                              
+           (deg, +ve c'wise looking at origin from 3-axis)                  
+     INC = angle from x1-x2 plane towards x3                                 
+           (deg, zero is in x1-x2 plane)                                     
+
+  Outputs: 
+
+     'vp'  = P-wave velocity
+     'vs1' = fast shear-wave velocity
+     'vs2' = slow shear-wave velocity
+     'avs' = shear-wave anisotropy
+     'pol' = angle in plane normal to raypath of FSW                           
+            (deg, zero is x3 direction, +ve c'wise looking along             
+            raypath at origin)  
+ 
+ (C) James Wookey, May 2007.	
+   
+ Based on EMATRIX6 by D. Mainprice. Re-coded in MATLAB by JW
+
+ Reference: Mainprice D. (1990). An efficient
+            FORTRAN program to calculate seismic anisotropy from
+            the lattice preferred orientation of minerals.
+            Computers & Gesosciences,vol16,pp385-393.
+
+

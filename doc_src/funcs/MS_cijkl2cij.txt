@@ -1,0 +1,3 @@
+== MS_cijkl2cij
+
+ [C] = cijkl2cij(CC)

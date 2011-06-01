@@ -1,0 +1,18 @@
+== MS_brow_chev_norms
+
+
+  Calculate the percentages of the original matrix norm represented by the
+  individual decompositions of an elasticity tensor. 
+
+  See Browaeys and Chevrot (GJI, v159, 667-678, 2004), and function
+     CIJ_brow_chev_decomp()
+
+  [P] = CIJ_brow_chev_norms(C,Ciso)
+     Isotropic part (scalar)
+
+  [P] = CIJ_brow_chev_norms(C,Ciso,Chex)
+     Isotropic, and hexagonal parts of the elastic tensor (vector)
+
+  [P] = CIJ_brow_chev_norms(C,Ciso,Chex,Ctet,Cort,Cmon,Ctri)
+     All parts of the elastic tensor (vector)
+   

@@ -1,0 +1,24 @@
+== MS_tandon_and_weng
+
+  [CC,rh]=tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi)
+
+  Calculate anisotropic elastic constants for an isotropic material containing
+  spheroidal inclusions with a symmetry axis aligned with the x1-direction.
+
+  From the theory of Tandon and Weng (1984). 
+
+  Input parameters:
+       vp,vs,rho : isotropic parameters of the matrix (m/s, kg/m3)
+             del : aspect ratio of spheroids:
+                      del < 1 = smarties
+                      del = 1 = spheres
+                      del > 1 = cigars
+               c : volume fractions of inclusions       
+  vpi, vsi, rhoi : isotropic parameters of the inclusions
+
+  Output parameters:
+     CC : Elastic constants (actually Aij, density normalised)
+     rh : aggregate density
+
+  Based on FORTRAN code by Mike Kendall, translated into matlab
+  by James Wookey, 2006

@@ -1,0 +1,8 @@
+== MS_brow_chev_axes
+
+
+  Calculate the principle axes of elasticity tensor C, after: 
+     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
+  
+  Report the vectors, and rotate C into the correct orientation. 
+     [CR]=CIJ_brow_chev_axes(C)

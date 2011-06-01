@@ -1,0 +1,20 @@
+== MS_sphere
+
+ CIJ_sphere : Plot a spherical plot from a set of elastic constants
+   
+ Usage: CIJ_sphere(CC,rh,mode,...)
+     mode can be 'p'(-wave) or 's'(-wave).
+     extra arguments are EVALed; parameters that can be (re)set are:
+
+        cmap = jet(64) ; colourmap
+        icmapflip = 1 ; reverse the sense of the colourscale     
+        scale=0.08 ; FSW vector length
+        dirs = [] ; directions of interest
+        dlen = 1.5 ; length of doi vectors 
+        plotlabels = 1 ;
+        plotaxes = 1 ;
+        nofig = 0 ; suppress the figure command, so plot can be sub-plotted
+        nocbar = 0 ; suppress the colorbar
+        cax = NaN ; colour axis, define to use - default is auto
+
+ (C) James Wookey, December 2007.	
