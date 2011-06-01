@@ -1,0 +1,12 @@
+% Olivine elastic constants (Abramson et al, 1996) in density normalised Pascals
+% Text following the '%' character is ignored. 
+1 1 9.552906e+07 
+1 2 2.029806e+07
+1 3 2.134128e+07
+2 2 5.856930e+07
+2 3 2.289121e+07
+3 3 6.959762e+07
+4 4 1.907601e+07
+5 5 2.295082e+07
+6 6 2.345753e+07
+7 7 3355.0 % density
