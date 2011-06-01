@@ -43,7 +43,7 @@ case 'auto'
    case 5
       mode = 'hex' ;
    otherwise
-      error(['No automatic symmetry set for ' ...
+      error('MS:EXPANDnoautosym',['No automatic symmetry set for ' ...
          sprintf('%i',nec) ' elastic constants.']) ;
    end
 otherwise
@@ -53,10 +53,12 @@ end
 switch lower(mode)
 case 'iso'
 %  check nec
-   if nec~=2, error('Isotropic expansion requires C33 and C66 to be set') ;, end
+   if nec~=2, error('MS:EXPANDbadiso',...
+      'Isotropic expansion requires C33 and C66 to be set') ;, end
 %  check that C(1,1) and C(6,6) are set
    if Cin(3,3)==0 | Cin(6,6)==0
-      error('Isotropic expansion requires C33 and C66 to be set.')
+      error('MS:EXPANDbadiso',...
+         'Isotropic expansion requires C33 and C66 to be set.')
    end
    C(3,3) = Cin(3,3) ;
    C(6,6) = Cin(6,6) ;
@@ -66,7 +68,7 @@ case 'iso'
    C(1,2) = (C(3,3)-2.*C(4,4)) ;
    C(1,3) = C(1,2) ; C(2,3) = C(1,2) ;   
 otherwise
-   error('Unsupported symmetry.') ;
+   error('MS:EXPANDunsupportsymmetry','Unsupported symmetry.') ;
 end
 
 for i=1:6
@@ -79,7 +81,8 @@ end
 try 
    MS_checkC(C) ;
 catch ME
-   error(['MS_expand: Resulting Cij matrix failed checks with error: ' ME.message])
+   error('MS:EXPANDcheckfailed', ...
+      ['MS_expand: Resulting Cij matrix failed checks with error: ' ME.message])
 end
 
 return 

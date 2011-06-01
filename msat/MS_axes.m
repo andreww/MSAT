@@ -1,12 +1,17 @@
-%-------------------------------------------------------------------------------
-%                  MSAT - Matlab Seismic Anisotropy Toolkit 
-%-------------------------------------------------------------------------------
+% MS_AXES - Reorient elasticity matrix for optimal decomposition.
+%
+% Part of MSAT - The Matlab Seismic Anisotropy Toolkit 
 %
 %  Calculate the principle axes of elasticity tensor C, after: 
 %     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
 %  
 %  Report the vectors, and rotate C into the correct orientation. 
 %     [CR]=MS_axes(C)
+%
+
+%
+% 
+%
 
 function [ CR ] = MS_axes( C )
 

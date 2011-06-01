@@ -1,8 +1,4 @@
-%-------------------------------------------------------------------------------
-%                  MSAT - Matlab Seismic Anisotropy Toolkit 
-%-------------------------------------------------------------------------------
 % MS_load - Load a set of elastic constants from a file.
-%-------------------------------------------------------------------------------
 % 
 % [ ... ] = MS_load( fname, ... )
 %
@@ -35,7 +31,7 @@
 %         Specify elasticity units; this is used to convert to GPa (msat's 
 %         default operating unit)
 %            'GPa' - elastic constants are already in GPa (default)
-%            'mbar' - elastic constants are in mbar
+%            'Mbar' - elastic constants are in Mbar
 %            'Pa' - elastic constants are in Pascals
 %            'bar' - elastic constants are in bar
 %
@@ -73,6 +69,7 @@
 %
 %     So, for olivine, the file might look like:
 %     
+%     
 %     1 1 320.5
 %     1 2 68.1
 %     1 3 71.6
@@ -85,168 +82,246 @@
 %
 %  * 'ematrix'
 %
-%    Elastic constants in the format read by EMATRIX (D. Mainprice). This 
-%    consists of 2 header lines 
+%    Elastic constants in the format read by EMATRIX (D. Mainprice). 
 %
-function [varargout] = MS_load(fname,varargin) ;
 
-eunits = 'GPa' ;
-dunits = 'kgm3' ;
-aij = 0 ;
-smode = 'none' ;
-force = 0 ;
-format = 'simple' ;
+%===============================================================================
+   function [varargout] = MS_load(fname,varargin) ;
+%===============================================================================
+      eunits = 'default' ;
+      dunits = 'default' ;
+      
+      aij = 0 ;
+      smode = 'none' ;
+      force = 0 ;
+      format = 'simple' ;
 
 % check inputs here
 % ...
 
 %  ** process the optional arguments
-iarg = 1 ;
-while iarg <= (length(varargin))
-   switch lower(varargin{iarg})
-      case 'aij'
-         aij = 1 ;
-         iarg = iarg + 1 ;
-      case 'force'
-         force = 1 ;
-         iarg = iarg + 1 ;
-      case 'format'
-         format = varargin{iarg+1} ;
-         iarg = iarg + 2 ;
-      case 'eunits'
-         eunits = varargin{iarg+1} ;
-         iarg = iarg + 2 ;
-      case 'dunits'
-         dunits = varargin{iarg+1} ;
-         iarg = iarg + 2 ;
-      case 'symmetry'
-         smode = varargin{iarg+1} ;
-         iarg = iarg + 2 ;
-      otherwise 
-         error(['Unknown option: ' varargin{iarg}]) ;   
-   end   
-end 
+      iarg = 1 ;
+      while iarg <= (length(varargin))
+         switch lower(varargin{iarg})
+            case 'aij'
+               aij = 1 ;
+               iarg = iarg + 1 ;
+            case 'force'
+               force = 1 ;
+               iarg = iarg + 1 ;
+            case 'format'
+               format = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'eunits'
+               eunits = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+               eunit_set = 1 ;
+            case 'dunits'
+               dunits = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+               dunit_set = 1 ;
+            case 'symmetry'
+               smode = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            otherwise 
+               error(['Unknown option: ' varargin{iarg}]) ;   
+         end   
+      end 
+      
+      switch lower(format)
+      case 'simple'
+         [ C, nec, rh ] = MS_load_simple( fname ) ;
+      case 'ematrix'
+%     ** forbid expansion from ematrix files. 
+         if ~strcmp(smode,'none'), error('MS:LOAD:ExpandForbidden',...
+            'Symmetry expansion is supported from this file format.') ;,end
+         [C,rh,eunits,dunits] = MS_load_ematrix(fname,eunits,dunits) ;
+      otherwise
+         error('MS:LOAD:BadFileFormat',...
+            ['Specified file format "' format '" is not supported.']) ;
+      end   
 
-switch lower(format)
-case 'simple'
-   [ ii, jj, ec, nec, rh ] = MS_load_simple( fname ) ;
-otherwise
-   error(['Specified file format "' format '" is not supported.']) ;
-end   
-
-% check if density is required but not provided.
-if isnan(rh) & ( aij | nargout > 1 )
-      error('No density is specified, but one is required.')
-end
-
-C = zeros(6,6) ;
-
-for i=1:nec
-   C(ii(i),jj(i)) = ec(i) ;
-end
-
-%  symmetry handling
-switch lower(smode)
-case 'none'
-   % nothing required, just make symmetrical
-   for i=1:6
-      for j=(i+1):6
-         C(j,i) = C(i,j) ;
+%  ** set default units if this hasn't already been done.
+      switch lower(eunits)
+      case 'default'
+         eunit = 'GPa' ;
+      otherwise
+      % do nothing
       end
-   end
-otherwise
-   % expand using MS_expand
-   C = MS_expand(C,smode) ;
-end
+      
+      switch lower(dunits)
+      case 'default'
+         dunit = 'kgm3' ;
+      otherwise
+      % do nothing
+      end
 
-% unnormalise for density (if required)
-if aij, C = C .* rh;, end
+%  ** check if density is required but not provided.
+      if isnan(rh) & ( aij | nargout > 1 )
+            error('MS:LOADdensityneeded',...
+               'No density is specified, but one is required.')
+      end
 
-% perform unit conversions
-switch lower(eunits)
-case 'gpa'
-case 'pa'
-   C = C ./ 1e9 ;
-case 'mbar'
-   C = C .* 100 ;
-case 'bar'
-   C = C ./ 10e3 ;
-otherwise
-   error('Unsupported elasticity unit.')
-end
 
-switch lower(dunits)
-case 'kgm3'
-case 'gcc'
-   rh = rh .* 1e3 ;
-otherwise
-   error('Unsupported density unit.')
-end
 
-% set the output arguments
-switch nargout
-case 1
-   varargout(1) = {C} ;
-case 2
-   varargout(1) = {C} ;
-   varargout(2) = {rh} ;
-otherwise
-   error('Requires 1 or 2 output arguments (Cij or [Cij,density]).')
-end
+%  ** symmetry handling
+      switch lower(smode)
+      case 'none'
+         % nothing required, just make symmetrical
+         for i=1:6
+            for j=(i+1):6
+               C(j,i) = C(i,j) ;
+            end
+         end
+      otherwise
+         % expand using MS_expand
+         C = MS_expand(C,smode) ;
+      end
 
-% finally, check Cij matrix
-if (~force)
-   try
-      MS_checkC(C) ;
-   catch ME
-      error(['Final matrix check failed with error message: ' ME.message]) ;
-   end   
-end   
+%  ** unnormalise for density (if required)
+      if aij, C = C .* rh;, end
 
-return
+%  ** perform unit conversions
+      switch lower(eunits)
+      case 'gpa'
+      case 'pa'
+         C = C ./ 1e9 ;
+      case 'mbar'
+         C = C .* 100 ;
+      case 'bar'
+         C = C ./ 10e3 ;
+      otherwise
+         error('MS:LOAD:BadEunit','Unsupported elasticity unit.')
+      end
+      
+      switch lower(dunits)
+      case 'kgm3'
+      case 'gcc'
+         rh = rh .* 1e3 ;
+      otherwise
+         error('MS:LOAD:BadDunit','Unsupported density unit.')
+      end
+
+
+%  ** finally, check Cij matrix
+      if (~force)
+         try
+            MS_checkC(C) ;
+         catch ME
+            error('MS:LOAD:CheckFailed', ...
+               ['Final matrix check failed with error message: ' ME.message]) ;
+         end   
+      end   
+
+%  ** set the output arguments
+      switch nargout
+      case 1
+         varargout(1) = {C} ;
+      case 2
+         varargout(1) = {C} ;
+         varargout(2) = {rh} ;
+      otherwise
+         error('MS:LOAD:BadOutputArgs', ...
+            'Requires 1 or 2 output arguments (Cij or [Cij,density]).')
+      end
+
+
+   return
+%===============================================================================
+
+%===============================================================================
 %-------------------------------------------------------------------------------
+%  File loader functions
+%-------------------------------------------------------------------------------
+%===============================================================================
 
-%-------------------------------------------------------------------------------
-%  Loader functions
-%-------------------------------------------------------------------------------
-
-%-------------------------------------------------------------------------------
+%===============================================================================
+   function [ C , nec, rh ] = MS_load_simple( fname )
+%===============================================================================
 %  'simple' format
-%-------------------------------------------------------------------------------
-function [ ii, jj, ec, nec, rh ] = MS_load_simple( fname )
 
-% load the ascii file
-try
-   a = load(fname) ;
-catch ME
-   error(['File load failed with error: ' ME.message]) ;
-end   
+%  ** load the ascii file in a standard MATLAB way
+      try
+         a = load(fname) ;
+      catch ME
+         error(['File load failed with error: ' ME.message]) ;
+      end   
 
-[nline ncol] = size(a) ;
+      [nline ncol] = size(a) ;
+      
+      if ncol~=3, error('MS:LOAD_SIMPLE:BadFormat',...
+         'File appears not to be in the specified format') ;, end
 
-if ncol~=3, error('File appears not to be in the specified format') ;, end
+%  ** remove any density lines
+      ind = find(a(:,1)>=1 & a(:,1)<=6 & a(:,2)>=1 & a(:,2)<=6) ;
 
-% remove any density lines
-ind = find(a(:,1)>=1 & a(:,1)<=6 & a(:,2)>=1 & a(:,2)<=6) ;
+%  ** extract indices and constants
+      ii = a(ind,1) ;
+      jj = a(ind,2) ;
+      ec = a(ind,3) ;
 
-% extract indices and constants
-ii = a(ind,1) ;
-jj = a(ind,2) ;
-ec = a(ind,3) ;
+%  ** count 
+      [nec ndum] = size(ec) ;
 
-% count 
-[nec ndum] = size(ec) ;
+%  ** get density
+      if (nline-nec)==1
+%     ** one density specified
+         ind = find(a(:,1)<1 | a(:,1)>6 & a(:,2)<1 | a(:,2)>6) ;
+         rh = a(ind,3) ;
+      elseif nline==nec
+%     ** no density is specified
+         rh = NaN ;
+      else   
+         error('MS:LOAD_SIMPLE:MultipleDensities',...
+         'Multiple densities specified (only one permitted).')
+      end
+      
+      C = zeros(6,6) ;
+      for i=1:nec
+         C(ii(i),jj(i)) = ec(i) ;
+      end
+      
+   return
+%===============================================================================
 
-% get density
-if (nline-nec)==1
-   % one density specified
-   ind = find(a(:,1)<1 | a(:,1)>6 & a(:,2)<1 | a(:,2)>6) ;
-   rh = a(ind,3) ;
-elseif nline==nec
-   % no density is specified
-   rh = NaN ;
-else   
-   error('Multiple densities specified (only one permitted).')
-end   
-return
-%-------------------------------------------------------------------------------
+%===============================================================================
+%  'ematrix' format
+%===============================================================================
+   function [C, rh, eunit_out, dunit_out] = MS_load_ematrix(fname, eunit, dunit)
+%===============================================================================
+%  ** default units for ematrix files is Mbar & g/cc. Redefine defaults if user
+%     has not explicitly defined units in call. 
+      switch lower(eunit)
+      case 'default'
+         eunit_out = 'Mbar' ;
+      otherwise
+         eunit_out = eunit ;
+      end
+
+      switch lower(dunit)
+      case 'default'
+         dunit_out = 'gcc' ;
+      otherwise
+         dunit_out = dunit ;
+      end
+
+%  ** no density is specified in these files. 
+      rh = NaN ;
+
+%  ** read the file
+      fid = fopen(fname,'rt') ;
+%  ** header lines (these are ignored)
+      TS = textscan(fid,'%*[^\n]',2) ;
+
+%  ** rotations line, this is not used at the moment.
+      TS = textscan(fid,'%f %f %f %f %f %f',1, 'CollectOutput', 1) ;
+      ematrix_rotations = TS{1} ;
+
+%  ** the good stuff
+      TS = textscan(fid,'%f %f %f %f %f %f',6, 'CollectOutput', 1) ;
+      C = TS{1} ;
+      
+      fclose(fid) ;
+%===============================================================================
+   return
+%===============================================================================
