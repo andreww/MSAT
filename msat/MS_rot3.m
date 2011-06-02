@@ -1,57 +1,42 @@
-% Script to rotate a set of elastic constants (Cij) by 3 angles:
+% MS_ROT3 - Elasticity matrix rotation.
 %
-% alp = clockwise about 1-axis (looking at origin, == yaw)
-% bet = clockwise about 2-axis (looking at origin, == -dip)
-% gam = clockwise about 3-axis (looking at origin, == azimuth)
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-% [CR] = CIJ_rot3(C,alp,bet,gam)
+% Rotates an elasticity matrix around the three axies. 
 %
-%  Inputs: the Cij elastic stiffness tensor, 3 angles (degrees)
+%  % [CR] = CIJ_rot3(C,alp,bet,gam)
 %
-%  Output is the rotated Cij elastic stiffness tensor                  
+% Usage: 
+%     [CR] = CIJ_rot3(C,alp,bet,gam)                    
+%         C: input 6x6 elasticity matrix 
+%         alp: clockwise rotation about 1-axis, looking at origin
+%         bet: clockwise rotation about 2-axis, looking at origin
+%         gam: clockwise rotation about 3-axis, looking at origin
 %
-%  NOTE: The rotations are applied in order, ie: alpha, then beta then gamma
-%
+% Notes:
+%     Angles are given in degrees and correspond to yaw, -dip and aximuth,
+%     respectvly. The rotations are applied in order, ie: alpha, then beta
+%     then gamma
+
+% (C) James Wookey and Andrew Walker, 2011.
+% 
 %
 
 function [CR] = MS_rot3(C,alp,bet,gam)
 
-%  Make 6x6 rotation matrices
+%  Make rotation matrix
 a = alp * pi/180. ;
 b = bet * pi/180. ;
 g = gam * pi/180. ;
 
-% These are from Bower Chapter 3, section 3.2. Note that that e2 and e3 matrices
-% in that section contain a number of errors; these have been corrected. 
+R1 = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
+R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
+R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
 
-c = cos(a) ; s = sin(a) ;
-R1 = [ 1      0      0      0      0      0 ; ...
-       0     c^2    s^2   2*c*s    0      0 ; ...
-       0     s^2    c^2  -2*c*s    0      0 ; ...
-       0    -c*s    c*s  c^2-s^2   0      0 ; ...
-       0      0      0      0      c     -s ; ...
-       0      0      0      0      s      c ] 
+RR =  R3 * R2 * R1;
 
-c = cos(b) ; s = sin(b) ;
-R2 = [c^2     0     s^2     0   -2*c*s    0 ; ...
-       0      1      0      0      0      0 ; ...
-      s^2     0     c^2     0    2*c*s    0 ; ...
-       0      0      0      c      0      s ; ...
-      c*s     0    -c*s     0   c^2-s^2   0 ; ...
-       0      0      0     -s      0      c ] ;
-
-c = cos(g) ; s = sin(g) ;
-R3 = [c^2    s^2     0      0      0    2*c*s ; ...
-      s^2    c^2     0      0      0   -2*c*s ; ...
-       0      0      1      0      0      0 ; ...
-       0      0      0      c      s      0 ; ...
-       0      0      0     -s      c      0 ; ...
-     -c*s    c*s     0      0      0   c^2-s^2 ] ;
-              
-RR =  R3 * R2 * R1 ;
-
-
-CR = RR * C * transpose(RR) ;
+%  Delegate the rotation
+CR = MS_rotR(C, RR) ;
 
 
 return
