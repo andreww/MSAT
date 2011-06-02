@@ -27,16 +27,16 @@
 %            'vti' - synonym for hexagonal
 %            'cubic' - cubic (nCij=3) ; C33, C66 and C12 must be specified
 %
-%     [C,...] = MS_load(fname,...,'eunits',unit)
-%         Specify elasticity units; this is used to convert to GPa (msat's 
+%     [C,...] = MS_load(fname,...,'eunit',unit)
+%         Specify elasticity unit; this is used to convert to GPa (msat's 
 %         default operating unit)
 %            'GPa' - elastic constants are already in GPa (default)
 %            'Mbar' - elastic constants are in Mbar
 %            'Pa' - elastic constants are in Pascals
 %            'bar' - elastic constants are in bar
 %
-%     [C,...] = MS_load(fname,...,'dunits',unit)
-%         Specify density units; this is used to convert to kg/m3 (msat's 
+%     [C,...] = MS_load(fname,...,'dunit',unit)
+%         Specify density unit; this is used to convert to kg/m3 (msat's 
 %         default operating unit)
 %            'kgm3' - density is already in kg/m3 (default)
 %            'gcc' - density is in g/cc
@@ -88,8 +88,8 @@
 %===============================================================================
    function [varargout] = MS_load(fname,varargin) ;
 %===============================================================================
-      eunits = 'default' ;
-      dunits = 'default' ;
+      eunit = 'default' ;
+      dunit = 'default' ;
       
       aij = 0 ;
       smode = 'none' ;
@@ -112,12 +112,12 @@
             case 'format'
                format = varargin{iarg+1} ;
                iarg = iarg + 2 ;
-            case 'eunits'
-               eunits = varargin{iarg+1} ;
+            case 'eunit'
+               eunit = varargin{iarg+1} ;
                iarg = iarg + 2 ;
                eunit_set = 1 ;
-            case 'dunits'
-               dunits = varargin{iarg+1} ;
+            case 'dunit'
+               dunit = varargin{iarg+1} ;
                iarg = iarg + 2 ;
                dunit_set = 1 ;
             case 'symmetry'
@@ -135,21 +135,21 @@
 %     ** forbid expansion from ematrix files. 
          if ~strcmp(smode,'none'), error('MS:LOAD:ExpandForbidden',...
             'Symmetry expansion is supported from this file format.') ;,end
-         [C,rh,eunits,dunits] = MS_load_ematrix(fname,eunits,dunits) ;
+         [C,rh,eunit,dunit] = MS_load_ematrix(fname,eunit,dunit) ;
       otherwise
          error('MS:LOAD:BadFileFormat',...
             ['Specified file format "' format '" is not supported.']) ;
       end   
 
 %  ** set default units if this hasn't already been done.
-      switch lower(eunits)
+      switch lower(eunit)
       case 'default'
          eunit = 'GPa' ;
       otherwise
       % do nothing
       end
       
-      switch lower(dunits)
+      switch lower(dunit)
       case 'default'
          dunit = 'kgm3' ;
       otherwise
@@ -161,8 +161,6 @@
             error('MS:LOADdensityneeded',...
                'No density is specified, but one is required.')
       end
-
-
 
 %  ** symmetry handling
       switch lower(smode)
@@ -182,7 +180,7 @@
       if aij, C = C .* rh;, end
 
 %  ** perform unit conversions
-      switch lower(eunits)
+      switch lower(eunit)
       case 'gpa'
       case 'pa'
          C = C ./ 1e9 ;
@@ -194,7 +192,7 @@
          error('MS:LOAD:BadEunit','Unsupported elasticity unit.')
       end
       
-      switch lower(dunits)
+      switch lower(dunit)
       case 'kgm3'
       case 'gcc'
          rh = rh .* 1e3 ;
