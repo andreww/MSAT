@@ -1,10 +1,8 @@
-%-------------------------------------------------------------------------------
-%                  MSAT - Matlab Seismic Anisotropy Toolkit 
-%-------------------------------------------------------------------------------
-% MS_checkC - check consistency of a stiffness matrix against various criteria
-%-------------------------------------------------------------------------------
+% MS_CHECKC - check consistency of a stiffness matrix against various criteria
 %
-% [ isgood ] = MS_checkC(C,...)
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+%
+% [ isgood ] = MS_checkC( C,... )
 %
 %	Inputs:
 %     C = Stiffness tensor for checking
@@ -73,7 +71,7 @@ function [isgood] = MS_checkC(C,varargin)
           if ~ismatrix(C)
 		    isgood = 0 ;
 	       error('MS:CHECKCNotMatrix', ...
-	         'Stiffness matrix error: Appears not to be a 2D matrix')
+	         'Elasticity matrix error: Appears not to be a 2D matrix')
           end
       catch e
           if ~strcmp(e.identifier, 'MATLAB:UndefinedFunction')
@@ -84,7 +82,7 @@ function [isgood] = MS_checkC(C,varargin)
       if (nr~=6 | nc~=6)
          isgood = 0;
 		   error('MS:CHECKCnot6x6',...
-		      'Stiffness matrix error: Appears not to be a 6x6 matrix')
+		      'Elasticity matrix error: Appears not to be a 6x6 matrix')
 		end
 
 %  ** if fast checking is selected, we're done here.       
@@ -99,10 +97,10 @@ function [isgood] = MS_checkC(C,varargin)
             isgood = 0;
             if warn
                warning('MS:CHECKCnotsym_W',...
-                  'Stiffness matrix warning: non-symmetric')
+                  'Elasticity matrix warning: non-symmetric')
             else
                error('MS:CHECKCnotsym',...
-                  'Stiffness matrix error: non-symmetric')
+                  'Elasticity matrix error: non-symmetric')
             end   
          end   
       end
@@ -115,10 +113,10 @@ function [isgood] = MS_checkC(C,varargin)
             isgood = 0;
             if warn
                warning('MS:CHECKCbadzeros_W',...
-                  'Stiffness matrix warning: zeros in trace or top left')
+                  'Elasticity matrix warning: zeros in trace or top left')
             else
                error('MS:CHECKCbadzeros',...
-                  'Stiffness matrix error: zeros in trace or top left')
+                  'Elasticity matrix error: zeros in trace or top left')
             end   
          end
       end
@@ -131,10 +129,10 @@ function [isgood] = MS_checkC(C,varargin)
             isgood = 0;
             if warn
                warning('MS:CHECKCnotposdef_W',...
-                  'Stiffness matrix warning: not positive definite')
+                  'Elasticity matrix warning: not positive definite')
             else
                error('MS:CHECKCnotposdef',...
-                  'Stiffness matrix error: not positive definite')
+                  'Elasticity matrix error: not positive definite')
             end
          end               
       end

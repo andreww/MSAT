@@ -16,6 +16,13 @@
 
 function [CR] = MS_rot3(C,alp,bet,gam)
 
+try 
+   MS_checkC(C) ;
+catch ME
+   error('MS:ROT3BadInputMatrix', ...
+      ['Invalid input elasticity matrix: ' ME.message]) ;
+end
+
 %  Make 6x6 rotation matrices
 a = alp * pi/180. ;
 b = bet * pi/180. ;
