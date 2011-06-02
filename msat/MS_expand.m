@@ -20,16 +20,15 @@
 %     input matrix. 
 %
 
-function [ C ] = MS_expand( Cin , mode )
+function [ C ] = MS_expand( Cin, mode )
 
 try 
-   MS_checkC(C,'fast') ; 
-catch
-   error('Bad input elasticity matrix.')
+   MS_checkC(Cin,'fast') ; 
+catch ME
+   error(['Bad input elasticity matrix:' ME.message])
 end   
 
 C = zeros( 6 , 6 ) ;
-
 
 nec = length( find( Cin ~= 0 ) ) ;
 

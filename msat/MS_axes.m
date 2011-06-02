@@ -5,15 +5,14 @@
 %  Calculate the principle axes of elasticity tensor C, after: 
 %     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
 %  
-%  Report the vectors, and rotate C into the correct orientation. 
-%     [CR]=MS_axes(C)
+%  [ CR ] = MS_axes( C )
+%     Report the vectors, and rotate C into the correct orientation. 
+%     
+%  [ CR, R ] = MS_axes( C )
+%     Also return the rotation matrix to transform C.
 %
 
-%
-% 
-%
-
-function [ CR ] = MS_axes( C )
+function [ varargout ] = MS_axes( C )
 
 det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
                     % of the best guess axes 
@@ -118,11 +117,9 @@ end
 
 if irot
 %  check axes
-   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) 
+   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
    if (length(find(dps>det_thresh))>0)
-      warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
-      CR=C ;
-      return
+      warning('MS_axes: Determined axes not orthogonal.') ;
    end
 
 %  fix up the axes, for safety, by redefining X2 and X3   
@@ -140,15 +137,29 @@ if irot
        warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
        fprintf('Determinant = %20.18f\n',det(RR))
        CR=C ;
-       return 
-   end
-   
+   else
    % apply to the input elasticity matrix
-   CR = MS_rotR(C,RR) ;
+      CR = MS_rotR(C,RR) ;
+   end
 else
    warning('No rotation was deemed necessary.')
    CR=C;
+   RR = eye(3) ;
 end
+
+   switch nargout
+   case 0
+      varargout{1} = CR ;
+   case 1
+      varargout{1} = CR ;
+   case 2
+      varargout{1} = CR ;
+      varargout{2} = RR ;
+   otherwise   
+      error('MS:INFO:BadOutputArgs','Requires 1 or 2 output arguments.')
+   end
+      
+
 return
 
 %%%

@@ -127,14 +127,20 @@
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
       end 
-      
+
+%      
       switch lower(format)
       case 'simple'
          [ C, nec, rh ] = MS_load_simple( fname ) ;
+         if nec<9 & strcmp(smode,'none')
+            error('MS:LOAD:ExpansionRequired',...
+               ['Fewer than 9 elastic constants were specified, and'  ...
+                ' no symmetry based expansion' ' was requested']) ;
+         end
       case 'ematrix'
 %     ** forbid expansion from ematrix files. 
          if ~strcmp(smode,'none'), error('MS:LOAD:ExpandForbidden',...
-            'Symmetry expansion is supported from this file format.') ;,end
+            'Symmetry expansion is not supported from this file format.') ;,end
          [C,rh,eunit,dunit] = MS_load_ematrix(fname,eunit,dunit) ;
       otherwise
          error('MS:LOAD:BadFileFormat',...
@@ -213,6 +219,8 @@
 
 %  ** set the output arguments
       switch nargout
+      case 0
+         varargout(1) = {C} ;
       case 1
          varargout(1) = {C} ;
       case 2
