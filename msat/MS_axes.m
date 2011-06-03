@@ -11,8 +11,26 @@
 %  [ CR, R ] = MS_axes( C )
 %     Also return the rotation matrix to transform C.
 %
+%  [ ... ] = MS_axes( C, 'nowarn' )
+%     Suppress all warnings.
+%
 
-function [ varargout ] = MS_axes( C )
+function [ varargout ] = MS_axes( C, varargin )
+
+warn = 1 ;
+
+%  ** process the optional arguments
+      iarg = 1 ;
+      while iarg <= (length(varargin))
+         switch lower(varargin{iarg})
+            case 'nowarn' % flag (i.e., no value required)
+               warn = 0 ;
+               iarg = iarg + 1 ;
+            otherwise 
+               error('MS:AXES:UnknownOption',...
+                  ['Unknown option: ' varargin{iarg}]) ;   
+         end   
+      end
 
 det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
                     % of the best guess axes 
@@ -119,30 +137,42 @@ if irot
 %  check axes
    dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
    if (length(find(dps>det_thresh))>0)
-      warning('MS_axes: Determined axes not orthogonal.') ;
+      if warn
+         warning('MS_axes: Determined axes not orthogonal.') ;
+         dps
+      end   
    end
-
+   R1 = [X1' X2' X3'] 
+   
 %  fix up the axes, for safety, by redefining X2 and X3   
    X3 = cross(X1,X2) ;
    X2 = cross(X1,X3) ;
+   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)])
+   
+   X1 = X1 ./sqrt(sum(X1.^2)) ; % normalise to unit vectors
+   X2 = X2 ./sqrt(sum(X2.^2)) ; % normalise to unit vectors
+   X3 = X3 ./sqrt(sum(X3.^2)) ; % normalise to unit vectors
       
 %  construct forward rotation matrix
-   R1 = [X1' X2' X3'] ;
-
+   R1 = [X1' X2' X3'] 
+   
+   
 %  calculate reverse rotation
-   RR = inv(R1) ;
+   RR = inv(R1) 
 
    % check rotation matrix
    if (abs(det(RR))-1)>det_thresh ;
-       warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
-       fprintf('Determinant = %20.18f\n',det(RR))
+       if warn
+          warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
+          fprintf('Determinant = %20.18f\n',det(RR))
+       end
        CR=C ;
    else
    % apply to the input elasticity matrix
       CR = MS_rotR(C,RR) ;
    end
 else
-   warning('No rotation was deemed necessary.')
+   if warn, warning('No rotation was deemed necessary.');, end
    CR=C;
    RR = eye(3) ;
 end
