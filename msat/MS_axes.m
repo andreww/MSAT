@@ -1,19 +1,46 @@
 % MS_AXES - Reorient elasticity matrix for optimal decomposition.
 %
-% Part of MSAT - The Matlab Seismic Anisotropy Toolkit 
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-%  Calculate the principle axes of elasticity tensor C, after: 
-%     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
-%  
-%  Report the vectors, and rotate C into the correct orientation. 
-%     [CR]=MS_axes(C)
+% Calculate the principle axes of elasticity matrix C, after:
+%     Browaeys and Chevrot (2004) (GJI, v159, 667-678, 2004)
 %
+%  % [ CR, ... ] = MS_axes(C)
+%
+% Usage: 
+%     [CR] = MS_axes(C)                    
+%         Return a rotated elasticity matrix minimising the number of 
+%         distinct elements. This is the orientation which, on further 
+%         decomposition using MS_NORMS, will maximise the high symmetry
+%         components of the matrix. 
+%
+%     [CR, RR] = MS_axes(C)
+%         In addition, return the rotation matrix, RR, used to perform
+%         the rotation to generate C from CR.
+%
+% Notes:
+%     If the input matrix has isotropic, hexagonal or tetragonal 
+%     symmetry there are multiple orentations of the principle axes.
+%     in the isotropic case CR not rotated with respect to C (and RR
+%     is the identity matrix). In the hexagonal and tetragonal cases, 
+%     X3 is defined by the distinct eigenvalue (see Browaeys and Chevrot).
+%     For the monoclinic or triclinic cases we have to make a 'best-guess'
+%     and following Browraeys and Chevrot we use the bisectrix of each of 
+%     the eigenvectors of d and its closest match in v.
+%
+% References:
+%     Browaeys, J. T. and S. Chevrot (2004) Decomposition of the elastic
+%         tensor and geophysical applications. Geophysical Journal 
+%         international v159, 667-678.
+%     Cowin, S. C. and M. M. Mehrabadi (1987) On the identification of 
+%         material symmetry for anisotropic elastic materials. Quartely
+%         Journal of Mechanics and Applied Mathematics v40, 451-476.
 
-%
+% (C) James Wookey and Andrew Walker, 2011.
 % 
 %
 
-function [ CR ] = MS_axes( C )
+function [ CR RR ] = MS_axes( C )
 
 det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
                     % of the best guess axes 
@@ -139,7 +166,8 @@ if irot
    if (abs(det(RR))-1)>det_thresh ;
        warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
        fprintf('Determinant = %20.18f\n',det(RR))
-       CR=C ;
+       RR = [1 0 0 ; 0 1 0 ; 0 0 1];
+       CR = C ;
        return 
    end
    
@@ -147,7 +175,8 @@ if irot
    CR = MS_rotR(C,RR) ;
 else
    warning('No rotation was deemed necessary.')
-   CR=C;
+   RR = [1 0 0 ; 0 1 0 ; 0 0 1];
+   CR = C;
 end
 return
 
