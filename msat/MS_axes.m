@@ -1,19 +1,41 @@
 % MS_AXES - Reorient elasticity matrix for optimal decomposition.
-%
-% Part of MSAT - The Matlab Seismic Anisotropy Toolkit 
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 %  Calculate the principle axes of elasticity tensor C, after: 
 %     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
 %  
-%  [ CR ] = MS_axes( C )
-%     Report the vectors, and rotate C into the correct orientation. 
-%     
-%  [ CR, R ] = MS_axes( C )
-%     Also return the rotation matrix to transform C.
+% [ CR, ... ] = MS_axes(C)
+%
+%%     [CR] = MS_axes(C)                    
+%         Return a rotated elasticity matrix minimising the number of 
+%         distinct elements. This is the orientation which, on further 
+%         decomposition using MS_NORMS, will maximise the high symmetry
+%         components of the matrix. 
+%
+%     [CR, RR] = MS_axes(C)
+%         In addition, return the rotation matrix, RR, used to perform
+%         the rotation to generate C from CR.
 %
 %  [ ... ] = MS_axes( C, 'nowarn' )
 %     Suppress all warnings.
 %
+% Notes:
+%     If the input matrix has isotropic, hexagonal or tetragonal 
+%     symmetry there are multiple orentations of the principle axes.
+%     in the isotropic case CR not rotated with respect to C (and RR
+%     is the identity matrix). In the hexagonal and tetragonal cases, 
+%     X3 is defined by the distinct eigenvalue (see Browaeys and Chevrot).
+%     For the monoclinic or triclinic cases we have to make a 'best-guess'
+%     and following Browraeys and Chevrot we use the bisectrix of each of 
+%     the eigenvectors of d and its closest match in v.
+%
+% References:
+%     Browaeys, J. T. and S. Chevrot (2004) Decomposition of the elastic
+%         tensor and geophysical applications. Geophysical Journal 
+%         international v159, 667-678.
+%     Cowin, S. C. and M. M. Mehrabadi (1987) On the identification of 
+%         material symmetry for anisotropic elastic materials. Quartely
+%         Journal of Mechanics and Applied Mathematics v40, 451-476.
 
 function [ varargout ] = MS_axes( C, varargin )
 
@@ -31,6 +53,7 @@ warn = 1 ;
                   ['Unknown option: ' varargin{iarg}]) ;   
          end   
       end
+
 
 det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
                     % of the best guess axes 
@@ -142,23 +165,21 @@ if irot
          dps
       end   
    end
-   R1 = [X1' X2' X3'] 
    
-%  fix up the axes, for safety, by redefining X2 and X3   
-   X3 = cross(X1,X2) ;
-   X2 = cross(X1,X3) ;
-   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)])
-   
-   X1 = X1 ./sqrt(sum(X1.^2)) ; % normalise to unit vectors
-   X2 = X2 ./sqrt(sum(X2.^2)) ; % normalise to unit vectors
-   X3 = X3 ./sqrt(sum(X3.^2)) ; % normalise to unit vectors
+%%  fix up the axes, for safety, by redefining X2 and X3   
+%   X3 = cross(X1,X2) ;
+%   X2 = cross(X1,X3) ;
+%   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)])
+%   X1 = X1 ./sqrt(sum(X1.^2)) ; % normalise to unit vectors
+%   X2 = X2 ./sqrt(sum(X2.^2)) ; % normalise to unit vectors
+%   X3 = X3 ./sqrt(sum(X3.^2)) ; % normalise to unit vectors
       
 %  construct forward rotation matrix
-   R1 = [X1' X2' X3'] 
+   R1 = [X1' X2' X3'] ;
    
    
 %  calculate reverse rotation
-   RR = inv(R1) 
+   RR = inv(R1) ;
 
    % check rotation matrix
    if (abs(det(RR))-1)>det_thresh ;
@@ -166,6 +187,7 @@ if irot
           warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
           fprintf('Determinant = %20.18f\n',det(RR))
        end
+       RR = [1 0 0 ; 0 1 0 ; 0 0 1];
        CR=C ;
    else
    % apply to the input elasticity matrix
