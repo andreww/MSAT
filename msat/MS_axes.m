@@ -6,7 +6,7 @@
 %  
 % [ CR, ... ] = MS_axes(C)
 %
-%%     [CR] = MS_axes(C)                    
+%     [CR] = MS_axes(C)                    
 %         Return a rotated elasticity matrix minimising the number of 
 %         distinct elements. This is the orientation which, on further 
 %         decomposition using MS_NORMS, will maximise the high symmetry
@@ -123,7 +123,8 @@ case 3
       X2=vecd(:,2)' ;
       X3=vecd(:,3)' ;
       irot = 1 ;
-      if (X3(1)==0 & X3(2)==0), irot=0;, end
+      %if (X3(1)==0 & X3(2)==0), irot=0;, end
+      if (all(all([X1' X2' X3'] == eye(3)))); end
    else
 % monoclinic or triclinic. Here we have to make a 'best-guess'. Following
 % Browraeys and Chevrot we use the bisectrix of each of the eigenvectors of
