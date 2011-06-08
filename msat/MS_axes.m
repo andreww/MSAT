@@ -1,4 +1,5 @@
 % MS_AXES - Reorient elasticity matrix for optimal decomposition.
+%
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 %  Calculate the principle axes of elasticity tensor C, after: 
@@ -19,6 +20,10 @@
 %  [ ... ] = MS_axes( C, 'nowarn' )
 %     Suppress all warnings.
 %
+%  [ ... ] = MS_axes( C, 'X3_stiff' )
+%     For hexagonal or tetragonal tensors, make X3 the stiffest direction,
+%     not the distinct direction.
+%
 % Notes:
 %     If the input matrix has isotropic, hexagonal or tetragonal 
 %     symmetry there are multiple orentations of the principle axes.
@@ -36,10 +41,15 @@
 %     Cowin, S. C. and M. M. Mehrabadi (1987) On the identification of 
 %         material symmetry for anisotropic elastic materials. Quartely
 %         Journal of Mechanics and Applied Mathematics v40, 451-476.
+%
+% See also: MS_NORMS, MS_INTERPOLATE
+
+% (C) James Wookey and Andrew Walker, 2011
 
 function [ varargout ] = MS_axes( C, varargin )
 
 warn = 1 ;
+X3_distinct = 1;
 
 %  ** process the optional arguments
       iarg = 1 ;
@@ -47,6 +57,9 @@ warn = 1 ;
          switch lower(varargin{iarg})
             case 'nowarn' % flag (i.e., no value required)
                warn = 0 ;
+               iarg = iarg + 1 ;
+            case 'x3_stiff'
+               X3_distinct = 0;
                iarg = iarg + 1 ;
             otherwise 
                error('MS:AXES:UnknownOption',...
@@ -92,21 +105,31 @@ case 1
    X3=[0 0 1] ;
    irot = 0 ;
 case 2
+    if X3_distinct
 % hexagonal or tetragonal tensor, only one is defined, other ones are 
 % any two othogonal vectors. X3 is defined by the distinct eigenvalue
 % (see Browaeys and Chevrot).
-  X3=vecd(:,id)' ;
+      X3=vecd(:,id)' ;
 % check that X3 has changed
-   if (X3(1)==0 & X3(2)==0)   
-      irot=0;
-   else      
-%     now set the other two vectors.    
-%     we want X2 to be horizontal ...
-      X2=cross(X3,[X3(1) X3(2) 0]) ; X2=X2./norm(X2);
-%     now have a definition for X1
-      X1=cross(X3,X2) ;  X1=X1./norm(X1) ;     
-      irot=1;
-   end   
+      if (X3(1)==0 & X3(2)==0)   
+          irot=0;
+      else      
+%         now set the other two vectors.    
+%         we want X2 to be horizontal ...
+          X2=cross(X3,[X3(1) X3(2) 0]) ; X2=X2./norm(X2);
+%         now have a definition for X1
+          X1=cross(X3,X2) ;  X1=X1./norm(X1) ;     
+          irot=1;
+      end
+    else
+        % Eigen vectors are sorted, so treat like orthorhombic
+        X1=vecd(:,1)' ;
+        X2=vecd(:,2)' ;
+        X3=vecd(:,3)' ;
+        if (all(all([X1' X2' X3'] == eye(3))))
+          irot = 0;
+        end
+    end
 case 3
 %  orthorhombic or lower symmetry
 %  first figure out how many common vectors there are   
@@ -124,7 +147,9 @@ case 3
       X3=vecd(:,3)' ;
       irot = 1 ;
       %if (X3(1)==0 & X3(2)==0), irot=0;, end
-      if (all(all([X1' X2' X3'] == eye(3)))); end
+      if (all(all([X1' X2' X3'] == eye(3))))
+          irot = 0;
+      end
    else
 % monoclinic or triclinic. Here we have to make a 'best-guess'. Following
 % Browraeys and Chevrot we use the bisectrix of each of the eigenvectors of
@@ -181,7 +206,17 @@ if irot
    
 %  calculate reverse rotation
    RR = inv(R1) ;
-
+   
+   if ((det(RR)+1) < det_thresh)
+       % Rotoinversion
+       if warn
+          warning('MS_axes: Fixing up rotoinversion.') ;
+          fprintf('Determinant = %20.18f\n',det(RR))
+       end
+       R1 = [-X1' X2' X3'] ;
+       RR = inv(R1) ;
+   end
+   
    % check rotation matrix
    if (abs(det(RR))-1)>det_thresh ;
        if warn
