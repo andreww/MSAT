@@ -67,11 +67,10 @@ X3_distinct = 1;
          end   
       end
 
-
 det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
                     % of the best guess axes 
 
-% calculate D and V matrices   
+% construct D and V matrices   
 d= [... 
    (C(1,1)+C(1,2)+C(1,3)) (C(1,6)+C(2,6)+C(3,6)) (C(1,5)+C(2,5)+C(3,5)) ; ...
    (C(1,6)+C(2,6)+C(3,6)) (C(1,2)+C(2,2)+C(3,2)) (C(1,4)+C(2,4)+C(3,4)) ; ...
@@ -82,14 +81,14 @@ v=[...
    (C(1,1)+C(6,6)+C(5,5)) (C(1,6)+C(2,6)+C(4,5)) (C(1,5)+C(3,5)+C(4,6)) ; ...
    (C(1,6)+C(2,6)+C(4,5)) (C(6,6)+C(2,2)+C(4,4)) (C(2,4)+C(3,4)+C(5,6)) ; ...
    (C(1,5)+C(3,5)+C(4,6)) (C(2,4)+C(3,4)+C(5,6)) (C(5,5)+C(4,4)+C(3,3)) ; ...
-];
+] ;
    
 % calculate eigenvectors and eigenvalues of D and V 
 [vecd,val]=eig(d) ; vald = [val(1,1) val(2,2) val(3,3)] ;    
 [vecv,val]=eig(v) ; valv = [val(1,1) val(2,2) val(3,3)] ;
 
 % count number of distinct eigenvalues. Maximum allowable difference is set
-% 1/1000th of the norm of the matrix. 
+% to be 1/1000th of the norm of the matrix. 
 [nud,id] = ndistinct(valv,norm(valv)./1000) ;
 [nuv,iv] = ndistinct(vald,norm(vald)./1000) ;
 
@@ -157,24 +156,13 @@ case 3
       D1=vecd(:,1) ; D2=vecd(:,2) ; D3=vecd(:,3) ;
       V1=vecv(:,1) ; V2=vecv(:,2) ; V3=vecv(:,3) ;
 
-%      plotvec(D1,'g-'); plotvec(D2,'g-'); plotvec(D3,'g-'); 
-%      plotvec(V1,'r-'); plotvec(V2,'r-'); plotvec(V3,'r-'); 
-      
-      [dum,ind] = max([dot(D1,V1) dot(D1,V2) dot(D1,V3)]) ;
-      X1 = bisectrix(D1,vecv(:,ind))' ;
-      [dum,ind] = max([dot(D2,V1) dot(D2,V2) dot(D2,V3)]) ;
-      X2 = bisectrix(D2,vecv(:,ind))' ;
-      [dum,ind] = max([dot(D3,V1) dot(D3,V2) dot(D3,V3)]) ;
-      X3 = bisectrix(D3,vecv(:,ind))' ;
-
-%      plotvec(X1,'b-'); plotvec(X2,'b-'); plotvec(X3,'b-'); 
-%      axis([-1 1 -1 1 -1 1]); daspect([1 1 1]) ;
-%      fprintf('Perp. check: %f %f\n',dot(X1,X2),dot(X1,X3));
+      [X1,X2,X3]=optimal_basis(D1,D2,D3,V1,V2,V3) ;
 
       irot = 1 ;
       if (X3(1)==0 & X3(2)==0), irot=0;, end      
    end
 otherwise
+% not possible.
 end
 
 % Now apply the necessary rotation. The three new axes define the rotation
@@ -184,7 +172,7 @@ end
 
 if irot
 %  check axes
-   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
+   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ; 
    if (length(find(dps>det_thresh))>0)
       if warn
          warning('MS_axes: Determined axes not orthogonal.') ;
@@ -193,6 +181,7 @@ if irot
    end
    
 %%  fix up the axes, for safety, by redefining X2 and X3   
+%   ** THIS IS DANGEROUS, SO IT HAS BEEN DISABLED.
 %   X3 = cross(X1,X2) ;
 %   X2 = cross(X1,X3) ;
 %   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)])
@@ -202,7 +191,6 @@ if irot
       
 %  construct forward rotation matrix
    R1 = [X1' X2' X3'] ;
-   
    
 %  calculate reverse rotation
    RR = inv(R1) ;
@@ -216,14 +204,14 @@ if irot
        R1 = [-X1' X2' X3'] ;
        RR = inv(R1) ;
    end
-   
+
    % check rotation matrix
    if (abs(det(RR))-1)>det_thresh ;
        if warn
           warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
           fprintf('Determinant = %20.18f\n',det(RR))
        end
-       RR = [1 0 0 ; 0 1 0 ; 0 0 1];
+       RR = eye(3);
        CR=C ;
    else
    % apply to the input elasticity matrix
@@ -254,6 +242,65 @@ return
 %%%   SUBFUNCTIONS
 %%%
 
+function [C1,C2,C3]=optimal_basis(A1,A2,A3,B1,B2,B3)
+%
+%     Estimate the best basis vectors for decomposition. This is bisectrices
+%     of vectors A1 and 
+
+%  ** first, determine whether get a better result by flipping the sign
+%     of any two of the vectors. (two preserves the sense of the
+%     coordinate system).
+%
+
+      M1=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ...
+          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
+          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] ;
+      
+      M2=[dot(-A1,B1) dot(-A1,B2) dot(-A1,B3) ; ... % flip 1 and 2
+          dot(-A2,B1) dot(-A2,B2) dot(-A2,B3) ; ...
+          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] ;
+      
+      M3=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ... % flip 2 and 3
+          dot(-A2,B1) dot(-A2,B2) dot(-A2,B3) ; ...
+          dot(-A3,B1) dot(-A3,B2) dot(-A3,B3) ] ;
+
+      M4=[dot(-A1,B1) dot(-A1,B2) dot(-A1,B3) ; ... % flip 1 and 3
+          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
+          dot(-A3,B1) dot(-A3,B2) dot(-A3,B3) ] ;
+      
+%  ** determine the optimal axes signs, this is where the sum of the M elements
+%     matrix is maximum ; 
+      [Y,ind] = sort([sum(sum(M1)) sum(sum(M2)) sum(sum(M3)) sum(sum(M4)) ]) ;
+
+%  ** flip the A-vectors into these orientation
+      switch ind(4)
+         case 2 % flip 1 and 2
+            A1 = -A1; A2 = -A2; 
+         case 3 % flip 2 and 3
+            A2 = -A2; A3 = -A3; 
+         case 4 % flip 1 and 3
+            A1 = -A1; A3 = -A3;
+         otherwise   
+%        ** Do nothing **         
+      end       
+                 
+      [dum, ind] = max(([dot(A1,B1) dot(A1,B2) dot(A1,B3)])) ;
+      C1 = bisectrix(A1,eval(sprintf('B%1.1i',ind)))' ;
+      [dum, ind] = max(([dot(A2,B1) dot(A2,B2) dot(A2,B3)])) ;
+      C2 = bisectrix(A2,eval(sprintf('B%1.1i',ind)))' ;
+      [dum, ind] = max(([dot(A3,B1) dot(A3,B2) dot(A3,B3)])) ;
+      C3 = bisectrix(A3,eval(sprintf('B%1.1i',ind)))' ;
+
+%  ** DEBUG plots and info
+%     figure ;
+%     plotvec(C1,'b-'); plotvec(A1,'g-'); plotvec(B1,'r-');   
+%     plotvec(C2,'b-'); plotvec(A2,'g-'); plotvec(B2,'r-'); 
+%     plotvec(C3,'b-'); plotvec(A3,'g-'); plotvec(B3,'r-');
+%     axis([-1 1 -1 1 -1 1]); daspect([1 1 1]) ;
+%     fprintf('Perp. check: %f %f\n',dot(X1,X2),dot(X1,X3));
+
+return
+
 function [C]=bisectrix(A,B)
 % return the unit length bisectrix of 3-vectors A and B
      C=(A+B);
@@ -261,8 +308,8 @@ function [C]=bisectrix(A,B)
 return
 
 function [i]=veceq(x,y,thresh)
-% return the number and indices of distinct entries in a 3x3 element vector, ignoring a 
-% difference of thresh
+% return the number and indices of distinct entries in a 3 element vector, 
+% ignoring a difference of thresh
    i=1 ;
    if length(find(abs(x-y)>thresh))>0, i=0 ;, end   
 return
