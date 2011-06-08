@@ -6,7 +6,7 @@
 %  
 % [ CR, ... ] = MS_axes(C)
 %
-%%     [CR] = MS_axes(C)                    
+%     [CR] = MS_axes(C)                    
 %         Return a rotated elasticity matrix minimising the number of 
 %         distinct elements. This is the orientation which, on further 
 %         decomposition using MS_NORMS, will maximise the high symmetry
@@ -58,7 +58,7 @@ warn = 1 ;
 det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
                     % of the best guess axes 
 
-% calculate D and V matrices   
+% construct D and V matrices   
 d= [... 
    (C(1,1)+C(1,2)+C(1,3)) (C(1,6)+C(2,6)+C(3,6)) (C(1,5)+C(2,5)+C(3,5)) ; ...
    (C(1,6)+C(2,6)+C(3,6)) (C(1,2)+C(2,2)+C(3,2)) (C(1,4)+C(2,4)+C(3,4)) ; ...
@@ -69,14 +69,14 @@ v=[...
    (C(1,1)+C(6,6)+C(5,5)) (C(1,6)+C(2,6)+C(4,5)) (C(1,5)+C(3,5)+C(4,6)) ; ...
    (C(1,6)+C(2,6)+C(4,5)) (C(6,6)+C(2,2)+C(4,4)) (C(2,4)+C(3,4)+C(5,6)) ; ...
    (C(1,5)+C(3,5)+C(4,6)) (C(2,4)+C(3,4)+C(5,6)) (C(5,5)+C(4,4)+C(3,3)) ; ...
-];
+] ;
    
 % calculate eigenvectors and eigenvalues of D and V 
 [vecd,val]=eig(d) ; vald = [val(1,1) val(2,2) val(3,3)] ;    
 [vecv,val]=eig(v) ; valv = [val(1,1) val(2,2) val(3,3)] ;
 
 % count number of distinct eigenvalues. Maximum allowable difference is set
-% 1/1000th of the norm of the matrix. 
+% to be 1/1000th of the norm of the matrix. 
 [nud,id] = ndistinct(valv,norm(valv)./1000) ;
 [nuv,iv] = ndistinct(vald,norm(vald)./1000) ;
 
@@ -97,7 +97,7 @@ case 2
 % (see Browaeys and Chevrot).
   X3=vecd(:,id)' ;
 % check that X3 has changed
-   if (X3(1)==0 & X3(2)==0)   
+   if (X3(1)==0 & X3(2)==0 & X1(2)==0 & X1(3)==0), irot=0;, end
       irot=0;
    else      
 %     now set the other two vectors.    
@@ -123,7 +123,7 @@ case 3
       X2=vecd(:,2)' ;
       X3=vecd(:,3)' ;
       irot = 1 ;
-      if (X3(1)==0 & X3(2)==0), irot=0;, end
+      if (X3(1)==0 & X3(2)==0 & X1(2)==0 & X1(3)==0), irot=0;, end
    else
 % monoclinic or triclinic. Here we have to make a 'best-guess'. Following
 % Browraeys and Chevrot we use the bisectrix of each of the eigenvectors of
@@ -137,6 +137,7 @@ case 3
       if (X3(1)==0 & X3(2)==0), irot=0;, end      
    end
 otherwise
+% not possible.
 end
 
 % Now apply the necessary rotation. The three new axes define the rotation
@@ -166,8 +167,7 @@ if irot
 %  construct forward rotation matrix
    R1 = [X1' X2' X3'] ;
    
-   
-%% calculate reverse rotation
+%  calculate reverse rotation
    RR = inv(R1) ;
    
    % check rotation matrix
@@ -176,7 +176,7 @@ if irot
           warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
           fprintf('Determinant = %20.18f\n',det(RR))
        end
-       RR = [1 0 0 ; 0 1 0 ; 0 0 1];
+       RR = eye(3);
        CR=C ;
    else
    % apply to the input elasticity matrix
@@ -213,8 +213,10 @@ function [C1,C2,C3]=optimal_basis(A1,A2,A3,B1,B2,B3)
 %     of vectors A1 and 
 
 %  ** first, determine whether get a better result by flipping the sign
-%     of any two of the eigenvectors. (two preserves the sense of the
+%     of any two of the vectors. (two preserves the sense of the
 %     coordinate system).
+%
+
       M1=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ...
           dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
           dot(A3,B1) dot(A3,B2) dot(A3,B3) ] ;
@@ -235,7 +237,6 @@ function [C1,C2,C3]=optimal_basis(A1,A2,A3,B1,B2,B3)
 %     matrix is maximum ; 
       [Y,ind] = sort([sum(sum(M1)) sum(sum(M2)) sum(sum(M3)) sum(sum(M4)) ]) ;
 
-
 %  ** flip the A-vectors into these orientation
       switch ind(4)
          case 2 % flip 1 and 2
@@ -244,34 +245,26 @@ function [C1,C2,C3]=optimal_basis(A1,A2,A3,B1,B2,B3)
             A2 = -A2; A3 = -A3; 
          case 4 % flip 1 and 3
             A1 = -A1; A3 = -A3;
-         otherwise    
+         otherwise   
+%        ** Do nothing **         
       end       
                  
-      [dum,ind] = max(([dot(A1,B1) dot(A1,B2) dot(A1,B3)])) ;
+      [dum, ind] = max(([dot(A1,B1) dot(A1,B2) dot(A1,B3)])) ;
       C1 = bisectrix(A1,eval(sprintf('B%1.1i',ind)))' ;
-      [dum,ind] = max(([dot(A2,B1) dot(A2,B2) dot(A2,B3)])) ;
+      [dum, ind] = max(([dot(A2,B1) dot(A2,B2) dot(A2,B3)])) ;
       C2 = bisectrix(A2,eval(sprintf('B%1.1i',ind)))' ;
-      [dum,ind] = max(([dot(A3,B1) dot(A3,B2) dot(A3,B3)])) ;
+      [dum, ind] = max(([dot(A3,B1) dot(A3,B2) dot(A3,B3)])) ;
       C3 = bisectrix(A3,eval(sprintf('B%1.1i',ind)))' ;
 
-%DEBUG plots
-%plotvec(C1,'b-');   
-%plotvec(A1,'g-');   
-%plotvec(B1,'r-');   
-%
-%plotvec(C2,'b-'); 
-%plotvec(A2,'g-'); 
-%plotvec(B2,'r-'); 
-%
-%plotvec(C3,'b-');
-%plotvec(A3,'g-');
-%plotvec(B3,'r-');
-%
-%      axis([-1 1 -1 1 -1 1]); daspect([1 1 1]) ;
-%      fprintf('Perp. check: %f %f\n',dot(X1,X2),dot(X1,X3));
+%  ** DEBUG plots and info
+%     figure ;
+%     plotvec(C1,'b-'); plotvec(A1,'g-'); plotvec(B1,'r-');   
+%     plotvec(C2,'b-'); plotvec(A2,'g-'); plotvec(B2,'r-'); 
+%     plotvec(C3,'b-'); plotvec(A3,'g-'); plotvec(B3,'r-');
+%     axis([-1 1 -1 1 -1 1]); daspect([1 1 1]) ;
+%     fprintf('Perp. check: %f %f\n',dot(X1,X2),dot(X1,X3));
 
 return
-
 
 function [C]=bisectrix(A,B)
 % return the unit length bisectrix of 3-vectors A and B
@@ -280,8 +273,8 @@ function [C]=bisectrix(A,B)
 return
 
 function [i]=veceq(x,y,thresh)
-% return the number and indices of distinct entries in a 3x3 element vector, ignoring a 
-% difference of thresh
+% return the number and indices of distinct entries in a 3 element vector, 
+% ignoring a difference of thresh
    i=1 ;
    if length(find(abs(x-y)>thresh))>0, i=0 ;, end   
 return
