@@ -111,7 +111,7 @@ end
 
 function zA = ZenerAnisotropyIndex( C )
 
-    zA = C(4,4)^2 / (C(1,1)^2 - C(1,2)^2); 
+    zA = C(4,4)*2.0 / (C(1,1) - C(1,2)); 
 
 end 
 
