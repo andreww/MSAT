@@ -45,9 +45,11 @@ function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
 
 		if (length(inc)~=length(azi))
 			error('AZI and INC must be scalars or vectors of the same dimension');
-		end	
+        end	
 
+        isotol = 0.0000001; % Mbars
 %  ** convert GPa to MB file units (Mbars), density to g/cc
+
       C(:,:) = C(:,:) * 0.01 ;
       rh = rh ./ 1e3 ;
       
@@ -58,6 +60,17 @@ function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
 		pol = zeros(size(azi)) ;
 		S1 = zeros(length(azi),3) ;
 		S1P = zeros(length(azi),3) ;
+        
+%   ** Handle isotropic case quickly
+     if isIsotropic(C, isotol)
+         vp(:) = sqrt(( ((1.0/3.0)*(C(1,1)+2*C(1,2)))+ ...
+                        ((4.0/3.0)*C(4,4)) )/rh)*10.0;
+         vs1(:) = sqrt(C(4,4)/rh)*10.0; % Factor of 10 converts from
+         vs2 = vs1;                     % Mbar to Pa.
+         avs(:) = 0.0;
+         pol(:) = 0.0; % Both waves have same velocity... meaningless.
+         return
+     end
 
 %	** start looping
 	for ipair = 1:length(inc)
@@ -74,12 +87,12 @@ function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
 		P  = EIGVEC(:,1) ;
       S1 = EIGVEC(:,2) ;
 
-		if ~isreal(S1)
-			S1
-			fprintf('%f,%f\n',cinc,cazi)
-			C_in
-			error('bad') ;
-		end
+  		if ~isreal(S1)
+  			S1
+  			fprintf('%f,%f\n',cinc,cazi)
+  			C
+  			error('bad') ;
+  		end
       S2 = EIGVEC(:,3) ;
 
 %  ** calculate projection onto propagation plane      
@@ -190,3 +203,17 @@ return
 
       return
 %=======================================================================================  
+
+function [ l ] = isIsotropic( C, tol )
+    
+    % Are we isotropic - assume matrix is symmetrical at this point.
+    l = (abs(C(1,1)-C(2,2)) < tol) & (abs(C(1,1)-C(3,3)) < tol) & ...
+        (abs(C(1,2)-C(1,3)) < tol) & (abs(C(1,2)-C(2,3)) < tol) & ...
+        (abs(C(4,4)-C(5,5)) < tol) & (abs(C(4,4)-C(6,6)) < tol) & ...
+        (abs(C(1,4)) < tol) & (abs(C(1,5)) < tol) & (abs(C(1,6)) < tol) & ...
+        (abs(C(2,4)) < tol) & (abs(C(2,5)) < tol) & (abs(C(2,6)) < tol) & ...
+        (abs(C(3,4)) < tol) & (abs(C(3,5)) < tol) & (abs(C(3,6)) < tol) & ...
+        (abs(C(4,5)) < tol) & (abs(C(4,6)) < tol) & (abs(C(5,6)) < tol) & ...
+        (((C(1,1)-C(1,2))/2.0)-C(4,4) < tol);
+        
+return
