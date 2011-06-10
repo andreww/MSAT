@@ -150,13 +150,18 @@ return
 %c north x=100  west y=010 up z=001
 %c irev=+1 positive vector x
 %c irev=-1 negative vector x
-	caz=cosd(azm)  ;
-   saz=sind(azm)  ;
-   cinc=cosd(inc) ;
-   sinc=sind(inc) ;
-   X=[caz*cinc -saz*cinc sinc] ;
+% NB: pre-converting azm and inc to radians and using
+%     cos and sin directly (instead to cosd and sind) 
+%     is ~10x faster making the function ~4x faster.
+    azmr = azm.*(pi/180.0);
+    incr = inc.*(pi/180.0);
+    caz=cos(azmr)  ;
+    saz=sin(azmr)  ;
+    cinc=cos(incr) ;
+    sinc=sin(incr) ;
+    X=[caz*cinc -saz*cinc sinc] ;
 %c normalise to direction cosines
-   r=sqrt(X(1)*X(1)+X(2)*X(2)+X(3)*X(3)) ;
+    r=sqrt(X(1)*X(1)+X(2)*X(2)+X(3)*X(3)) ;
    
 	X = X./r ;
 	if(irev == -1), X = -X;, end
