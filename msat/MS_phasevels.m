@@ -41,13 +41,13 @@
 %            Computers & Gesosciences, vol16, pp385-393.
 %
 %
-function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
+function [pol,avs,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,inc,azi)
 
 		if (length(inc)~=length(azi))
 			error('AZI and INC must be scalars or vectors of the same dimension');
         end	
 
-        isotol = 0.0000001; % Mbars
+        isotol = sqrt(eps); % Mbars
 %  ** convert GPa to MB file units (Mbars), density to g/cc
 
       C(:,:) = C(:,:) * 0.01 ;
@@ -68,7 +68,8 @@ function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
          vs1(:) = sqrt(C(4,4)/rh)*10.0; % Factor of 10 converts from
          vs2 = vs1;                     % Mbar to Pa.
          avs(:) = 0.0;
-         pol(:) = 0.0; % Both waves have same velocity... meaningless.
+         pol(:) = NaN; % Both waves have same velocity... meaningless.
+         S1P(:) = NaN;
          return
      end
 
@@ -97,7 +98,7 @@ function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
 
 %  ** calculate projection onto propagation plane      
       S1N = cross(XI,S1) ;
-      S1P = cross(XI,S1N);
+      S1P(ipair,:) = cross(XI,S1N);
 
 %  ** rotate into y-z plane to calculate angles
       [S1PR] = V_rot3(S1P,0,0,cazi) ;
@@ -120,7 +121,14 @@ function [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
 		
 		pol(ipair) = ph ;
 	end % ipair = 1:length(inc_in)
-		
+
+    % If any directions have zero avs (within machine accuracy)
+    % set pol to NaN - array wise:
+    isiso = real(avs > sqrt(eps)); % list of 1.0 and 0.0.
+    pol = pol .* (isiso./isiso); % times by 1.0 or NaN. 
+    S1P(:,1) = S1P(:,1) .* (isiso./isiso);
+    S1P(:,2) = S1P(:,2) .* (isiso./isiso);
+    S1P(:,3) = S1P(:,3) .* (isiso./isiso);
 return
 %=======================================================================================  
 
