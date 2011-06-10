@@ -24,6 +24,9 @@
 %     For hexagonal or tetragonal tensors, make X3 the stiffest direction,
 %     not the distinct direction.
 %
+%  [ ... ] = MS_axes( C, 'debug' )
+%     Enable debugging plots and messages. These are quite messy.  
+%
 % Notes:
 %     If the input matrix has isotropic, hexagonal or tetragonal 
 %     symmetry there are multiple orentations of the principle axes.
@@ -49,6 +52,7 @@
 function [ varargout ] = MS_axes( C, varargin )
 
 warn = 1 ;
+debug = 0 ;
 X3_distinct = 1;
 
 %  ** process the optional arguments
@@ -60,6 +64,9 @@ X3_distinct = 1;
                iarg = iarg + 1 ;
             case 'x3_stiff'
                X3_distinct = 0;
+               iarg = iarg + 1 ;
+            case 'debug'
+               debug = 1;
                iarg = iarg + 1 ;
             otherwise 
                error('MS:AXES:UnknownOption',...
@@ -87,6 +94,17 @@ v=[...
 [vecd,val]=eig(d) ; vald = [val(1,1) val(2,2) val(3,3)] ;    
 [vecv,val]=eig(v) ; valv = [val(1,1) val(2,2) val(3,3)] ;
 
+%  ** DEBUG plots and info
+if debug
+     figure ;
+     
+     plot2vec(vecd(:,1),'b-','1'); plot2vec(vecv(:,1),'g-','1');   
+     plot2vec(vecd(:,2),'b-','2'); plot2vec(vecv(:,2),'g-','2'); 
+     plot2vec(vecd(:,3),'b-','3'); plot2vec(vecv(:,3),'g-','3'); 
+     axis([-3 3 -3 3]./3); daspect([1 1 1]) ;
+%     fprintf('Perp. check: %f %f\n',dot(X1,X2),dot(X1,X3));
+end
+
 % count number of distinct eigenvalues. Maximum allowable difference is set
 % to be 1/1000th of the norm of the matrix. 
 [nud,id] = ndistinct(valv,norm(valv)./1000) ;
@@ -104,31 +122,32 @@ case 1
    X3=[0 0 1] ;
    irot = 0 ;
 case 2
-    if X3_distinct
-% hexagonal or tetragonal tensor, only one is defined, other ones are 
-% any two othogonal vectors. X3 is defined by the distinct eigenvalue
-% (see Browaeys and Chevrot).
+   if X3_distinct
+%  ** hexagonal or tetragonal tensor, only one is defined, other ones are 
+%     any two othogonal vectors. X3 is defined by the distinct eigenvalue
+%     (see Browaeys and Chevrot).
       X3=vecd(:,id)' ;
-% check that X3 has changed
+%  ** check that X3 has changed
       if (X3(1)==0 & X3(2)==0)   
-          irot=0;
+         irot=0;
       else      
-%         now set the other two vectors.    
-%         we want X2 to be horizontal ...
-          X2=cross(X3,[X3(1) X3(2) 0]) ; X2=X2./norm(X2);
-%         now have a definition for X1
-          X1=cross(X3,X2) ;  X1=X1./norm(X1) ;     
-          irot=1;
+%     ** now set the other two vectors.    
+%        we want X2 to be horizontal ...
+         X2=cross(X3,[X3(1) X3(2) 0]) ; X2=X2./norm(X2);
+
+%        now have a definition for X1
+         X1=cross(X3,X2) ;  X1=X1./norm(X1) ;     
+         irot=1;
       end
-    else
-        % Eigen vectors are sorted, so treat like orthorhombic
-        X1=vecd(:,1)' ;
-        X2=vecd(:,2)' ;
-        X3=vecd(:,3)' ;
-        if (all(all([X1' X2' X3'] == eye(3))))
-          irot = 0;
-        end
-    end
+   else
+      % Eigen vectors are sorted, so treat like orthorhombic
+      X1=vecd(:,1)' ;
+      X2=vecd(:,2)' ;
+      X3=vecd(:,3)' ;
+      if (all(all([X1' X2' X3'] == eye(3))))
+        irot = 0;
+      end
+   end
 case 3
 %  orthorhombic or lower symmetry
 %  first figure out how many common vectors there are   
@@ -144,8 +163,10 @@ case 3
       X1=vecd(:,1)' ;
       X2=vecd(:,2)' ;
       X3=vecd(:,3)' ;
+      
+      [X1,X2,X3] = makeRH(X1,X2,X3) ; % make sure they form a RH set.
+
       irot = 1 ;
-      %if (X3(1)==0 & X3(2)==0), irot=0;, end
       if (all(all([X1' X2' X3'] == eye(3))))
           irot = 0;
       end
@@ -156,7 +177,7 @@ case 3
       D1=vecd(:,1) ; D2=vecd(:,2) ; D3=vecd(:,3) ;
       V1=vecv(:,1) ; V2=vecv(:,2) ; V3=vecv(:,3) ;
 
-      [X1,X2,X3]=optimal_basis(D1,D2,D3,V1,V2,V3) ;
+      [X1,X2,X3]=estimate_basis(D1,D2,D3,V1,V2,V3) ;
 
       irot = 1 ;
       if (X3(1)==0 & X3(2)==0), irot=0;, end      
@@ -172,14 +193,22 @@ end
 
 if irot
 %  check axes
-   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ; 
+   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
    if (length(find(dps>det_thresh))>0)
       if warn
-         warning('MS_axes: Determined axes not orthogonal.') ;
+         warning('MS_axes: Determined axes not orthogonal: DPS=') ;
          dps
       end   
    end
    
+%   %%  ** DEBUG plots and info
+%     figure ;
+%     
+%     plot2vec(X1,'b-','1');   
+%     plot2vec(X2,'b-','2'); 
+%     plot2vec(X3,'b-','3'); 
+%     axis([-3 3 -3 3]./3); daspect([1 1 1]) ;
+
 %%  fix up the axes, for safety, by redefining X2 and X3   
 %   ** THIS IS DANGEROUS, SO IT HAS BEEN DISABLED.
 %   X3 = cross(X1,X2) ;
@@ -242,7 +271,7 @@ return
 %%%   SUBFUNCTIONS
 %%%
 
-function [C1,C2,C3]=optimal_basis(A1,A2,A3,B1,B2,B3)
+function [C1,C2,C3]=estimate_basis(A1,A2,A3,B1,B2,B3)
 %
 %     Estimate the best basis vectors for decomposition. This is bisectrices
 %     of vectors A1 and 
@@ -252,53 +281,117 @@ function [C1,C2,C3]=optimal_basis(A1,A2,A3,B1,B2,B3)
 %     coordinate system).
 %
 
-      M1=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ...
-          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
-          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] ;
-      
-      M2=[dot(-A1,B1) dot(-A1,B2) dot(-A1,B3) ; ... % flip 1 and 2
-          dot(-A2,B1) dot(-A2,B2) dot(-A2,B3) ; ...
-          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] ;
-      
-      M3=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ... % flip 2 and 3
-          dot(-A2,B1) dot(-A2,B2) dot(-A2,B3) ; ...
-          dot(-A3,B1) dot(-A3,B2) dot(-A3,B3) ] ;
+%      C1=B1'; C2=B2'; C3=B3';
 
-      M4=[dot(-A1,B1) dot(-A1,B2) dot(-A1,B3) ; ... % flip 1 and 3
-          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
-          dot(-A3,B1) dot(-A3,B2) dot(-A3,B3) ] ;
+
+
+%      [A1,A2,A3] = makeRH(A1,A2,A3) ;
       
-%  ** determine the optimal axes signs, this is where the sum of the M elements
-%     matrix is maximum ; 
-      [Y,ind] = sort([sum(sum(M1)) sum(sum(M2)) sum(sum(M3)) sum(sum(M4)) ]) ;
+%      [B1,B2,B3] = makeRH(B1,B2,B3) ;
 
-%  ** flip the A-vectors into these orientation
-      switch ind(4)
-         case 2 % flip 1 and 2
-            A1 = -A1; A2 = -A2; 
-         case 3 % flip 2 and 3
-            A2 = -A2; A3 = -A3; 
-         case 4 % flip 1 and 3
-            A1 = -A1; A3 = -A3;
-         otherwise   
-%        ** Do nothing **         
-      end       
-                 
-      [dum, ind] = max(([dot(A1,B1) dot(A1,B2) dot(A1,B3)])) ;
-      C1 = bisectrix(A1,eval(sprintf('B%1.1i',ind)))' ;
-      [dum, ind] = max(([dot(A2,B1) dot(A2,B2) dot(A2,B3)])) ;
-      C2 = bisectrix(A2,eval(sprintf('B%1.1i',ind)))' ;
-      [dum, ind] = max(([dot(A3,B1) dot(A3,B2) dot(A3,B3)])) ;
-      C3 = bisectrix(A3,eval(sprintf('B%1.1i',ind)))' ;
+%      M1=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ...
+%          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
+%          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] 
+%      
+%      M2=[dot(A1,-B1) dot(A1,-B2) dot(A1,-B3) ; ... % flip 1 and 2
+%          dot(A2,-B1) dot(A2,-B2) dot(A2,-B3) ; ...
+%          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] 
+%      
+%      M3=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ... % flip 2 and 3
+%          dot(A2,-B1) dot(A2,-B2) dot(A2,-B3) ; ...
+%          dot(A3,-B1) dot(A3,-B2) dot(A3,-B3) ] 
+%
+%      M4=[dot(A1,-B1) dot(A1,-B2) dot(A1,-B3) ; ... % flip 1 and 3
+%          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
+%          dot(A3,-B1) dot(A3,-B2) dot(A3,-B3) ] 
+%      
+%%  ** determine the optimal axes signs, this is where the sum of the M elements
+%%     matrix is maximum ; 
+%      [Y,ind] = sort([sum(sum(M1)) sum(sum(M2)) sum(sum(M3)) sum(sum(M4)) ]) ;
+%
+%%  ** flip the A-vectors into these orientation
+%      switch ind(4)
+%         case 2 % flip 1 and 2
+%            B1 = -B1; B2 = -B2; 
+%         case 3 % flip 2 and 3
+%            B2 = -B2; B3 = -B3; 
+%         case 4 % flip 1 and 3
+%            B1 = -B1; B3 = -B3;
+%         otherwise   
+%%        ** Do nothing **         
+%      end       
 
+      [dum, ind] = max(abs([dot(A1,B1) dot(A1,B2) dot(A1,B3)])) ;
+      eval(sprintf('X=B%1.1i;',ind)) ;
+      if dot(A1,X)<0
+         C1 = bisectrix(A1,-X)' ;
+      else   
+         C1 = bisectrix(A1, X)' ;
+      end   
+      
+      [dum, ind] = max(abs([dot(A2,B1) dot(A2,B2) dot(A2,B3)])) ;
+      eval(sprintf('X=B%1.1i;',ind)) ;
+      if dot(A2,X)<0
+         C2 = bisectrix(A2,-X)' ;
+      else   
+         C2 = bisectrix(A2, X)' ;
+      end   
+
+      [dum, ind] = max(abs([dot(A3,B1) dot(A3,B2) dot(A3,B3)])) ;
+      eval(sprintf('X=B%1.1i;',ind)) ;
+      if dot(A3,X)<0
+         C3 = bisectrix(A3,-X)' ;
+      else   
+         C3 = bisectrix(A3, X)' ;
+      end   
+
+%      [dum, ind] = max(abs([dot(A1,B1) dot(A1,B2) dot(A1,B3)])) ;
+%      C1 = bisectrix(A1,eval(sprintf('B%1.1i',ind)))' ;
+%      [dum, ind] = max(abs([dot(A2,B1) dot(A2,B2) dot(A2,B3)])) ;
+%      C2 = bisectrix(A2,eval(sprintf('B%1.1i',ind)))' ;
+%      [dum, ind] = max(abs([dot(A3,B1) dot(A3,B2) dot(A3,B3)])) ;
+%      C3 = bisectrix(A3,eval(sprintf('B%1.1i',ind)))' ;
+
+%     C1 = bisectrix(A1,B1)' ;
+%     C2 = bisectrix(A2,B2)' ;
+%     C3 = bisectrix(A3,B3)' ;
+
+
+%  fix up the axes, for safety, by redefining X2 and X3   
+%     C3 = cross(C1,C2) ;
+%     C2 = cross(C3,C1) ;
+%     dps = abs([dot(C1,C2) dot(C1,C3) dot(C2,C3)])
+%     C1 = C1 ./sqrt(sum(C1.^2)) ; % normalise to unit vectors
+%     C2 = C2 ./sqrt(sum(C2.^2)) ; % normalise to unit vectors
+%     C3 = C3 ./sqrt(sum(C3.^2)) ; % normalise to unit vectors
+     
+%     [C1,C2,C3] = makeRH(C1,C2,C3) ;
+     
 %  ** DEBUG plots and info
 %     figure ;
-%     plotvec(C1,'b-'); plotvec(A1,'g-'); plotvec(B1,'r-');   
-%     plotvec(C2,'b-'); plotvec(A2,'g-'); plotvec(B2,'r-'); 
-%     plotvec(C3,'b-'); plotvec(A3,'g-'); plotvec(B3,'r-');
-%     axis([-1 1 -1 1 -1 1]); daspect([1 1 1]) ;
-%     fprintf('Perp. check: %f %f\n',dot(X1,X2),dot(X1,X3));
-
+%     plotvec(C1,'b-','1');    
+%     plotvec(C2,'b-','2');  
+%     plotvec(C3,'b-','3'); 
+%
+%     plotvec(A1,'g-','1'); plotvec(B1,'r-','1'); 
+%     plotvec(A2,'g-','2'); plotvec(B2,'r-','2'); 
+%     plotvec(A3,'g-','3'); plotvec(B3,'r-','3');
+%     axis([-3 3 -3 3 -3 3]./3); daspect([1 1 1]) ;
+%
+%     fprintf('Perp. check: %f %f\n',dot(C1,C2),dot(C1,C3));
+     
+% ** require the principle 2 vectors have a positive 3-components, if it doesn't
+%    already flip 1 and 2 (preserves handedness)
+%     if C1(3)<0 & C2(3)<0 
+%         C1 = -C1 ;
+%         C2 = -C2 ;
+%     elseif C1(3)<0 & C2(3)>=0 
+%         C1 = -C1 ;
+%         C3 = -C3 ;     
+%     elseif C1(3)>=0 & C2(3)<0 
+%         C2 = -C2 ;
+%         C3 = -C3 ;
+%     end
 return
 
 function [C]=bisectrix(A,B)
@@ -333,7 +426,24 @@ function [nd,i]=ndistinct(x,thresh)
    end   
 return
  
-function plotvec(V,spec)
+function plotvec(V,spec,str)
    plot3([0 V(1)],[0 V(2)],[0 V(3)],spec)
+   text([V(1)],[V(2)],[V(3)],str)
    hold on
 return
+
+function plot2vec(V,spec,str)
+   if V(3)<0, spec = [spec '-'];, end
+   plot([0 V(1)],[0 V(2)],spec)
+   text([V(1)],[V(2)],str)
+   hold on
+return
+
+function [Y1,Y2,Y3] = makeRH(X1,X2,X3) ;
+   if (dot(cross(X1,X2),X3))<0
+      Y1 = X1; Y2 = X2; Y3 = -X3 ;
+   else
+      Y1 = X1; Y2 = X2; Y3 = X3 ;
+   end   
+return
+
