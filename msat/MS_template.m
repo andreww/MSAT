@@ -20,6 +20,8 @@
 %
 % Notes:
 %     Notes on operation.
+%
+% See also: MS_NORMS, MS_INTERPOLATE
 
 % Change log / copyright statements.
 % 
