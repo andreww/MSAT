@@ -177,19 +177,27 @@ return
 		ijkl = [1,6,5; ...
 		        6,2,4; ...
 		        5,4,3] ;
-%c form symmetric matrix tik=cijkl*xj*xl
-		for i=1:3
-      	for k=1:3
-	         T(i,k)=0.0 ;
-      		for j=1:3
-      			for l=1:3
-      				m=ijkl(i,j) ;
-      				n=ijkl(k,l) ;
-      				T(i,k)=T(i,k)+C(m,n).*X(j).*X(l) ;
-					end
-				end
-			end
-		end
+            
+        % Form symmetric matrix Tik=Cijkl*Xj*Xl (summation convention)
+        % note that this mostly-unrolled approach is ~5x faster than the
+        % direct (four-looping) construction and allows us to use the 
+        % symmetry of T to reduce the cost. I suspect there is a better
+        % way, involving kron(X,X') and a single line for the summation, 
+        % but I cannot see it.
+        T = zeros(3,3);
+        for j=1:3
+            T(1,1)=T(1,1) + sum(C(ijkl(1,j),ijkl(1,1:3)).*X(j).*X(1:3)) ;
+            T(1,2)=T(1,2) + sum(C(ijkl(1,j),ijkl(2,1:3)).*X(j).*X(1:3)) ;
+            T(1,3)=T(1,3) + sum(C(ijkl(1,j),ijkl(3,1:3)).*X(j).*X(1:3)) ;
+            T(2,2)=T(2,2) + sum(C(ijkl(2,j),ijkl(2,1:3)).*X(j).*X(1:3)) ;
+            T(2,3)=T(2,3) + sum(C(ijkl(2,j),ijkl(3,1:3)).*X(j).*X(1:3)) ;
+            T(3,3)=T(3,3) + sum(C(ijkl(3,j),ijkl(3,1:3)).*X(j).*X(1:3)) ;
+        end
+        % Impose the symmetry (build the lower-left corner).
+        T(2,1) = T(1,2);
+        T(3,1) = T(1,3);
+        T(3,2) = T(2,3);
+        
 % determine the eigenvalues of symmetric tij
       [EIVEC EIVAL] = eig(T) ;
 
