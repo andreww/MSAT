@@ -27,7 +27,7 @@
 %  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 %-------------------------------------------------------------------------------
 
-function MS_sphere(CC,rh,mode,varargin);
+function MS_sphere(CC,rh,mode,varargin)
 
 cmap = jet(64) ;
 icmapflip = 1 ; % reverse the sense of the colourscale
@@ -61,7 +61,7 @@ else
 end
 
 if ischar(mode)
-   if sum(strcmp({'p','s'},lower(mode)))~=1
+   if sum(strcmpi({'p','s', 's1', 's2'},mode))~=1
       error('Mode must be ''S''(-wave) or ''P''(-wave) ')
    end
 else
@@ -92,12 +92,17 @@ if (nofig~=1)
    figure('position',[0 0 800 800])
 end
 
+
 %% load the triangulation
 load SPHTR3.mat ;
-[SF,avs,vs1,vs2,vp] = MS_phasevels(CC,rh,inc,az) ;
+[~,avs,vs1,vs2,vp] = MS_phasevels(CC,rh,inc,az) ;
 
-if strcmp(lower(mode),'p')
+if strcmpi(mode,'p')
    trisurf(faces,x,y,z,vp) ;
+elseif strcmpi(mode,'s1')
+   trisurf(faces,x,y,z,vs1) ;
+elseif strcmpi(mode,'s2')
+   trisurf(faces,x,y,z,vs2) ;
 else
    trisurf(faces,x,y,z,avs) ;
 end
@@ -111,7 +116,7 @@ hold on
 if ~isnan(cax), caxis(cax), end
 
 %% plot the shear-wave polarisation
-if strcmp(lower(mode),'s') 
+if sum(strcmpi({'s','s1','s2'},mode))==1 
    load SPHTR2.mat ; % fewer sampled directions
 
 %  find the closest points to each specified direction   
@@ -128,15 +133,25 @@ if strcmp(lower(mode),'s')
       inc(ind) = din(idir)*180/pi ;
    end
    
-   [pol,avs,vs1,vs2,vp, SF] = MS_phasevels(CC,rh,inc,az) ;
+   [~,~,~,~,~, SF, SS] = MS_phasevels(CC,rh,inc,az) ;
    %% calculate PM vectors
    nv = length(x) ;
-   for iv=1:nv
-      XI=1.01.*[x(iv) y(iv) z(iv)] ;
-      X1 = XI-FSWTickLength.*SF(iv,:);
-      X2 = XI+FSWTickLength.*SF(iv,:);
-      plot3(XI(1),XI(2),XI(3),'ko','MarkerSize',4,'MarkerFaceColor','k')
-      plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'k-','LineWidth',2)
+   if sum(strcmpi(mode,{'s','s1'}))==1 
+      for iv=1:nv
+          XI=1.01.*[x(iv) y(iv) z(iv)] ;
+          X1 = XI-FSWTickLength.*SF(iv,:);
+          X2 = XI+FSWTickLength.*SF(iv,:);
+          plot3(XI(1),XI(2),XI(3),'ko','MarkerSize',4,'MarkerFaceColor','k')
+          plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'k-','LineWidth',2)
+      end
+   else
+      for iv=1:nv
+          XI=1.01.*[x(iv) y(iv) z(iv)] ;
+          X1 = XI-FSWTickLength.*SS(iv,:);
+          X2 = XI+FSWTickLength.*SS(iv,:);
+          plot3(XI(1),XI(2),XI(3),'wo','MarkerSize',4,'MarkerFaceColor','w')
+          plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'w-','LineWidth',2)
+      end
    end
 end
 
@@ -167,6 +182,15 @@ end
 axis off
 daspect([1 1 1]) ;
 if (nocbar~=1)
-colorbar('NorthOutside','FontSize',14,'FontWeight','bold')
+cbax = colorbar('NorthOutside','FontSize',14,'FontWeight','bold');
+if strcmpi(mode,'s')
+    title(cbax,'S-wave anisotropy (%)');
+elseif strcmpi(mode,'p')
+    title(cbax,'P-wave velocity (m/s)');
+elseif strcmpi(mode,'s1')
+    title(cbax,'Fast S-wave velocity (m/s)');
+elseif strcmpi(mode,'s2')
+    title(cbax,'Slow S-wave velocity (m/s)');
+end
 end
 return

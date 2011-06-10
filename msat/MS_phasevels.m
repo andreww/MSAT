@@ -41,7 +41,7 @@
 %            Computers & Gesosciences, vol16, pp385-393.
 %
 %
-function [pol,avs,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,inc,azi)
+function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 
 		if (length(inc)~=length(azi))
 			error('AZI and INC must be scalars or vectors of the same dimension');
@@ -60,6 +60,7 @@ function [pol,avs,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,inc,azi)
 		pol = zeros(size(azi)) ;
 		S1 = zeros(length(azi),3) ;
 		S1P = zeros(length(azi),3) ;
+        S2P = zeros(length(azi),3) ;
         
 %   ** Handle isotropic case quickly
      if isIsotropic(C, isotol)
@@ -99,6 +100,8 @@ function [pol,avs,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,inc,azi)
 %  ** calculate projection onto propagation plane      
       S1N = cross(XI,S1) ;
       S1P(ipair,:) = cross(XI,S1N);
+      S2N = cross(XI,S2) ;
+      S2P(ipair,:) = cross(XI,S2N);
 
 %  ** rotate into y-z plane to calculate angles
       [S1PR] = V_rot3(S1P,0,0,cazi) ;
