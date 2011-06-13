@@ -1,46 +1,52 @@
-%-------------------------------------------------------------------------------
-%                  MSAT - Matlab Seismic Anisotropy Toolkit 
-%-------------------------------------------------------------------------------
-% MS_phasevels - calculate the phase velocity details for a set of elastic 
-%                 constants
-%-------------------------------------------------------------------------------
-% [pol,avs,vs1,vs2,vp] = MS_phasevels(C,rh,inc,azi)
+% MS_PHASEVELS - Wave velocities in anisotropic media.
 %
-%	Inputs:
-%     
-%     C = Stiffness tensor, in 6x6 Voigt notation, units of GPa, symmetry is
-%            enforced.
-%     rh = density (units of kg/m^3)
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-%		* inc and azi may be scalars, or vectors of the same size. *
+% Calculate the phase velocity details for an elsticity matrix. 
 %
-%     AZI = angle from +ve 1-axis in x1-x2 plane                              
-%           (deg, +ve c'wise looking at origin from 3-axis)                  
-%     INC = angle from x1-x2 plane towards x3                                 
-%           (deg, zero is in x1-x2 plane)                                     
+%  [ pol, avs, vs1, vs2, vp, ...] = MS_phasevels( C, rh, inc, azi )
 %
-%  Outputs: 
+% Usage: 
+%     [ pol, avs, vs1, vs2, vp ] = MS_phasevels( C, rh, inc, azi )                    
+%         Calculate phase velocities from elasticity matrix C (in GPa) and
+%         density rh (in kg/m^3) for a propogation direction defined by
+%         an inclination and azimuth (both in degrees, see below). Output 
+%         details are given below.
 %
-%     'pol' = angle in plane normal to raypath of FSW                           
-%            (deg, zero is x3 direction, +ve c'wise looking along             
-%            raypath at origin)  
-%     'avs' = shear-wave anisotropy
-%     'vs1' = fast shear-wave velocity (m/s)
-%     'vs2' = slow shear-wave velocity (m/s)
-%     'vp'  = P-wave velocity (m/s)
+%     [ pol, avs, vs1, vs2, vp, SF, SS ] = MS_phasevels( C, rh, inc, azi )                    
+%         Additionally output fast and slow S-wave polarisation in vector
+%         form.
+%
+% Notes:
+%     Azi is defined as the angle in degrees from the +ve 1-axis in x1-x2 
+%     plane with +ve being clockwise when looking at origin from the
+%     3-axis. Inc is defined as the angle in degrees from the x1-x2 plane
+%     towards x3 with zero being in the x1-x2 plane. Inc and azi may be
+%     scalars, or vectors of the same size. Outputs are:
+%
+%       'pol' = angle in plane normal to raypath of FSW                           
+%              (deg, zero is x3 direction, +ve c'wise looking along             
+%              raypath at origin)  
+%       'avs' = shear-wave anisotropy
+%       'vs1' = fast shear-wave velocity (m/s)
+%       'vs2' = slow shear-wave velocity (m/s)
+%       'vp'  = P-wave velocity (m/s)
+%
+%     and all are vectors of length equal to the input inc and azi vectors.
+%     In the case of no S-wave splitting (vs1 and vs2 are equal to within
+%     eps^1/2) pol is set to NaN. Optional outputs SF and SS are arrays of
+%     size (length(inc),3), with each row corresponding to a polarisation
+%     vector. This implementation is based on EMATRIX6 by D. Mainprice. 
+%     Re-coded in MATLAB by James Wookey.
 % 
-%  See source code for further notes
-
-% (C) James Wookey, 2007-2011
-% Notes:   
-% Based on EMATRIX6 by D. Mainprice. Re-coded in MATLAB by JW
-%
 % Reference: Mainprice D. (1990). An efficient
 %            FORTRAN program to calculate seismic anisotropy from
 %            the lattice preferred orientation of minerals.
 %            Computers & Gesosciences, vol16, pp385-393.
-%
-%
+
+% (C) James Wookey, 2007-2011
+% (C) James Wookey and Andrew Walker, 2011
+
 function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 
 		if (length(inc)~=length(azi))
@@ -90,10 +96,16 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       S1 = EIGVEC(:,2) ;
 
   		if ~isreal(S1)
-  			S1
-  			fprintf('%f,%f\n',cinc,cazi)
-  			C
-  			error('bad') ;
+            error_str = ['The S1 polarisation vector is not real!\n\n'...
+                sprintf('inc = %f, azi = %f\n\n',cinc,cazi) ...
+                sprintf('C = %f %f %f %f %f %f\n',C(1:6,1)) ...
+                sprintf('    %f %f %f %f %f %f\n',C(1:6,2)) ...
+                sprintf('    %f %f %f %f %f %f\n',C(1:6,3)) ...
+                sprintf('    %f %f %f %f %f %f\n',C(1:6,4)) ...
+                sprintf('    %f %f %f %f %f %f\n',C(1:6,5)) ...
+                sprintf('    %f %f %f %f %f %f\n\n',C(1:6,6)) ...
+                sprintf('S1 = %f %f %f\n',S1)];
+  			error('MS_PHASEVELS:vectornotreal', error_str) ;
   		end
       S2 = EIGVEC(:,3) ;
 
