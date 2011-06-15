@@ -1,49 +1,31 @@
 
+% MS_PLOT - Plot phasevels/anisotropy on pole figures.
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+%
+% Given an elasticity matrix and density, produce pole figures showing 
+%     the P- and S-wave anisotrpy. 
+%
+%  % MS_plot(C, rh, ...)
+%
+% Usage: 
+%     MS_plot(C, rh)                    
+%         Produce three pole figures showing P-wave velocity, S-wave
+%         anisotropy and fast S-wave polarisation direction
+%
+%     MS_plot(C, rh)                    
+%          Further arguments are EVALed (most useful to change various 
+%          options, see source-code for details).
+%
 
-function MS_polefigure(C,rh,varargin)
-
-    [INC,AZ] = meshgrid([90:-6:0],[0:6:360]) ;
-    [~,~,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,...
-        reshape(INC,61*16,1),reshape(AZ,61*16,1));
-    %pol = reshape(pol,61,16);
-    %avs = reshape(avs,61,16);
-    vs1 = reshape(vs1,61,16);
-    vs2 = reshape(vs2,61,16);
-    vp =  reshape(vp,61,16);
-    S1_X = reshape(S1P(:,1),61,16);
-    S1_Y = reshape(S1P(:,2),61,16);
-    S1_Z = reshape(S1P(:,3),61,16);
-    
-    if nargin>2
-        plot_vpg(INC,AZ,vp,vs1,vs2,S1_X,S1_Y,S1_Z,varargin{:});
-    else 
-        plot_vpg(INC,AZ,vp,vs1,vs2,S1_X,S1_Y,S1_Z);
-    end
-return
-
-% --------------------------
-%  MATLAB function plot_vpg
-% --------------------------
-%
-%  Usage: 
-%     plot_vgp('file.vpg',...) - where file.vpg is a VPG file produced
-%     by ematrix5 (or other program). Other arguments are EVALed (most
-%     useful to change various options, see source-code for details). 
-%
-%  Purpose:    
-%     Plot pole figures from EMATRIX5/6 output (VPG files)
-%     At the moment phase velocities only are plotted
-%
-%  Bugs/known problems:       
-%     None (workaround for contourf bug)
-%
+% Change log / copyright statements.
+% 
 %  Written by James Wookey
 %  Department of Earth Sciences, University of Bristol, UK
 %  Version 1.2
 %  Incept: March 2004
 %  Last update: March 2007
 %
-
 %  Major changes log
 %
 %  v0.991 - fixed difference in plots
@@ -66,18 +48,12 @@ return
 %           little redundant with the other changes. 
 %  v1.2   - Reinstated proper contourf function since this got fixed in V7.4
 %  
-%-------------------------------------------------------------------------------
-%  This software is distributed in the hope that it will be useful,
-%  but WITHOUT ANY WARRANTY; without even the implied warranty of
-%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-%-------------------------------------------------------------------------------
 
-%-------------------------------------------------------------------------------
-   function plot_vpg(INC,AZ,VP,VS1,VS2,VS1_x,VS1_y,VS1_z,varargin)
-%-------------------------------------------------------------------------------
+%=========================================================================
+function MS_plot(C,rh,varargin)
+%=========================================================================
 
 %  ** Set defaults, these can be overriden in the function call
-
 %  ** configure contouring options
       cvect = 10 ;     % number of contours
       VPcvect = NaN ;  % set these for different number of contours for VP
@@ -101,6 +77,9 @@ return
       if isnan(AVScvect)
          AVScvect = cvect ;
       end   
+      
+      % check the inputs: C
+      assert(MS_checkC(C)==1, 'MS_PLOT:badC', 'MS_checkC error MS_plot') ;
 
 %  ** buggy MATLAB contourf (version 7.1-7.3)
 %
@@ -120,43 +99,24 @@ return
 
       rad = pi./180 ;
       deg = 180./pi ;
-
-%  ** check input            
-%      if isempty(fname)
-%         error('No filename specified') ;
-%      end      
-
-%  ** load the VPG file      
-%      file = local_load_vpgfile(fname) ;
-
-%  ** pull the bits out of the structure (for ease)
-%      INC    = file.INC ;
-%      AZ     = -file.AZ ; 
-      AZ = -AZ;% reverse so sph2cart() works properly
-%      VP     = file.VP ;
-%      VS1    = file.VS1 ;
-%      VS2    = file.VS2 ;
-%      VP_x   = file.VP_x ;
-%      VP_y   = file.VP_y ;
-%      VP_z   = file.VP_z ;
- %     VS1_x  = file.VS1_x ;
- %     VS1_y  = file.VS1_y ;
- %     VS1_z  = file.VS1_z ;
- %     VS2_x  = file.VS2_x ;
- %     VS2_y  = file.VS2_y ;
- %     VS2_z  = file.VS2_z ;
- %     VPG_x  = file.VPG_x ;
- %     VPG_y  = file.VPG_y ;
- %     VPG_z  = file.VPG_z ;
- %     VS1G_x = file.VS1G_x ;
- %     VS1G_y = file.VS1G_y ;
- %     VS1G_z = file.VS1G_z ;
- %     VS2G_x = file.VS2G_x ;
- %     VS2G_y = file.VS2G_y ;
- %     VS2G_z = file.VS2G_z ;
-
-%  ** clear the structure (to save memory)     
-      clear vpgfile
+      
+      % Set up inc-az grids...
+      [INC,AZ] = meshgrid([90:-6:0],[0:6:360]) ;
+      
+      % Invoke MS_phasevels to get wave velocs etc.
+      [~,~,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,...
+        reshape(INC,61*16,1),reshape(AZ,61*16,1));
+    
+      % reverse so sph2cart() works properly
+      AZ = -AZ;
+      
+      % Reshape results back to grids
+      VS1 = reshape(vs1,61,16);
+      VS2 = reshape(vs2,61,16);
+      VP =  reshape(vp,61,16);
+      VS1_x = reshape(S1P(:,1),61,16);
+      VS1_y = reshape(S1P(:,2),61,16);
+      VS1_z = reshape(S1P(:,3),61,16);
       
 %  ** output average velocities
       VPiso=mean(mean(VP)) ;
