@@ -32,12 +32,15 @@ function MS_sphere(CC,rh,mode,varargin)
 cmap = jet(64) ;
 icmapflip = 1 ; % reverse the sense of the colourscale
 FSWTickLength=0.08 ;
+FSWMarkerSize=4;
 dirs = [] ;
 dlen = 1.5 ;
 plotlabels = 1 ;
 plotaxes = 1 ;
 nofig = 0 ;
 nocbar = 0 ;
+velmesh = 3;
+polmesh = 2;
 cax = NaN ; % define to use
 
 % check the inputs: CC
@@ -94,7 +97,7 @@ end
 
 
 %% load the triangulation
-[x, y, z, faces, az, inc] =  get_mesh(3);
+[x, y, z, faces, az, inc] =  get_mesh(velmesh);
 [~,avs,vs1,vs2,vp] = MS_phasevels(CC,rh,inc,az) ;
 
 if strcmpi(mode,'p')
@@ -117,7 +120,7 @@ if ~isnan(cax), caxis(cax), end
 
 %% plot the shear-wave polarisation
 if sum(strcmpi({'s','s1','s2'},mode))==1 
-   [x, y, z, ~, az, inc] =  get_mesh(2);
+   [x, y, z, ~, az, inc] =  get_mesh(polmesh);
 
 %  find the closest points to each specified direction   
    [xd,yd,zd] = sph2cart(-daz,din,ones(size(daz))) ;
@@ -141,16 +144,16 @@ if sum(strcmpi({'s','s1','s2'},mode))==1
           XI=1.01.*[x(iv) y(iv) z(iv)] ;
           X1 = XI-FSWTickLength.*SF(iv,:);
           X2 = XI+FSWTickLength.*SF(iv,:);
-          plot3(XI(1),XI(2),XI(3),'ko','MarkerSize',4,'MarkerFaceColor','k')
-          plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'k-','LineWidth',2)
+          plot3(XI(1),XI(2),XI(3),'ko','MarkerSize',FSWMarkerSize,'MarkerFaceColor','k')
+          plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'k-','LineWidth',(FSWMarkerSize/2))
       end
    else
       for iv=1:nv
           XI=1.01.*[x(iv) y(iv) z(iv)] ;
           X1 = XI-FSWTickLength.*SS(iv,:);
           X2 = XI+FSWTickLength.*SS(iv,:);
-          plot3(XI(1),XI(2),XI(3),'wo','MarkerSize',4,'MarkerFaceColor','w')
-          plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'w-','LineWidth',2)
+          plot3(XI(1),XI(2),XI(3),'wo','MarkerSize',FSWMarkerSize,'MarkerFaceColor','w')
+          plot3([X1(1) X2(1)],[X1(2) X2(2)],[X1(3) X2(3)],'w-','LineWidth',(FSWMarkerSize/2))
       end
    end
 end
