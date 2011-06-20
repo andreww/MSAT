@@ -52,7 +52,7 @@ function test_MS_axes_triclin
     C45z = MS_rot3(C, 0, 0, 45);
     C90z = MS_rot3(C, 0, 0, 90);
 
-    assertElementsAlmostEqual(MS_axes(C),MS_axes(C90z));
+    assertElementsAlmostEqual(MS_axes(C,'debug'),MS_axes(C90z,'debug'));
 
 end
 

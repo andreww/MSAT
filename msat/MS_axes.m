@@ -94,15 +94,29 @@ v=[...
 [vecd,val]=eig(d) ; vald = [val(1,1) val(2,2) val(3,3)] ;    
 [vecv,val]=eig(v) ; valv = [val(1,1) val(2,2) val(3,3)] ;
 
+      RSD = [sum(vecd(1,:)) sum(vecd(2,:)) sum(vecd(3,:))]' ;
+      RSV = [sum(vecv(1,:)) sum(vecv(2,:)) sum(vecv(3,:))]' ;
+      RSD = RSD ./ norm(RSD) ; RSV = RSV ./ norm(RSV) ;
+
+
 %  ** DEBUG plots and info
 if debug
-     figure ;
-     
-     plot2vec(vecd(:,1),'b-','1'); plot2vec(vecv(:,1),'g-','1');   
-     plot2vec(vecd(:,2),'b-','2'); plot2vec(vecv(:,2),'g-','2'); 
-     plot2vec(vecd(:,3),'b-','3'); plot2vec(vecv(:,3),'g-','3'); 
-     axis([-3 3 -3 3]./3); daspect([1 1 1]) ;
-%     fprintf('Perp. check: %f %f\n',dot(X1,X2),dot(X1,X3));
+   figure ;
+   if 1
+      plot2vec(vecd(:,1),'b-','1'); plot2vec(vecv(:,1),'g-','1');   
+      plot2vec(vecd(:,2),'b-','2'); plot2vec(vecv(:,2),'g-','2'); 
+      plot2vec(vecd(:,3),'b-','3'); plot2vec(vecv(:,3),'g-','3'); 
+      plot2vec(RSD,'k-','RD') ; plot2vec(RSV,'k-','RV') ;
+      axis([-3 3 -3 3]./3); daspect([1 1 1]) ;
+   else
+      plotvec(vecd(:,1),'g-','1'); plotvec(vecv(:,1),'r-','1'); 
+      plotvec(vecd(:,2),'g-','2'); plotvec(vecv(:,2),'r-','2'); 
+      plotvec(vecd(:,3),'g-','3'); plotvec(vecv(:,3),'r-','3');
+      plotvec(RSD,'k-','RD') ; plotvec(RSV,'k-','RV') ;
+      
+      
+      axis([-3 3 -3 3 -3 3]./3); daspect([1 1 1]) ;
+    end
 end
 
 % count number of distinct eigenvalues. Maximum allowable difference is set
@@ -180,7 +194,7 @@ case 3
       [X1,X2,X3]=estimate_basis(D1,D2,D3,V1,V2,V3) ;
 
       irot = 1 ;
-      if (X3(1)==0 & X3(2)==0), irot=0;, end      
+      if (X3(1)==0 & X3(2)==0), irot=0; end      
    end
 otherwise
 % not possible.
@@ -194,7 +208,7 @@ end
 if irot
 %  check axes
    dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
-   if (length(find(dps>det_thresh))>0)
+   if (~isempty(find(dps>det_thresh)))
       if warn
          warning('MS_axes: Determined axes not orthogonal: DPS=') ;
          dps
@@ -275,52 +289,13 @@ function [C1,C2,C3]=estimate_basis(A1,A2,A3,B1,B2,B3)
 %
 %     Estimate the best basis vectors for decomposition. This is bisectrices
 %     of vectors A1 and 
-
-%  ** first, determine whether get a better result by flipping the sign
-%     of any two of the vectors. (two preserves the sense of the
-%     coordinate system).
-%
-
-%      C1=B1'; C2=B2'; C3=B3';
-
-
-
-%      [A1,A2,A3] = makeRH(A1,A2,A3) ;
       
-%      [B1,B2,B3] = makeRH(B1,B2,B3) ;
-
-%      M1=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ...
-%          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
-%          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] 
-%      
-%      M2=[dot(A1,-B1) dot(A1,-B2) dot(A1,-B3) ; ... % flip 1 and 2
-%          dot(A2,-B1) dot(A2,-B2) dot(A2,-B3) ; ...
-%          dot(A3,B1) dot(A3,B2) dot(A3,B3) ] 
-%      
-%      M3=[dot(A1,B1) dot(A1,B2) dot(A1,B3) ; ... % flip 2 and 3
-%          dot(A2,-B1) dot(A2,-B2) dot(A2,-B3) ; ...
-%          dot(A3,-B1) dot(A3,-B2) dot(A3,-B3) ] 
-%
-%      M4=[dot(A1,-B1) dot(A1,-B2) dot(A1,-B3) ; ... % flip 1 and 3
-%          dot(A2,B1) dot(A2,B2) dot(A2,B3) ; ...
-%          dot(A3,-B1) dot(A3,-B2) dot(A3,-B3) ] 
-%      
-%%  ** determine the optimal axes signs, this is where the sum of the M elements
-%%     matrix is maximum ; 
-%      [Y,ind] = sort([sum(sum(M1)) sum(sum(M2)) sum(sum(M3)) sum(sum(M4)) ]) ;
-%
-%%  ** flip the A-vectors into these orientation
-%      switch ind(4)
-%         case 2 % flip 1 and 2
-%            B1 = -B1; B2 = -B2; 
-%         case 3 % flip 2 and 3
-%            B2 = -B2; B3 = -B3; 
-%         case 4 % flip 1 and 3
-%            B1 = -B1; B3 = -B3;
-%         otherwise   
-%%        ** Do nothing **         
-%      end       
-
+%      C1 = A1' ;
+%      C2 = A2' ;
+%      C3 = A3' ;
+      
+%      return
+      
       [dum, ind] = max(abs([dot(A1,B1) dot(A1,B2) dot(A1,B3)])) ;
       eval(sprintf('X=B%1.1i;',ind)) ;
       if dot(A1,X)<0
@@ -367,16 +342,25 @@ function [C1,C2,C3]=estimate_basis(A1,A2,A3,B1,B2,B3)
      
 %     [C1,C2,C3] = makeRH(C1,C2,C3) ;
      
+     if C1(3)<0
+        C1 = -C1 ;
+        C2 = -C2 ;
+        C3 = -C3 ;
+     end   
+     
 %  ** DEBUG plots and info
-%     figure ;
-%     plotvec(C1,'b-','1');    
-%     plotvec(C2,'b-','2');  
-%     plotvec(C3,'b-','3'); 
-%
-%     plotvec(A1,'g-','1'); plotvec(B1,'r-','1'); 
-%     plotvec(A2,'g-','2'); plotvec(B2,'r-','2'); 
-%     plotvec(A3,'g-','3'); plotvec(B3,'r-','3');
-%     axis([-3 3 -3 3 -3 3]./3); daspect([1 1 1]) ;
+     figure ;
+     plotvec(C1,'b-','1');    
+     plotvec(C2,'b-','2');  
+     plotvec(C3,'b-','3'); 
+
+     plotvec(A1,'g-','1'); plotvec(B1,'r-','1'); 
+     plotvec(A2,'g-','2'); plotvec(B2,'r-','2'); 
+     plotvec(A3,'g-','3'); plotvec(B3,'r-','3');
+     axis([-3 3 -3 3 -3 3]./3); daspect([1 1 1]) ;
+     
+     
+     
 %
 %     fprintf('Perp. check: %f %f\n',dot(C1,C2),dot(C1,C3));
      
