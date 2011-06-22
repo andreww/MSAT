@@ -23,7 +23,7 @@ function [ varargout ] = MS_elasticDB( uid )
                -0.9  -5.8  -9.8  -7.2   0.5  33.5 ];
          rh = 2623 ;
        case {'enstatite', 'ens'}
-         info = 'Single crystal orthoenstatote (Weidner et al, PEPI 1978, 17:7-13)' ;
+         info = 'Single crystal orthoenstatite (Weidner et al, PEPI 1978, 17:7-13)' ;
          C = [ 225.0  72.0  54.0   0.0  0.0   0.0 ; ...
                72.0  178.0  53.0   0.0  0.0   0.0 ; ...
                54.0   53.0 214.0   0.0  0.0   0.0 ; ...
@@ -54,6 +54,8 @@ function [ varargout ] = MS_elasticDB( uid )
    end
    
    switch nargout
+   case 0
+      varargout(1) = {C} ;   
    case 1
       varargout(1) = {C} ;
    case 2
