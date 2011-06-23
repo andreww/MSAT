@@ -1,12 +1,21 @@
-%  UNWIND_PM_180 - Unwind an angle until it is between -180 and 180 degrees
+% MS_UNWIND_PM_180 - Unwind an angle until it is between 0 and 360 degrees
 %
-%  [angle] = unwind_pm_180(angle_in)
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-%  Angle can be a scalar or a vector. 
+% Utility function to find the equivelent angle between 0 and 360 degrees. 
 %
+%  % [angle] = unwind_pm_180(angle_in)
+%
+% Usage: 
+%     for a given value of angle_in return a value greater than 
+%     -180 and less than or equal to 180 by repetedly adding or subtracting
+%     360. Angle can be a scalar or a vector.
+%
+% See also: MS_UNWIND_0_180, MS_UNWIND_360, MS_UNWIND_PM_90
+
 %  Created by James Wookey on 2007-05-08.
 %
-function [angle] = unwind_pm_180(angle_in)
+function [angle] = MS_unwind_pm_180(angle_in)
 %===============================================================================
    angle = angle_in ;
    for i=1:1000 % should never reach this
@@ -25,7 +34,8 @@ function [angle] = unwind_pm_180(angle_in)
    end
 
 %  if we got to here something is probably wrong:
-error('UNWIND_PM_180 completed 1000 iterations without angle reaching +/-180 deg')   
+error('MS:UNWIND:toomanyits', ...
+    'UNWIND_PM_180 completed 1000 iterations without angle reaching +/-180 deg')   
    
 return
 %===============================================================================
