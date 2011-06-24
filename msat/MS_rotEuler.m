@@ -1,4 +1,4 @@
-function [ CC ] = MS_rot_mtex_rotation( C, o )
+function [ CC ] = MS_rotEuler( C, phi1, theta, phi2 )
 %MS_rot_mtex_rotation: rotate elastic matrix using mtex orentation object
 %   The MTEX toolbox can represent cryatal orentations using a range of 
 %   Euler angle conventions as instances of the orentation class. This 
@@ -6,42 +6,38 @@ function [ CC ] = MS_rot_mtex_rotation( C, o )
 %   tensors in MSAT.
 
 
-    try
-       mtex_path;
-    catch e
-      if strcmp(e.identifier, 'MATLAB:UndefinedFunction')
-          error('MS:NoMtex', ...
-            'MTEX must be installed in order to use MS_rot_mtex_rotation');
-      else
-          error('MS:internaError', ...
-            'Internal error in MS_rot_mtex_rotation');
-      end
-    end
 
-    numOs = size(o, 1);
+
+    numEs = size(phi1, 1);
+    
+    % Convert all angles to radians
+    phi1r = phi1*(pi/180.0);
+    thetar = theta*(pi/180.0);
+    phi2r = phi2*(pi/180.0);
+    
     numdimCs = ndims(C);
-    if ((numOs == 1) && (numdimCs == 2))
+    if ((numEs == 1) && (numdimCs == 2))
         % Two matrix scalar case
-        CC = rot_mtex_rotation_scalar(C, o);
-    elseif ((numOs > 1) && (numdimCs == 2))
+        CC = rot_Euler_scalar(C, phi1r, thetar, phi2r);
+    elseif ((numEs > 1) && (numdimCs == 2))
         % Many rotations and one matrix case
-        CC = zeros(6,6,numOs);
-        for i = 1:numOs
-            CC(:,:,i) = rot_mtex_rotation_scalar(C, o(i));
+        CC = zeros(6,6,numEs);
+        for i = 1:numEs
+            CC(:,:,i) = rot_Euler_scalar(C, phi1r(i), thetar(i), phi2r(i));
         end
-    elseif ((numOs == 1) && (numdimCs == 3))
+    elseif ((numEs == 1) && (numdimCs == 3))
         % Many matrix and one rotation case
         CC = zeros(6,6,size(C, 3));
         for i = 1:size(C, 3)
-            CC(:,:,i) = rot_mtex_rotation_scalar(C(:,:,i), o);
+            CC(:,:,i) = rot_Euler_scalar(C(:,:,i), phi1r, thetar, phi2r);
         end
-    elseif ((numOs > 1) && (numdimCs == 3))
+    elseif ((numEs > 1) && (numdimCs == 3))
         % List of rotatiosn and matrices case
-        assert((numOs == size(C, 3)), 'MS:ListsMustMatch', ...
+        assert((numEs == size(C, 3)), 'MS:ListsMustMatch', ...
             'The length of the lists of rotations and matrices must match');
         CC = zeros(6,6,size(C, 3));
         for i = 1:size(C,3)
-            CC(:,:,i) = rot_mtex_rotation_scalar(C(:,:,i), o(i));
+            CC(:,:,i) = rot_Euler_scalar(C(:,:,i), phi1r(i), thetar(i), phi2r(i));
         end
     end
     
@@ -49,9 +45,7 @@ function [ CC ] = MS_rot_mtex_rotation( C, o )
 end
 
 
-function [ CC ] = rot_mtex_rotation_scalar(C, o)
-    assert(isa(o, 'rotation'), 'MS:notarot', ...
-        'Argument "o" must be a MTEX rotation object');
+function [ CC ] = rot_Euler_scalar(C, phi1, theta, phi2)
     
     %FIXME - delegate this text to MS_rotR?
     assert(MS_checkC(C)==1, 'MS:Cinvalid', ...
@@ -59,7 +53,7 @@ function [ CC ] = rot_mtex_rotation_scalar(C, o)
     
     % Extract Bundge convention Euler angles from rotation object
     % and pre-compute trig functions. phi1 etc are in radians.
-    [phi1, theta, phi2] = Euler(o, 'Bundge');
+    %[phi1, theta, phi2] = Euler(o, 'Bundge');
     cp1 = cos(phi1);
     sp1 = sin(phi1);
     cp2 = cos(phi2);
@@ -78,12 +72,3 @@ function [ CC ] = rot_mtex_rotation_scalar(C, o)
     CC = MS_rotR(C, g);
    
 end
-
-% Things to add...
-% Make this work (JW's rot func)
-% check g is a rotation matrix
-% make it work for lists of g's an one matrix
-% make it work for lists of C's and one g
-% make it work for equal length lists?
-% example for VRH av from VPSC output.
-

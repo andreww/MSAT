@@ -1,8 +1,8 @@
-function test_suite = test_MS_rot_mtex_rotation
+function test_suite = test_MS_rotEuler
 initTestSuite;
 end
 
-function test_MS_rot_mtex_rotation_scalar_vector
+function test_MS_rot_Euler_scalar_vector
 
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
@@ -14,18 +14,22 @@ function test_MS_rot_mtex_rotation_scalar_vector
     Cs_in(:,:,1) = C_in;
     Cs_in(:,:,2) = C_in;
     Cs_in(:,:,3) = C_in;
-    o = rotation('Euler',90*degree,0*degree,0*degree,'Roe');
-    os = [o ; o ; o];
+    phi1 = 90.0;
+    theta = 0.0;
+    phi2 = 0.0;
+    phi1s = [phi1 ; phi1; phi1];
+    thetas = [theta ; theta ; theta];
+    phi2s = [phi2 ; phi2 ; phi2];
     
     % Scalar test
-    assertElementsAlmostEqual(C_in, MS_rot_mtex_rotation(C_in, o))
+    assertElementsAlmostEqual(C_in, MS_rotEuler(C_in, phi1, theta, phi2))
     % Vecor tests
-    assertElementsAlmostEqual(Cs_in, MS_rot_mtex_rotation(Cs_in, o))
-    assertElementsAlmostEqual(Cs_in, MS_rot_mtex_rotation(C_in, os))
-    assertElementsAlmostEqual(Cs_in, MS_rot_mtex_rotation(Cs_in, os))
+    assertElementsAlmostEqual(Cs_in, MS_rotEuler(Cs_in, phi1, theta, phi2))
+    assertElementsAlmostEqual(Cs_in, MS_rotEuler(C_in, phi1s, thetas, phi2s))
+    assertElementsAlmostEqual(Cs_in, MS_rotEuler(Cs_in, phi1s, thetas, phi2s))
 end
 
-function test_MS_rot_mtex_rotation_errors
+function test_MS_rot_Euler_errors
 
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
@@ -38,16 +42,23 @@ function test_MS_rot_mtex_rotation_errors
     Cs_in(:,:,2) = C_in;
     Cs_in(:,:,3) = C_in;
     Cs_in(:,:,4) = C_in;
-    o = rotation('Euler',90*degree,0*degree,0*degree,'Roe');
-    os = [o ; o ; o];
-    noto = 'not a rotation object';
+    phi1 = 90.0;
+    theta = 0.0;
+    phi2 = 0.0;
+    phi1s = [phi1 ; phi1; phi1];
+    thetas = [theta ; theta ; theta];
+    phi2s = [phi2 ; phi2 ; phi2];
     
     % 4 elastic matices and 3 rotation objects...
-    f = @()MS_rot_mtex_rotation(Cs_in, os);
+    f = @()MS_rotEuler(Cs_in, phi1s, thetas, phi2s);
     assertExceptionThrown(f, 'MS:ListsMustMatch')
     
-    % Not a rotation object
-    f = @()MS_rot_mtex_rotation(Cs_in, noto);
-    assertExceptionThrown(f, 'MS:notarot')
+    % 4 elastic matices and 3 rotation objects...
+    f = @()MS_rotEuler(Cs_in, phi1s, theta, phi2s);
+    assertExceptionThrown(f, 'MS:ListsMustMatch')
+    
+    % 4 elastic matices and 3 rotation objects...
+    f = @()MS_rotEuler(Cs_in, phi1s, thetas, phi2);
+    assertExceptionThrown(f, 'MS:ListsMustMatch')
     
 end
