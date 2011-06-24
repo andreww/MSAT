@@ -19,7 +19,7 @@ ebsd = loadEBSD(fname,CS,SS,'interface','generic' ...
 phi1s=phi1s*(180.0/pi);
 thetas=thetas*(180.0/pi);
 phi2s=phi2s*(180.0/pi);
-num_xtals = length(phi1s)
+num_xtals = length(phi1s);
 
 %All_Cs = MS_rot_mtex_rotation(C, get(ebsd,'orientations'));
 all_Cs = MS_rotEuler(C, phi1s, thetas, phi2s);
