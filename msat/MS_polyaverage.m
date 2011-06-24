@@ -1,4 +1,4 @@
-% MS_CALC_POLYAVERAGE - Isotropic elasticity for polycrystal 
+% MS_POLYAVERAGE - Isotropic elasticity for polycrystal 
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
@@ -22,7 +22,7 @@
 %     pp. 122.
 %
 %
-% See also: MS_VRH, MS_CALC_ANISOTROPY
+% See also: MS_VRH, MS_ANISOTROPY
 
 % (C) James Wookey and Andrew Walker, 2011
 

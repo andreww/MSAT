@@ -1,38 +1,38 @@
-% MS_CALC_ANISOTROPY - Simple measures of anisotropy 
+% MS_ANISOTROPY - Simple measures of anisotropy 
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 % Calculate the degree of ansiotropy of an elasticity matrix. 
 %
-% [ uA, ... ] = MS_calc_anisotropy( C, ... )
+% [ uA, ... ] = MS_anisotropy( C, ... )
 %
 % Usage: 
-%     [ uA ] = MS_calc_anisotropy( C )                    
+%     [ uA ] = MS_anisotropy( C )                    
 %         Return the Universal Elastic Anisotropy Index of Ranganathan
 %         and Ostoja-Starzewski (2008). Valid for any elasticity matrix,
 %         uA is zero for an isotropic case and increses for incresing 
 %         anisotropy.
 %
-%     [ uA, lmA ] = MS_calc_anisotropy( C )
+%     [ uA, lmA ] = MS_anisotropy( C )
 %         Also return the general measure of anisotropy proposed by
 %         Ledbetter and Miglion (2006). This the the ratio of the fastest
 %         and slowest squared shear wave velocity over all propogation
 %         and polarization directions. Equal to one in the isotropic case,
 %         increses with incresing anisotropy.
 %
-%     [ uA, lmA, zA ] = MS_calc_anisotropy( C )
+%     [ uA, lmA, zA ] = MS_anisotropy( C )
 %         Also return the Zenner (1948) measure of anisotropy. This is
 %         only valid for cubic crystals (NaN is returned if C does not 
 %         represent a cubic crystal). zA is 1 for an isotropic case and
 %         increses or decreses with incresing anisotropy.
 %
-%     [ uA, lmA, zA, cbA ] = MS_calc_anisotropy( C )
+%     [ uA, lmA, zA, cbA ] = MS_anisotropy( C )
 %         Also return the Chung-Buessem (1967) anisotropy index. This
 %         is a single valued measure of anisotropy derived from zA. Like
 %         uA, this is zero for an isotropic case and increses for incresing 
 %         anisotropy. Only valid for matricies representing cubic crystals.
 %
-%     [ uA, lmA, ... ] = MS_calc_anisotropy( C, n )
+%     [ uA, lmA, ... ] = MS_anisotropy( C, n )
 %         Set the number of random directions to sample for the calculation
 %         of lmA. Defaults to 1000, which seems to give results accurate to
 %         two decimal places. Ledbetter and Miglion (2006) use 10000 which 
@@ -67,7 +67,7 @@
 
 % (C) James Wookey and Andrew Walker, 2011
 
-function [ uA, lmA, zA, cbA] = MS_calc_anisotropy( C, varargin )
+function [ uA, lmA, zA, cbA] = MS_anisotropy( C, varargin )
 
     numprop = 1000;
     % process the optional arguments
