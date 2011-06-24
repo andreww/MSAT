@@ -1,14 +1,49 @@
+% MS_ROTEULER - Rotate an elasticity matrix using Bunge's Euler angles
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+%
+% Rotate one or more elasticity matrices usign Bunge's Euler angles 
+%
+%  % [ CC ] = MS_rotEuler( C, phi1, theta, phi2 )
+%
+% Usage: 
+%     For three angles in degrees (phi1, theta, phi2) representing a
+%     rotation in Bunge convention rotate the elasticity matrix C. All
+%     variables can be arrays or scalars but (1) the angles must all be the
+%     same length and (2) either C or all the angles must be scalars unless
+%     they are the same length.
+%
+% Notes:
+%    In the context of this function the term 'Euler angle' is used in 
+%    the sense common in texture analysis not computer graphics etc. where
+%    the three angles are rotations around a fixes axis system (see 
+%    MS_rot3 for this case). In the (Bunge) convention used here the object
+%    (crystal) reference frame is first assumed to be alligned with the 
+%    sample reference frame. The object is then rotated around the common
+%    z axis by an angle phi1. The second rotation (theta) is about 
+%    the object's x axis (which is no longer parallel to the external 
+%    x axis). The third rotation, phi2, is about the samples z axis 
+%    (which, by this point, is not paralell with the external z axis). See
+%    Figure 5 of Bunge 1985 for a graphical example.
+%
+% References:
+%    Bunge, H. J. (1985) "Representaton of Preferred Orientations" in H.-R.
+%    Wenk (ed.) "Preferred Orientation in Deformed Metals and Rocks: 
+%     An Introduction to Modern Texture Analysis" Academic Press inc.
+%     Orlando.
+%
+% See also: MS_ROT3 MS_ROTR
+
+% (C) James Wookey and Andrew Walker, 2011
+
 function [ CC ] = MS_rotEuler( C, phi1, theta, phi2 )
-%MS_rot_mtex_rotation: rotate elastic matrix using mtex orentation object
-%   The MTEX toolbox can represent cryatal orentations using a range of 
-%   Euler angle conventions as instances of the orentation class. This 
-%   function allows such instances to be used to rotate elatic constnats
-%   tensors in MSAT.
 
-
-
-
+    % How many Euler angles - are lists correct length. 
     numEs = size(phi1, 1);
+    assert(numEs == size(theta, 1), 'MS:ListsMustMatch',...
+        'The number of phi1 angles must be the same as the number of theta angles')
+    assert(numEs == size(phi2, 1), 'MS:ListsMustMatch',...
+        'The number of phi1 angles must be the same as the number of phi2 angles')
     
     % Convert all angles to radians
     phi1r = phi1*(pi/180.0);
@@ -51,9 +86,7 @@ function [ CC ] = rot_Euler_scalar(C, phi1, theta, phi2)
     assert(MS_checkC(C)==1, 'MS:Cinvalid', ...
         'Argument "C" must be a valid 6x6 elasticity matrix');
     
-    % Extract Bundge convention Euler angles from rotation object
-    % and pre-compute trig functions. phi1 etc are in radians.
-    %[phi1, theta, phi2] = Euler(o, 'Bundge');
+    % Pre-compute trig functions.
     cp1 = cos(phi1);
     sp1 = sin(phi1);
     cp2 = cos(phi2);
