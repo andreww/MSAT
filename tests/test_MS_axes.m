@@ -12,7 +12,9 @@ function test_MS_axes_ortho
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
       
-      fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      if 0
+          fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      end
       
       C1 = MS_rot3(C,a1,b1,g1) ;
       C2 = MS_rot3(C,a2,b2,g2) ;
@@ -38,7 +40,9 @@ function test_MS_axes_triclin_weak
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
       
-      fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      if 0
+          fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      end
       
       C1 = MS_rot3(C,a1,b1,g1) ;
       C2 = MS_rot3(C,a2,b2,g2) ;
@@ -59,7 +63,9 @@ function test_MS_axes_triclin_strong
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
       
-      fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      if 0
+          fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      end
       
       C1 = MS_rot3(C,a1,b1,g1) ;
       C2 = MS_rot3(C,a2,b2,g2) ;
