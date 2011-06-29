@@ -2,6 +2,31 @@ function test_suite = test_MS_axes
 initTestSuite;
 end
 
+function test_MA_axes_reference
+    % Test the olivine example from page 671 of B&C
+    % This checks that (for this case) the orentation
+    % is correct (no permutation of axes).
+    C_ref = [ 192.0  66.0  60.0   0.0   0.0   0.0 ; ...
+               66.0 160.0  56.0   0.0   0.0   0.0 ; ...
+               60.0  56.0 272.0   0.0   0.0   0.0 ; ...
+                0.0   0.0   0.0  60.0   0.0   0.0 ; ...
+                0.0   0.0   0.0   0.0  62.0   0.0 ; ...
+                0.0   0.0   0.0   0.0   0.0  49.0 ];
+            
+    for i=1:25
+      a1 = rand.*360 ;
+      b1 = rand.*360 ; 
+      g1 = rand.*360 ;
+      
+      if 0
+          fprintf('Rotations: [%6.1f %6.1f %6.1f]\n',a1,b1,g1)
+      end
+      
+      C1 = MS_rot3(C_ref,a1,b1,g1) ;
+
+      assertElementsAlmostEqual(MS_axes(C1),C_ref);
+end
+
 function test_MS_axes_ortho
     % Test the interpolator works for constant
     % matrices rotated about axies
