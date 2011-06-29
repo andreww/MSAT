@@ -157,7 +157,7 @@ case 3
       X2=vecd(:,2)' ;
       X3=vecd(:,3)' ;
       
-      [X1,X2,X3] = makeRH(X1,X2,X3) ; % make sure they form a RH set.
+      % [X1,X2,X3] = makeRH(X1,X2,X3) ; % make sure they form a RH set.
 
       irot = 1 ;
       if (all(all([X1' X2' X3'] == eye(3))))

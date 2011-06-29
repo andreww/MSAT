@@ -59,8 +59,7 @@ function test_MS_interpolate_angs_triclin
     C30z = MS_rot3(C, 0, 0, 30);
     C45z = MS_rot3(C, 0, 0, 45);
     C90z = MS_rot3(C, 0, 0, 90);
-    assertElementsAlmostEqual(MS
-    _interpolate(C, C90z, 0.5), C45z);
+    assertElementsAlmostEqual(MS_interpolate(C, C90z, 0.5), C45z);
     assertElementsAlmostEqual(MS_interpolate(C10z, C30z, 0.5), C20z);
 
     assertElementsAlmostEqual(MS_interpolate(C10z, C110z, 0.5), C60z);
