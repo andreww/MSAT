@@ -225,9 +225,8 @@ if irot
 %     we try 180 degree rotations around all the principle axes. For each flip, we choose
 %     the result that gives the fastest P-wave velocity in the [1 1 1] direction
       if isMonoOrTri
-         CR = tryrotations(CR) ;
+         [CR,RR] = tryrotations(CR,RR) ;
       end   
-            
    end
 else
    if warn, warning('No rotation was deemed necessary.');, end
@@ -254,7 +253,7 @@ return
 %%%   SUBFUNCTIONS
 %%%
 
-function [CRR] = tryrotations(CR) ;
+function [ CRR, RRR ] = tryrotations( CR, RR ) ;
 %  ** try all combinations of 180 rotations around principle axes
 %     select the one that gives the highest Vp in the [1 1 1] direction
       x1r = [000 180 000 000 180 000] ;
@@ -266,7 +265,15 @@ function [CRR] = tryrotations(CR) ;
             MS_phasevels( MS_rot3(CR,x1r(i),x2r(i),x3r(i)), 2000, 45, 45 ) ;
       end
       [~,ind] = sort(vp) ; % select fastest
+      
       CRR = MS_rot3(CR,x1r(ind(end)),x2r(ind(end)),x3r(ind(end))) ;
+
+      a = x1r(ind(end)) * pi/180. ; R1 = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
+      b = x2r(ind(end)) * pi/180. ; R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
+      g = x3r(ind(end)) * pi/180. ; R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+
+      RRR =  RR * R3 * R2 * R1 ;
+
 return
 
 function [C1,C2,C3]=estimate_basis(A1,A2,A3,B1,B2,B3)

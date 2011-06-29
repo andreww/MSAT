@@ -7,7 +7,7 @@ function test_MS_axes_ortho
     % matrices rotated about axies
  
     [C, r] = MS_elasticDB('olivine');
-   for i=1:100 
+   for i=1:25
       a1 = rand.*360 ; a2 = rand.*360 ;
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
@@ -33,7 +33,7 @@ function test_MS_axes_triclin_weak
    
    C=Cweak ;
     
-   for i=1:100 
+   for i=1:25
       a1 = rand.*360 ; a2 = rand.*360 ;
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
@@ -54,7 +54,7 @@ function test_MS_axes_triclin_strong
  
    [C, r] = MS_elasticDB('albite');
 
-   for i=1:100 
+   for i=1:25
       a1 = rand.*360 ; a2 = rand.*360 ;
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
