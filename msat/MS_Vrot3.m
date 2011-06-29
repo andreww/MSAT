@@ -24,8 +24,23 @@
 %
 
 %===============================================================================
-   function [VR] = MS_Vrot3(Vin,alp,bet,gam)
+   function [VR] = MS_Vrot3(Vin,alp,bet,gam,varargin)
 %===============================================================================
+
+      reverse = 0 ;
+
+%  ** process the optional arguments
+      iarg = 1 ;
+      while iarg <= (length(varargin))
+         switch lower(varargin{iarg})
+            case 'reverse' % flag (i.e., no value required)
+               reverse = 1 ;
+               iarg = iarg + 1 ;
+            otherwise 
+               error('MS:VROT3:UnknownOption',...
+                  ['Unknown option: ' varargin{iarg}]) ;   
+         end   
+      end
 
       [nr nc] = size(Vin) ; % store this to produce output
       itran = 0 ;
@@ -54,8 +69,11 @@
       R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
       R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
       
-      RR =  R3 * R2 * R1;
-      
+      if reverse
+          RR = R1 * R2 * R3 ;
+      else    
+          RR =  R3 * R2 * R1;
+      end
 %  ** apply it
       VR = RR * V;
       

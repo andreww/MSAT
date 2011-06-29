@@ -2,57 +2,70 @@ function test_suite = test_MS_axes
 initTestSuite;
 end
 
-
 function test_MS_axes_ortho
     % Test the interpolator works for constant
     % matrices rotated about axies
  
     [C, r] = MS_elasticDB('olivine');
-    C90x = MS_rot3(C, 90, 0, 0);
-    C45x = MS_rot3(C, 45, 0, 0);
-    C40y = MS_rot3(C, 0, 40, 0);
-    C30y = MS_rot3(C, 0, 30, 0);
-    C31y = MS_rot3(C, 0, 31, 0);
-    C35y = MS_rot3(C, 0, 35, 0);
-    C39y = MS_rot3(C, 0, 39, 0);
-    C10z = MS_rot3(C, 0, 0, 10);
-    C110z = MS_rot3(C, 0, 0, 110);
-    C60z = MS_rot3(C, 0, 0, 60);
- 
-    C20z = MS_rot3(C, 0, 0, 20);
-    C30z = MS_rot3(C, 0, 0, 30);
-    C45z = MS_rot3(C, 0, 0, 45);
-    C90z = MS_rot3(C, 0, 0, 90);
+   for i=1:25
+      a1 = rand.*360 ; a2 = rand.*360 ;
+      b1 = rand.*360 ; b2 = rand.*360 ;
+      g1 = rand.*360 ; g2 = rand.*360 ;
+      
+      fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      
+      C1 = MS_rot3(C,a1,b1,g1) ;
+      C2 = MS_rot3(C,a2,b2,g2) ;
+
+      assertElementsAlmostEqual(MS_axes(C1),MS_axes(C2));
     
-    Cmulti = MS_rot3(C, 15, 67, 23);
-
-    assertElementsAlmostEqual(MS_axes(C),MS_axes(C90z));
-    assertElementsAlmostEqual(MS_axes(C90z),MS_axes(Cmulti));
-
+   end
 end
 
-function test_MS_axes_triclin
+function test_MS_axes_triclin_weak
+   % Test the interpolator works for constant
+   % matrices rotated about axes
+   close all
+   [C, r] = MS_elasticDB('albite');
+   [Ciso] = MS_decomp(C) ;
+   
+   [Cweak] = MS_VRH([0.05 0.95],C,r,Ciso,r) ;
+   
+   C=Cweak ;
+    
+   for i=1:25
+      a1 = rand.*360 ; a2 = rand.*360 ;
+      b1 = rand.*360 ; b2 = rand.*360 ;
+      g1 = rand.*360 ; g2 = rand.*360 ;
+      
+      fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      
+      C1 = MS_rot3(C,a1,b1,g1) ;
+      C2 = MS_rot3(C,a2,b2,g2) ;
+
+      assertElementsAlmostEqual(MS_axes(C1),MS_axes(C2));
+    
+   end
+end
+
+function test_MS_axes_triclin_strong
     % Test the interpolator works for constant
     % matrices rotated about axes
  
-    [C, r] = MS_elasticDB('albite');
-    C90x = MS_rot3(C, 90, 0, 0);
-    C45x = MS_rot3(C, 45, 0, 0);
-    C40y = MS_rot3(C, 0, 40, 0);
-    C30y = MS_rot3(C, 0, 30, 0);
-    C31y = MS_rot3(C, 0, 31, 0);
-    C35y = MS_rot3(C, 0, 35, 0);
-    C39y = MS_rot3(C, 0, 39, 0);
-    C10z = MS_rot3(C, 0, 0, 10);
-    C110z = MS_rot3(C, 0, 0, 110);
-    C60z = MS_rot3(C, 0, 0, 60);
- 
-    C20z = MS_rot3(C, 0, 0, 20);
-    C30z = MS_rot3(C, 0, 0, 30);
-    C45z = MS_rot3(C, 0, 0, 45);
-    C90z = MS_rot3(C, 0, 0, 90);
+   [C, r] = MS_elasticDB('albite');
 
-    assertElementsAlmostEqual(MS_axes(C,'debug'),MS_axes(C90z,'debug'));
+   for i=1:25
+      a1 = rand.*360 ; a2 = rand.*360 ;
+      b1 = rand.*360 ; b2 = rand.*360 ;
+      g1 = rand.*360 ; g2 = rand.*360 ;
+      
+      fprintf('Rotations: [%6.1f %6.1f %6.1f] [%6.1f %6.1f %6.1f]\n',a1,b1,g1,a2,b2,g2)
+      
+      C1 = MS_rot3(C,a1,b1,g1) ;
+      C2 = MS_rot3(C,a2,b2,g2) ;
 
+      assertElementsAlmostEqual(MS_axes(C1),MS_axes(C2));
+    
+   end
 end
 
