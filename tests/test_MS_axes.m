@@ -12,6 +12,13 @@ function test_MA_axes_reference
                 0.0   0.0   0.0  60.0   0.0   0.0 ; ...
                 0.0   0.0   0.0   0.0  62.0   0.0 ; ...
                 0.0   0.0   0.0   0.0   0.0  49.0 ];
+    % NB: The reference matrix (above) has the second
+    % stiffest direction in the X1 direction. Because our
+    % d eigen-vecors are sorted we have stiffnesses X3>X2>X1
+    % Rotate C_ref into our frame...
+    C_ref = MS_rot3(C_ref,0,0,90);
+    % Shouldn't matter for future decoposition (T, H and I maticies
+    % are not changed by this, only O.
             
     for i=1:25
       a1 = rand.*360 ;
@@ -25,6 +32,7 @@ function test_MA_axes_reference
       C1 = MS_rot3(C_ref,a1,b1,g1) ;
 
       assertElementsAlmostEqual(MS_axes(C1),C_ref);
+    end
 end
 
 function test_MS_axes_ortho
@@ -100,3 +108,23 @@ function test_MS_axes_triclin_strong
    end
 end
 
+function test_MS_axes_errors
+
+    [C, ~] = MS_elasticDB('olivine');
+    f = @()MS_axes(C, 'NotAnArgument');
+    assertExceptionThrown(f, 'MS:AXES:UnknownOption')
+
+    % This is open coded so that we can check the output
+    % ... cannot work out how to do this by passing a function
+    % handle into assertExceptionThrown. Maybe a patch to xunit
+    % is in order
+    val = 0;  
+    try
+        [out1, out2, out3] = MS_axes(C);
+    catch e
+        assert(strcmp(e.identifier, ...
+      'MS:AXES:BadOutputArgs'), 'Wrong error thrown')
+       val = 1;
+    end
+    assert(val==1, 'No error thrown')
+end

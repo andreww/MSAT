@@ -30,12 +30,16 @@
 % Notes:
 %     If the input matrix has isotropic, hexagonal or tetragonal 
 %     symmetry there are multiple orentations of the principle axes.
-%     in the isotropic case CR not rotated with respect to C (and RR
+%     In the isotropic case CR is not rotated with respect to C (and RR
 %     is the identity matrix). In the hexagonal and tetragonal cases, 
-%     X3 is defined by the distinct eigenvalue (see Browaeys and Chevrot).
-%     For the monoclinic or triclinic cases we have to make a 'best-guess'
-%     and following Browraeys and Chevrot we use the bisectrix of each of 
-%     the eigenvectors of d and its closest match in v.
+%     X3 is defined by the distinct eigenvalue (see Browaeys and Chevrot)
+%     or, if 'X3_stiff', by the stiffest direction. For the monoclinic or 
+%     triclinic cases we have to make a 'best-guess' and following 
+%     Browraeys and Chevrot we use the bisectrix of each of the 
+%     eigenvectors of d and its closest match in v. Furthermore, in order
+%     to always give the same output orientation for the lowest symmetry 
+%     cases, a final rotation is performed to place the maximum P-wave 
+%     velocity in the positive quadrent of the output axis system.
 %
 % References:
 %     Browaeys, J. T. and S. Chevrot (2004) Decomposition of the elastic
@@ -185,10 +189,10 @@ end
 if irot
 %  check axes
    dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
-   if (~isempty(find(dps>det_thresh)))
+   if (~isempty(find(dps>det_thresh, 1)))
       if warn
-         warning('MS_axes: Determined axes not orthogonal: DPS=') ;
-         dps
+         warning('MS:AXES:WARNING', ...
+             'MS_axes: Determined axes not orthogonal: DPS = %20.18f',dps) ;
       end   
    end
    
@@ -201,7 +205,7 @@ if irot
    if ((det(RR)+1) < det_thresh)
 %   ** Fix rotoinversion
        if 0
-          warning('MS_axes: Fixing up rotoinversion.') ;
+          warning('MS:AXES:WARNING', 'MS_axes: Fixing up rotoinversion.') ;
           fprintf('Determinant = %20.18f\n',det(RR))
        end
        R1 = [-X1' X2' X3'] ;
@@ -211,7 +215,8 @@ if irot
    % check rotation matrix
    if (abs(det(RR))-1)>det_thresh ;
        if warn
-          warning('MS_axes: Improper rotation matrix resulted, not rotating.') ;
+          warning('MS:AXES:WARNING', ...
+              'MS_axes: Improper rotation matrix resulted, not rotating.') ;
           fprintf('Determinant = %20.18f\n',det(RR))
        end
        RR = eye(3);
@@ -229,7 +234,8 @@ if irot
       end   
    end
 else
-   if warn, warning('No rotation was deemed necessary.');, end
+   if warn, warning('MS:AXES:WARNING', ...
+           'No rotation was deemed necessary.');, end
    CR=C;
    RR = eye(3) ;
 end
@@ -243,7 +249,7 @@ end
       varargout{1} = CR ;
       varargout{2} = RR ;
    otherwise   
-      error('MS:INFO:BadOutputArgs','Requires 1 or 2 output arguments.')
+      error('MS:AXES:BadOutputArgs','Requires 1 or 2 output arguments.')
    end
       
 
