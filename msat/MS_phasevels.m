@@ -51,9 +51,13 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 
 		if (length(inc)~=length(azi))
 			error('AZI and INC must be scalars or vectors of the same dimension');
-        end	
+      end
+      
+%  ** convert inc, azi to column vectors if necessary      
+      inc = reshape(inc,length(inc),1) ;
+      azi = reshape(azi,length(azi),1) ;
 
-        isotol = sqrt(eps); % Mbars
+      isotol = sqrt(eps); % Mbars
 %  ** convert GPa to MB file units (Mbars), density to g/cc
 
       C(:,:) = C(:,:) * 0.01 ;
@@ -139,11 +143,13 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 
     % If any directions have zero avs (within machine accuracy)
     % set pol to NaN - array wise:
-    isiso = real(avs > sqrt(eps)); % list of 1.0 and 0.0.
-    pol = pol .* (isiso./isiso); % times by 1.0 or NaN. 
+    isiso = real(avs > sqrt(eps)) ; % list of 1.0 and 0.0.
+    pol = pol .* (isiso./isiso) ; % times by 1.0 or NaN. 
+
     S1P(:,1) = S1P(:,1) .* (isiso./isiso);
     S1P(:,2) = S1P(:,2) .* (isiso./isiso);
     S1P(:,3) = S1P(:,3) .* (isiso./isiso);
+    
 return
 %=======================================================================================  
 
