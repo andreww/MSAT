@@ -278,7 +278,7 @@ function [ CRR, RRR ] = tryrotations( CR, RR ) ;
       b = x2r(ind(end)) * pi/180. ; R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
       g = x3r(ind(end)) * pi/180. ; R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
 
-      RRR =  RR * R3 * R2 * R1 ;
+      RRR =  R3 * R2 * R1 * RR;
 
 return
 

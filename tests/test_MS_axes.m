@@ -108,6 +108,31 @@ function test_MS_axes_triclin_strong
    end
 end
 
+function test_MS_axes_triclin_strong_rots
+    % Test the interpolator works for constant
+    % matrices rotated about axes
+ 
+   [C, r] = MS_elasticDB('albite');
+
+   for i=1:25
+      a1 = rand.*360 ;
+      b1 = rand.*360 ; 
+      g1 = rand.*360 ; 
+      
+      if 0
+          fprintf('Rotations: [%6.1f %6.1f %6.1f] \n',a1,b1,g1)
+      end
+      
+      C1 = MS_rot3(C,a1,b1,g1) ;
+      [CC, RR] = MS_axes(C1);
+      C2 = MS_rotR(C1,RR) ;
+      C3 = MS_rotR(CC,RR');
+      assertElementsAlmostEqual(CC,C2);
+      assertElementsAlmostEqual(C1,C3);
+    
+   end
+end
+
 function test_MS_axes_errors
 
     [C, ~] = MS_elasticDB('olivine');
