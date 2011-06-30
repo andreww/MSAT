@@ -192,7 +192,8 @@ if irot
    if (~isempty(find(dps>det_thresh, 1)))
       if warn
          warning('MS:AXES:WARNING', ...
-             'MS_axes: Determined axes not orthogonal: DPS = %20.18f',dps) ;
+             'MS_axes: Determined axes not orthogonal: DPS = %20.18f %20.18f %20.18f',...
+             dps(1), dps(2), dps(3)) ;
       end   
    end
    
@@ -259,7 +260,7 @@ return
 %%%   SUBFUNCTIONS
 %%%
 
-function [ CRR, RRR ] = tryrotations( CR, RR ) ;
+function [ CRR, RRR ] = tryrotations( CR, RR ) 
 %  ** try all combinations of 180 rotations around principle axes
 %     select the one that gives the highest Vp in the [1 1 1] direction
       x1r = [000 180 000 000 180 000] ;
