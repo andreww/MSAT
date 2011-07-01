@@ -41,7 +41,7 @@ R3 = [ cos(g) sin(g) 0 ; ...
       -sin(g) cos(g) 0 ; ... 
             0      0 1 ] ;
 
-M =  R3 * R2 * R1;
+M =  R3 * R2 * R1 ;
 
 return
 
