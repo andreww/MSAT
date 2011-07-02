@@ -120,8 +120,8 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       S2P(ipair,:) = cross(XI,S2N);
 
 %  ** rotate into y-z plane to calculate angles
-      [S1PR] = V_rot3(S1P,0,0,cazi) ;
-	  [S1PRR] = V_rot3(S1PR,0,cinc,0) ;
+      [S1PR] = MS_Vrot3(S1P(ipair,:),0,0,cazi) ;
+	  [S1PRR] = MS_Vrot3(S1PR,0,cinc,0) ;
 
 	   ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
 
