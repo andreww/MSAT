@@ -74,8 +74,8 @@ X3_distinct = 1;
          end   
       end
 
-det_thresh = 100 * sqrt(eps) ; % threshold on flagging an error on the orthogonality 
-                               % of the best guess axes 
+det_thresh = 100 * sqrt(eps) ; % threshold on flagging an error on the  
+                               % orthogonality of the best guess axes 
 
 % construct D and V matrices   
 d= [... 
@@ -103,7 +103,7 @@ if ~isortho(D1,D2,D3) ;
 end
 
 if ~isortho(V1,V2,V3) ;
-   warning('D basis is not othogonal') ;
+   warning('V basis is not othogonal') ;
 end
 
 % count number of distinct eigenvalues. Maximum allowable difference is set
