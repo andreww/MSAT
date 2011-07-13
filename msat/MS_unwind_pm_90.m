@@ -17,9 +17,9 @@
 function [angle] = MS_unwind_pm_90(angle_in)
 %===============================================================================
 %  ** check input
-      if ~isvector(angle_in)
+      if (~isvector(angle_in) | ~isnumeric(angle_in))
          error('MS:unwind_pm_90:BadInput',...
-            'Input is required to be a scalar/vector') ;
+            'Input is required to be a numeric scalar/vector') ;
       end
       
       angle = angle_in ;

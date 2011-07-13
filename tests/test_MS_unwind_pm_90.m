@@ -21,6 +21,6 @@ function test_MS_unwind_0_90_vector
 end
 
 function test_MS_unwind_0_90_error
-    f = @()MS_unwind_pm_90(1E24);
-    assertExceptionThrown(f, 'MS:UNWIND:toomanyits');
+    f = @()MS_unwind_pm_90('bob');
+    assertExceptionThrown(f, 'MS:unwind_pm_90:BadInput');
 end
