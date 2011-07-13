@@ -22,7 +22,7 @@
 % (C) James Wookey and Andrew Walker, 2011
 
 %===============================================================================
-function [fast_eff,tlag_eff]=MS_effective_splitting(f,spol,fast,tlag)
+function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
 %===============================================================================
 %  check inputs are the same size   
    if ~isequal(length(fast),length(tlag))
@@ -81,11 +81,11 @@ function [fast_eff,tlag_eff]=MS_effective_splitting(f,spol,fast,tlag)
       fast_eff = spol + (ala.*180./pi) ./ 2. ;
       tlag_eff = 2.*tha./w ;                                     
       
-      fast_eff = unwind_pm_90(fast_eff) ;
+      fast_eff = MS_unwind_pm_90(fast_eff) ;
    end
 %**handle zero tlags      
    if (tlag_eff < 0)
-      fast_eff = unwind_pm_90(fast_eff+90) ;
+      fast_eff = MS_unwind_pm_90(fast_eff+90) ;
       tlag_eff = abs(tlag_eff) ;
    end   
 
