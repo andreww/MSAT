@@ -22,7 +22,14 @@
 %     to the arguments
 %        'thresh',x - set numerical threshold for zero to x (default = 1e-6)
 %
-%  See source code for further notes
+%  Notes:
+%  Currently, the following properties of the input elastic stiffness
+%  matrix, C, are tested: (1) The maxtrix must be of rank 2 and size (6,6).
+%  (2) The matrix must be symmetrical along the leading diagonal (i.e. 
+%  the major symmetry of the elastic constants tensor, Cijkl == Cklij, must
+%  be present). (3) The matrix must be positive-definite and be none zero
+%  in the leading diagonal and top left corner.
+%
 
 % (C) James Wookey and Andrew Walker, 2011
 function [isgood] = MS_checkC(C,varargin)
@@ -53,11 +60,11 @@ function [isgood] = MS_checkC(C,varargin)
             case 'nozerochk'
                zerochk = 0 ;
                iarg = iarg + 1 ;
-            case 'nopdef'
-               magchk = 0 ;
+            case 'nopdefchk'
+               pdefchk = 0 ;
                iarg = iarg + 1 ;
             case 'thresh'
-               thresh = varargin{iarg+1}
+               thresh = varargin{iarg+1} ;
                iarg = iarg + 2 ;
             otherwise 
                error('Unknown flag') ;   
@@ -67,15 +74,28 @@ function [isgood] = MS_checkC(C,varargin)
       isgood = 1 ;
 
 %  ** start with basic checks
-      try % ismatrix is quite new, so suppress Undef func error.
+      try 
           if ~ismatrix(C)
 		    isgood = 0 ;
 	       error('MS:CHECKCNotMatrix', ...
 	         'Elasticity matrix error: Appears not to be a 2D matrix')
           end
       catch e
+          % ismatrix is quite new, so suppress Undef func error and 
+          % do open coded check on Matrix. Otherwise, rethrow the exception
           if ~strcmp(e.identifier, 'MATLAB:UndefinedFunction')
               rethrow(e)
+          elseif strcmp(e.identifier, 'MS:CHECKCNotMatrix')
+              rethrow(e)
+          elseif (length(size(C)) ~= 2)
+             error('MS:CHECKCNotMatrix', ...
+	         'Elasticity matrix error: Appears not to be a 2D matrix')
+          else
+              dim = size(C);
+              if (dim(1) ~= dim(2))
+                  error('MS:CHECKCNotMatrix', ...
+	             'Elasticity matrix error: Appears not to be a 2D matrix')
+              end
           end
       end
       [nr nc] = size(C) ;
@@ -93,7 +113,7 @@ function [isgood] = MS_checkC(C,varargin)
 %  ** check symmetry    
       if symchk
          D=C-C';
-         if (length(find(abs(D)>thresh))>0)
+         if (~isempty(find(abs(D)>thresh, 1)))
             isgood = 0;
             if warn
                warning('MS:CHECKCnotsym_W',...
@@ -109,7 +129,7 @@ function [isgood] = MS_checkC(C,varargin)
       if zerochk
          isopart = [C(1,1) C(1,2) C(1,3) C(2,2) C(2,3) ...
                     C(3,3) C(4,4) C(5,5) C(6,6)] ;
-         if (length(find(abs(isopart)<thresh))>0)
+         if (~isempty(find(abs(isopart)<thresh, 1)))
             isgood = 0;
             if warn
                warning('MS:CHECKCbadzeros_W',...
@@ -124,8 +144,12 @@ function [isgood] = MS_checkC(C,varargin)
 %  ** check that matrix is positive definite
       if pdefchk
          try
-            X=chol(C) ;
-         catch ME   
+            [~]=chol(C) ;
+         catch ME 
+            % Only process the matlab posdef errors...
+            if ~strcmp(ME.identifier, 'MATLAB:posdef')
+                rethrow(ME)
+            end
             isgood = 0;
             if warn
                warning('MS:CHECKCnotposdef_W',...
