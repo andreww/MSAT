@@ -2,7 +2,7 @@ function test_suite = test_MS_axes
 initTestSuite;
 end
 
-function test_MA_axes_reference
+function test_MS_axes_reference
     % Test the olivine example from page 671 of B&C
     % This checks that (for this case) the orentation
     % is correct (no permutation of axes).
@@ -40,7 +40,7 @@ function test_MS_axes_ortho
     % matrices rotated about axies
  
     [C, r] = MS_elasticDB('olivine');
-   for i=1:25
+   for i=1:10
       a1 = rand.*360 ; a2 = rand.*360 ;
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
@@ -68,7 +68,7 @@ function test_MS_axes_triclin_weak
    
    C=Cweak ;
     
-   for i=1:25
+   for i=1:10
       a1 = rand.*360 ; a2 = rand.*360 ;
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;
@@ -86,12 +86,12 @@ function test_MS_axes_triclin_weak
 end
 
 function test_MS_axes_triclin_strong
-    % Test the interpolator works for constant
-    % matrices rotated about axes
+%% Test the interpolator works for constant
+%% matrices rotated about axes
  
    [C, r] = MS_elasticDB('albite');
 
-   for i=1:25
+   for i=1:10
       a1 = rand.*360 ; a2 = rand.*360 ;
       b1 = rand.*360 ; b2 = rand.*360 ;
       g1 = rand.*360 ; g2 = rand.*360 ;

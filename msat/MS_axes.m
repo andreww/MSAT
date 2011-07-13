@@ -78,8 +78,8 @@ X3_distinct = 1;
          end   
       end
 
-det_thresh = 0.01 ; % threshold on flagging an error on the orthogonality 
-                    % of the best guess axes 
+det_thresh = 100 * sqrt(eps) ; % threshold on flagging an error on the  
+                               % orthogonality of the best guess axes 
 
 % construct D and V matrices   
 d= [... 
@@ -97,6 +97,18 @@ v=[...
 % calculate eigenvectors and eigenvalues of D and V 
 [vecd,val]=eig(d) ; vald = [val(1,1) val(2,2) val(3,3)] ;    
 [vecv,val]=eig(v) ; valv = [val(1,1) val(2,2) val(3,3)] ;
+
+D1=vecd(:,1) ; D2=vecd(:,2) ; D3=vecd(:,3) ;
+V1=vecv(:,1) ; V2=vecv(:,2) ; V3=vecv(:,3) ;
+
+% check orthogonality of these
+if ~isortho(D1,D2,D3) ;
+   warning('D basis is not othogonal') ;
+end
+
+if ~isortho(V1,V2,V3) ;
+   warning('V basis is not othogonal') ;
+end
 
 % count number of distinct eigenvalues. Maximum allowable difference is set
 % to be 1/1000th of the norm of the matrix. 
@@ -167,9 +179,7 @@ case 3
 % monoclinic or triclinic. Here we have to make a 'best-guess'. Following
 % Browraeys and Chevrot we use the bisectrix of each of the eigenvectors of
 % d and its closest match in v.
-      D1=vecd(:,1) ; D2=vecd(:,2) ; D3=vecd(:,3) ;
-      V1=vecv(:,1) ; V2=vecv(:,2) ; V3=vecv(:,3) ;
-      
+       
       isMonoOrTri = 1 ;
       
       [X1,X2,X3]=estimate_basis(D1,D2,D3,V1,V2,V3) ;
@@ -279,7 +289,7 @@ function [ CRR, RRR ] = tryrotations( CR, RR )
       b = x2r(ind(end)) * pi/180. ; R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
       g = x3r(ind(end)) * pi/180. ; R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
 
-      RRR =  R3 * R2 * R1 * RR;
+      RRR =  R3 * R2 * R1 * RR ;
 
 return
 
@@ -312,6 +322,14 @@ function [C1,C2,C3]=estimate_basis(A1,A2,A3,B1,B2,B3)
          C3 = bisectrix(A3, X)' ;
       end   
 
+%
+%     Enforce orthoganality, and renormalise
+%
+      C3 = cross(C1,C2) ;
+      C2 = cross(C1,C3) ;
+      C1 = C1 ./ norm(C1) ;
+      C2 = C2 ./ norm(C2) ;
+      C3 = C3 ./ norm(C3) ;
 return
 
 function [C]=bisectrix(A,B)
@@ -368,3 +386,10 @@ function plot2vec(V,spec,str)
    hold on
 return
 
+function [iortho] = isortho(X1,X2,X3)
+   thresh = 10 * sqrt(eps) ;
+   dps = abs([dot(X1,X2) dot(X1,X3) dot(X2,X3)]) ;
+   iortho = isempty(find(dps>thresh)) ;
+return
+   
+   

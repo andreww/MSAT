@@ -9,7 +9,9 @@
 %     bet = clockwise about 2-axis (looking at origin, == -dip)
 %     gam = clockwise about 3-axis (looking at origin, == azimuth)
 %
-%  [VR] = MS_rot3(V,alp,bet,gam)
+%     [VR] = MS_Vrot3(...,'order',V)                    
+%         order: V is a 3 element vector containing the order in which to apply the 3 rotations.
+%                Default is [1 2 3].
 %
 %
 %  Notes:
@@ -27,20 +29,28 @@
    function [VR] = MS_Vrot3(Vin,alp,bet,gam,varargin)
 %===============================================================================
 
-      reverse = 0 ;
+orderV = [1 2 3] ;
 
 %  ** process the optional arguments
-      iarg = 1 ;
-      while iarg <= (length(varargin))
-         switch lower(varargin{iarg})
-            case 'reverse' % flag (i.e., no value required)
-               reverse = 1 ;
-               iarg = iarg + 1 ;
-            otherwise 
-               error('MS:VROT3:UnknownOption',...
-                  ['Unknown option: ' varargin{iarg}]) ;   
-         end   
-      end
+iarg = 1 ;
+while iarg <= (length(varargin))
+   switch lower(varargin{iarg})
+      case 'order' 
+         orderV = varargin{iarg+1} ;
+         if (length(find(orderV==1))+length(find(orderV==2))+length(find(orderV==3)))~=3
+            error('MS:VROT3:BadOrder',...
+            'Order vector must be 3-element, containing 1,2 and 3') ;   
+         end
+         if (length(orderV)~=3)
+            error('MS:VROT3:BadOrder',...
+            'Order vector must be 3-element, containing 1,2 and 3') ;  
+         end                  
+         iarg = iarg + 2 ;
+      otherwise 
+         error('MS:VROT3:UnknownOption',...
+            ['Unknown option: ' varargin{iarg}]) ;   
+   end   
+end
 
       [nr nc] = size(Vin) ; % store this to produce output
       itran = 0 ;
@@ -65,15 +75,16 @@
       b = bet * pi/180. ;
       g = gam * pi/180. ;
       
-      R1 = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
-      R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
-      R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
-      
-      if reverse
-          RR = R1 * R2 * R3 ;
-      else    
-          RR =  R3 * R2 * R1;
-      end
+RM = zeros(3,3,3) ;
+
+R(1,:,:) = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
+R(2,:,:) = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
+R(3,:,:) = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+
+RR =  squeeze(R(orderV(3),:,:)) * ...
+         squeeze(R(orderV(2),:,:)) * ...
+            squeeze(R(orderV(1),:,:));
+            
 %  ** apply it
       VR = RR * V;
       
