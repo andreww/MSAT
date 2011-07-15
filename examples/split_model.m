@@ -83,6 +83,7 @@ function split_model()
       axis([0 360 0 4])
       xlabel('Polarisation (relative to downdip direction)')
       ylabel('Lag times (s)')
+      legend('Lower layer','Upper layer','Total') ;
 
 %  ** fast directions
       subplot(2,1,2)
@@ -92,8 +93,8 @@ function split_model()
       axis([0 360 -90 90])
       xlabel('Polarisation (relative to downdip direction)')
       ylabel('Fast shear-wave orientation (degree)')      
+      legend('Lower layer','Upper layer','Total') ;
       
-
 return
 
 function [dist]=distance_in_dipping_layer(dip,aoi,thick,baz)
