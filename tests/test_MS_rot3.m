@@ -1,8 +1,8 @@
-function test_suite = test_MS_rotations
+function test_suite = test_MS_rot3
 initTestSuite;
 end
 
-function test_MS_rotations_triclinic
+function test_MS_rot_3_triclinic
 
     [C,r] = MS_elasticDB('alb') ;
     C1 = MS_rot3(C,30,45,60) ;
