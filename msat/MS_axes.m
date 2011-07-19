@@ -49,7 +49,7 @@
 %         material symmetry for anisotropic elastic materials. Quartely
 %         Journal of Mechanics and Applied Mathematics v40, 451-476.
 %
-% See also: MS_NORMS, MS_INTERPOLATE
+% See also: MS_NORMS, MS_INTERPOLATE, MS_DECOMP
 
 % (C) James Wookey and Andrew Walker, 2011
 
