@@ -1,6 +1,27 @@
-% [C] = cijkl2cij(CC)
+% MS_CIJKL2CIJ - Convert from elastic tensor to Voigt elasticity matrix
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+%
+% Converts between a 3x3x3x3 tensor representation and a 6x6 Voigt 
+%     representation of anisotropic elasticity. 
+%
+%  % [C] = MS_cijkl2cij(CC)
+%
+% Usage: 
+%     CC must be a rank 4 array with size (3,3,3,3). The
+%     returned array C will be rank 2 with size (6,6). The elasticity
+%     matrix representation is used as input for almost all MSAT functions.
+%
+% Notes:
+%     Do not use this function for the elastic compliance as additional
+%     terms are needed in this case.
+%
+% See also: MS_cij2cijkl
 
-function [C] = cijkl2cij(CC)
+% (C) James Wookey and Andrew Walker, 2011
+
+function [C] = MS_cijkl2cij(CC)
+ C = zeros(6,6);
  for im=1:3
    for jm=1:3
       for km=1:3
@@ -16,7 +37,7 @@ function [C] = cijkl2cij(CC)
 return
 
 function [iv,jv] = ijkl2ij_local(ii,jj,kk,ll)   
-	if (ii==1 & jj==1) 
+   if (ii==1 & jj==1) 
       iv=1;
    end
    if (ii==1 & jj==2) 
