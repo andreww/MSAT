@@ -1,4 +1,3 @@
-
 % MS_PLOT - Plot phasevels/anisotropy on pole figures.
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
@@ -13,18 +12,21 @@
 %         Produce three pole figures showing P-wave velocity, S-wave
 %         anisotropy and fast S-wave polarisation direction
 %
-%     MS_plot(C, rh)                    
+%     MS_plot(C, rh, ...)                    
 %          Further arguments are EVALed (most useful to change various 
 %          options, see source-code for details).
 %
+% See also: MS_SPHERE, MS_PHASEVELS
 
+% (C) James Wookey and Andrew Walker, 2011
+%
 % Change log / copyright statements.
 % 
 %  Written by James Wookey
 %  Department of Earth Sciences, University of Bristol, UK
 %  Version 1.2
 %  Incept: March 2004
-%  Last update: March 2007
+%  Last update: July 2011
 %
 %  Major changes log
 %
@@ -47,7 +49,8 @@
 %           EPS. Removed the highres and iport options, as these are a 
 %           little redundant with the other changes. 
 %  v1.2   - Reinstated proper contourf function since this got fixed in V7.4
-%  
+%  MSAT   - Remove residual fortran. Change log now in version control
+%           system
 
 %=========================================================================
 function MS_plot(C,rh,varargin)
@@ -79,7 +82,7 @@ function MS_plot(C,rh,varargin)
       end   
       
       % check the inputs: C
-      assert(MS_checkC(C)==1, 'MS_PLOT:badC', 'MS_checkC error MS_plot') ;
+      assert(MS_checkC(C)==1, 'MS:PLOT:badC', 'MS_checkC error MS_plot') ;
 
 %  ** buggy MATLAB contourf (version 7.1-7.3)
 %
@@ -409,58 +412,6 @@ function MS_plot(C,rh,varargin)
 %
       [A,I] = min(Z) ; [Zmin,II] = min(A) ; imin = I(II) ; jmin = II ;
       [A,I] = max(Z) ; [Zmax,II] = max(A) ; imax = I(II) ; jmax = II ;
-
-   return
-%===============================================================================
-
-%===============================================================================
-   function [vpgfile] = local_load_vpgfile(fname)
-%===============================================================================
-
-%  ** check input            
-      if isempty(fname)
-         fprintf('ERROR: LOAD_VPGFILE: No filename specified\n') ;
-         return
-      end      
-%  ** open and read file          
-      fid=fopen(fname,'rt') ;
-      vpgfile.TITLE=fscanf(fid,'%s',1) ;
-      all_data=fscanf(fid,'%f',[21 inf])' ;
-      [vpgfile.INC,vpgfile.AZ] = meshgrid([90:-6:0],[0:6:360]) ;
-
-%  ** build AZI x INC matrices in structure          
-
-%  ** phase velocity
-      vpgfile.VP       = reshape(all_data(:,01),61,16) ;
-      vpgfile.VS1      = reshape(all_data(:,02),61,16) ;
-      vpgfile.VS2      = reshape(all_data(:,03),61,16) ;
-
-%  ** particle motion (x-direction)
-      vpgfile.VP_x     = reshape(all_data(:,04),61,16) ;
-      vpgfile.VS1_x    = reshape(all_data(:,05),61,16) ;
-      vpgfile.VS2_x    = reshape(all_data(:,06),61,16) ;
-
-%  ** particle motion (y-direction)
-      vpgfile.VP_y     = reshape(all_data(:,07),61,16) ;
-      vpgfile.VS1_y    = reshape(all_data(:,08),61,16) ;
-      vpgfile.VS2_y    = reshape(all_data(:,09),61,16) ;
-
-%  ** particle motion (z-direction)
-      vpgfile.VP_z     = reshape(all_data(:,10),61,16) ;
-      vpgfile.VS1_z    = reshape(all_data(:,11),61,16) ;
-      vpgfile.VS2_z    = reshape(all_data(:,12),61,16) ;
-
-%  ** group velocities
-      vpgfile.VPG_x    = reshape(all_data(:,13),61,16) ;
-      vpgfile.VPG_y    = reshape(all_data(:,14),61,16) ;
-      vpgfile.VPG_z    = reshape(all_data(:,15),61,16) ;
-      vpgfile.VS1G_x   = reshape(all_data(:,16),61,16) ;
-      vpgfile.VS1G_y   = reshape(all_data(:,17),61,16) ;
-      vpgfile.VS1G_z   = reshape(all_data(:,18),61,16) ;
-      vpgfile.VS2G_x   = reshape(all_data(:,19),61,16) ;
-      vpgfile.VS2G_y   = reshape(all_data(:,20),61,16) ;
-      vpgfile.VS2G_z   = reshape(all_data(:,21),61,16) ;
-
 
    return
 %===============================================================================
