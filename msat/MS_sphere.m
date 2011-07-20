@@ -1,32 +1,47 @@
-% MS_sphere : Plot a spherical plot of phasevels/anisotropy from a set of 
+% MS_SPHERE - Plot a spherical plot of phasevels/anisotropy from a set of 
 %              elastic constants.
-%   
-% Usage: MS_sphere(CC,rh,mode,...)
-%     mode can be 'p'(-wave) or 's'(-wave).
-%     extra arguments are EVALed; parameters that can be (re)set are:
 %
-%        cmap = jet(64) ; % colourmap
-%        icmapflip = 1 ; % reverse the sense of the colourscale     
-%        FSWTickLength=0.08 ; % Fast shear wave vector length
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-%        plotlabels = 1 ;
-%        plotaxes = 1 ;
-%        nofig = 0 ; % suppress the figure command, so plot can be sub-plotted
-%        nocbar = 0 ; % suppress the colorbar
-%        cax = NaN ; % colour axis, define to use - default is auto
-%        dirs = [] ;  % directions of interest, this should be a vector of azi, 
-%                       inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4]
-%        dlen = 1.5 ; % length of doi vectors 
+% Given an elasticity matrix and density, produce spherical figures showing 
+%     the P- or S-wave anisotrpy. 
 %
+%  % MS_sphere(CC,rh,mode,...)
 %
-% (C) James Wookey, 2007-2011.	
+% Usage: 
+%     MS_sphere(CC,rh,mode)                    
+%         Mode can be 'p'(-wave), 's'(-wave), 's1' (fast s-wave) or 's2'
+%         (slow s-wave).
+%
+%     MS_sphere(CC,rh,mode,...)                    
+%          Further arguments are EVALed. Parameters that can be (re)set 
+%          are:
+%            cmap = jet(64) ; % colourmap
+%            icmapflip = 1 ; % reverse the sense of the colourscale     
+%            FSWTickLength=0.08 ; % Fast shear wave vector length
+%            plotlabels = 1 ;
+%            plotaxes = 1 ;
+%            nofig = 0 ; % suppress the figure command, so plot can be sub-plotted
+%            nocbar = 0 ; % suppress the colorbar
+%            cax = NaN ; % colour axis, define to use - default is auto
+%            dirs = [] ;  % directions of interest, this should be a vector of azi, 
+%                           inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4]
+%            dlen = 1.5 ; % length of doi vectors 
 
+%
+% See also: MS_SPHERE, MS_PHASEVELS
+
+% (C) James Wookey, 2007-2011.	
+% (C) James Wookey and Andrew Walker, 2011
+% Portions of this function are:
+% (C) Darren Weber, Jon Leech and Jim Buddenhagen 1989 - 2002. 
 %-------------------------------------------------------------------------------
 %  This software is distributed in the hope that it will be useful,
 %  but WITHOUT ANY WARRANTY; without even the implied warranty of
 %  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 %-------------------------------------------------------------------------------
 
+%%
 function MS_sphere(CC,rh,mode,varargin)
 
 cmap = jet(64) ;
@@ -44,15 +59,7 @@ polmesh = 2;
 cax = NaN ; % define to use
 
 % check the inputs: CC
-if isnumeric(CC)
-   if sum(size(CC)==6) ~= 2
-      error('CC must be a 6x6 matrix')
-   end
-else   
-   error('CC must be a 6x6 matrix')
-end
-
-[isgood] = MS_checkC(CC) ;
+assert(MS_checkC(CC)==1, 'MS:SPHERE:badC', 'MS_checkC error MS_sphere') ;
 
 % check the inputs: rh
 if isnumeric(rh)
@@ -65,10 +72,12 @@ end
 
 if ischar(mode)
    if sum(strcmpi({'p','s', 's1', 's2'},mode))~=1
-      error('Mode must be ''S''(-wave) or ''P''(-wave) ')
+      error('MS:SPHERE:badmode', ...
+          'Mode must be ''S''(-wave), ''S1'', ''S2'', or ''P''(-wave) ')
    end
 else
-   error('Mode must be ''S''(-wave) or ''P''(-wave) ')
+   error('MS:SPHERE:badmode', ...
+       'Mode must be ''S''(-wave) or ''P''(-wave) ')
 end     
 
 % process the optional arguments, these are EVAL'ed in turn
@@ -78,7 +87,7 @@ end
 
 % check input pars
 if mod(length(dirs),2)~=0
-   error('Plot directions must be in (azi,inc) pairs') ;
+   error('MS:SPHERE:baddirs', 'Plot directions must be in (azi,inc) pairs') ;
 end
 
 %  ** Setup a seismic colourmap (i.e. red->green->blue)
