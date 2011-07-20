@@ -1,4 +1,4 @@
-% EFFECT_SPLITTING_N - N-layer effective splitting operator calculation.
+% MS_EFFECTIVE_SPLITTING_N - N-layer effective splitting operator calculation.
 % 
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
@@ -16,7 +16,10 @@
 %  the source polarisation is near the effective fast direction. This would,
 %  however probably be seen as a null result anyway.
 %
-%  Reference: Silver and Savage (GJI, v119 pp 949-963, 1994)  
+%  Reference: 
+%      Silver, P. G. and Savage, M. K. 1994 "The interpretation of shear-wave
+%      splitting parameters in the presence of two anisotropic layers" 
+%      Geophysical Journal International, v119 pp 949-963.  
 
 % (C) James Wookey, 2005-2011
 % (C) James Wookey and Andrew Walker, 2011
@@ -26,7 +29,8 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
 %===============================================================================
 %  check inputs are the same size   
    if ~isequal(length(fast),length(tlag))
-      error('Input fast and tlag vectors must be of the same length')            
+      error('MS:ListsMustMatch', ...
+          'Input fast and tlag vectors must be of the same length')            
    end
 
 %  remove any layers with 0 tlag time; these break the calculation
