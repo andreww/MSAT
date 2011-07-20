@@ -1,10 +1,17 @@
-%  [CC,rh]=MS_tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi)
+% MS_TANDON_AND_WENG - Inclusions in an isotropic material.
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 %  Calculate anisotropic elastic constants for an isotropic material containing
-%  spheroidal inclusions with a symmetry axis aligned with the x1-direction.
+%  spheroidal inclusions with a symmetry axis aligned with the
+%  x1-direction.
 %
 %  From the theory of Tandon and Weng (1984), based on original FORTRAN code by Mike
-%  Kendall.  
+%  Kendall. 
+%
+% Usage:
+%
+%  % [CC,rh]=MS_tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi)
 %
 %  Input parameters:
 %       vp,vs,rho : isotropic parameters of the matrix (km/s, kg/m3)
@@ -19,9 +26,16 @@
 %     CC : Elastic constants (GPa)
 %     rh : aggregate density (kg/m3)
 %
+% References:
+%     Tandon, G. P. and Weng, G. P. 1984 "The effect of aspect ratio of
+%     inclusions on the elastic properties of unidirectionally aligned
+%     composites" Polymer Composites. vol.5 pp.327-333.
+%
+% See also: MS_PHASEVELS
 
- 
-function [CC,rh]=MS_tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi) ;
+% (C) James Wookey and Andrew Walker, 2011
+
+function [CC,rh]=MS_tandon_and_weng(vp,vs,rho,del,c,vpi,vsi,rhoi)
 
 %  weighted average density
    rh = (1.0-c)*rho + c*rhoi ;
