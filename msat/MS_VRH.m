@@ -1,19 +1,77 @@
-%  [Cave,rhave]=CIJ_VRH(VF,C1,rho1,C2,rho2,...)
+% MS_VRH - n phase Voigt-Reuss-Hill average of elasticity.
 %
-%  n phase Voigt-Reuss-Hill average of elastic tensors (C1, C2 etc) and
-%  densities (rho1, rho2 etc). VF is a vector of volume fractions. There should
-%  be a C,rho argument pair for each entry in this vector. The sum of the 
-%  elements of VF is normalised to 1 before averaging.  
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-%  (c) James Wookey, 2006
+% Given n elasticity matricies, densities and phase volume fractions, 
+%     calculate the avarage of the Voigt upper and Reuss lower bound of the 
+%     composite material. 
 %
-function [Cave,rhave]=MS_VRH(VF,varargin)
+%  %  [Cave,rhave]=MS_VRH(VF, C, rh, ...)
+%
+% Usage: 
+%     [Cave,rhave]=MS_VRH(VF, C, rh)                    
+%          The volume fractions and densities (VF and rh) can be provided as
+%          vectors of common length n and the elasticities as a (6,6,n)
+%          matrix. 
+%
+%     [Cave,rhave]=MS_VRH(VF, C1, rh1, C2, rh2, C3, rh3, ...)                    
+%          Alternitivly, VF can be a vector of volume fractions and the 
+%          elasticity matricies and densities given as sequence of arguments
+%          as (6,6) matricies and scalars. There should be a C,rho argument 
+%          pair for each entry in the VF vector.
+%
+%     [Cave,rhave,Cvoigt,Creuss]=MS_VRH(VF, C, rh, ...)                    
+%          For both input argument forms, it is possible to access the upper
+%          and lower bound on the composite elasticity by adding output 
+%          arguments.
+%
+% Notes:
+%     The sum of the elements of VF is normalised to 1 before averaging.
+%
+% See also: MS_POLYAVERAGE
 
-%--check the input
-   if length(varargin)~=length(VF)*2
-      error('MS:VRHargs', 'There must be as many C,rho argument pairs as elements in VF') ;
-   end   
+% (C) James Wookey and Andrew Walker, 2011
+% (c) James Wookey, 2006
+%
+function [Cave,rhave,voigt_ave,reuss_ave]=MS_VRH(VF,C,r,varargin)
 
+
+   optargs = size(varargin,2);
+   if (optargs == 0)
+       % VF, C and r should be arrays of size (n), (6,6,n) and (n),
+       % respectivly. Check this and proceed.
+       np = length(VF) ;% Number of phases
+       sc = size(C);
+       assert(length(sc) == 3, 'MS:VRH:args', ... 
+           'For three argument form, C must be size (6,6,np)') 
+       assert(sc(1) == 6, 'MS:VRH:args', ... 
+           'For three argument form, C must be size (*6*,6,np)')
+       assert(sc(2) == 6, 'MS:VRH:args', ... 
+           'For three argument form, C must be size (6,*6*,np)')
+       assert(sc(3) == np, 'MS:VRH:args', ... 
+           'For three argument form, C must be size (6,6,*np*)')
+       assert(length(r) == np, 'MS:VRH:args', ... 
+           'For three argument form, r must be length np')
+       Cs = C;
+       rs = r;
+   elseif (optargs > 0)
+       % The old interface - VF should be a size (n) and we should see 2n-2
+       % varargs in pairs of size (6,6) for Cs and scalars for the
+       % densitys. Check this here then put the values into optargs == 0
+       % format.
+       np = length(VF); % Number of phases
+       assert((np*2)-2  == (length(varargin)), 'MS:VRH:args', ...
+           'For many argument form, there must be as many C, rho argument pairs as elements in VF')
+       Cs = zeros(6,6,np);
+       rs = zeros(1,np);
+       Cs(:,:,1) = C(:,:);
+       rs(1) = r;
+       for i = 2:np
+           Cs(:,:,i) = varargin{(i-2).*2+1};
+           rs(i) = varargin{(i-2).*2+2} ;
+       end
+   end
+  
 %--normalise VF
    VF = VF ./ sum(VF) ;
 
@@ -21,16 +79,12 @@ function [Cave,rhave]=MS_VRH(VF,varargin)
    reuss_ave = zeros(6,6) ;
    rhave = 0 ;
 
-   n = length(VF) ;
-
-   for i=1:n
-      CR = varargin{(i-1).*2+1} ;
-      rh = varargin{(i-1).*2+2} ;
-      voigt_ave = voigt_ave + CR .* VF(i) ;      % stiffness average
-      reuss_ave = reuss_ave + inv(CR) .* VF(i) ; % compliance average
-      rhave = rhave + rh .* VF(i) ;
+   for i=1:np
+      voigt_ave = voigt_ave + Cs(:,:,i) .* VF(i) ;      % stiffness average
+      reuss_ave = reuss_ave + inv(Cs(:,:,i)) .* VF(i) ; % compliance average
+      rhave = rhave + rs(i) .* VF(i) ;
    end
-
-   Cave = (voigt_ave + inv(reuss_ave)) ./ 2  ;
+   reuss_ave = inv(reuss_ave);
+   Cave = (voigt_ave + reuss_ave) ./ 2  ;
 
 return
