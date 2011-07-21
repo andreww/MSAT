@@ -1,4 +1,3 @@
-
 % MS_PLOT - Plot phasevels/anisotropy on pole figures.
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
@@ -18,36 +17,7 @@
 %          options, see source-code for details).
 %
 
-% Change log / copyright statements.
-% 
-%  Written by James Wookey
-%  Department of Earth Sciences, University of Bristol, UK
-%  Version 1.2
-%  Incept: March 2004
-%  Last update: March 2007
-%
-%  Major changes log
-%
-%  v0.991 - fixed difference in plots
-%  v0.992 - minor change to view options  
-%  v0.993 - workaround for MATLAB v7.1 contourf bug
-%  v0.994 - fixed a bug in the polarisation plotting
-%  v0.995 - changed the subset of polarisations plotted to more even 
-%           distribution on the sphere
-%  v0.996 - Extended workaround to be standard, since 7.2 doesn't fix it.
-%  v0.997 - Output average velocities also
-%  v0.998 - Added a mechanism for configuring things; including plot orientation
-%  v0.999 - Added a 'high resolution' option for publication quality graphics
-%           and did some font tweaking
-%  v1.000 - Restored contourf plots in buggyMATLAB using the contouf('v6'...)
-%           syntax. Added configuration options for contouring.
-%           Finally had to make code version 1. 
-%  v1.1   - Finally got contourf plot behind the polarisation vectors working.
-%           Other minor tweaks. This produces better vector image output for
-%           EPS. Removed the highres and iport options, as these are a 
-%           little redundant with the other changes. 
-%  v1.2   - Reinstated proper contourf function since this got fixed in V7.4
-%  
+% (C) James Wookey and Andrew Walker, 2011
 
 %=========================================================================
 function MS_plot(C,rh,varargin)
