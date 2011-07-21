@@ -2,7 +2,7 @@
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-% Calculate the degree of ansiotropy of an elasticity matrix. 
+% Calculate the degree of anisotropy of an elasticity matrix. 
 %
 % [ uA, ... ] = MS_anisotropy( C, ... )
 %
@@ -10,7 +10,7 @@
 %     [ uA ] = MS_anisotropy( C )                    
 %         Return the Universal Elastic Anisotropy Index of Ranganathan
 %         and Ostoja-Starzewski (2008). Valid for any elasticity matrix,
-%         uA is zero for an isotropic case and increses for incresing 
+%         uA is zero for an isotropic case and increases for increasing 
 %         anisotropy.
 %
 %     [ uA, lmA ] = MS_anisotropy( C )
@@ -18,18 +18,18 @@
 %         Ledbetter and Miglion (2006). This the the ratio of the fastest
 %         and slowest squared shear wave velocity over all propogation
 %         and polarization directions. Equal to one in the isotropic case,
-%         increses with incresing anisotropy.
+%         increases with increasing anisotropy.
 %
 %     [ uA, lmA, zA ] = MS_anisotropy( C )
 %         Also return the Zenner (1948) measure of anisotropy. This is
 %         only valid for cubic crystals (NaN is returned if C does not 
 %         represent a cubic crystal). zA is 1 for an isotropic case and
-%         increses or decreses with incresing anisotropy.
+%         increases or decreases with incresing anisotropy.
 %
 %     [ uA, lmA, zA, cbA ] = MS_anisotropy( C )
 %         Also return the Chung-Buessem (1967) anisotropy index. This
 %         is a single valued measure of anisotropy derived from zA. Like
-%         uA, this is zero for an isotropic case and increses for incresing 
+%         uA, this is zero for an isotropic case and increases for increasing 
 %         anisotropy. Only valid for matricies representing cubic crystals.
 %
 %     [ uA, lmA, ... ] = MS_anisotropy( C, n )
