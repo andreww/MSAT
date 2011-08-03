@@ -99,7 +99,8 @@ function [ varargout ] = MS_elasticDB( uid )
                   0.0   0.0   0.0  0.0  0.0 24.8];
            rh = 7600;
        otherwise
-         error('MS_elasticDB: Unknown identifier') ;
+         error('MS:ELASTICDB:UNKNOWN', ...
+             'MS_elasticDB: Unknown identifier') ;
    end
    
    switch nargout
@@ -115,7 +116,8 @@ function [ varargout ] = MS_elasticDB( uid )
       varargout(2) = {rh} ;
       varargout(3) = {info} ;
    otherwise
-      error('MS_elasticDB requires 1-3 output arguments.') ;
+      error('MS:BADOUTPUT', ...
+          'MS_elasticDB requires 1-3 output arguments.') ;
    end   
 return
 
