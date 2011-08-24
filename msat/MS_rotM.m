@@ -11,7 +11,7 @@
 %           angles are in ** degrees **, they should be scalars. 
 %
 %  Output: is the rotated Cij elastic stiffness tensor                  
-%     M - rotation matrix (3x3xN)
+%     M - rotation matrix (3x3)
 %
 %     [M] = MS_rotM(...,'order',V)                    
 %         order: V is a 3 element vector containing the order in which to apply the 3 rotations.
@@ -20,6 +20,8 @@
 %  Notes: 
 %    The rotations are applied in order, ie: alpha, then beta then gamma (by default).
 %
+
+% (C) James Wookey and Andrew Walker, 2011
 
 function [ M ] = MS_rotM( alp, bet, gam, varargin )
 
@@ -52,21 +54,6 @@ b = bet * pi/180. ;
 g = gam * pi/180. ;
 
 %  Make rotation matrices
-R1 = [ 1       0      0 ; ...
-       0  cos(a) sin(a) ; ...
-       0 -sin(a) cos(a) ] ;
-
-
-R2 = [ cos(b)  0 -sin(b) ; ...
-            0  1       0 ; ...
-       sin(b)  0  cos(b) ] ;
-
-
-R3 = [ cos(g) sin(g) 0 ; ...
-      -sin(g) cos(g) 0 ; ... 
-            0      0 1 ] ;
-
-RM = zeros(3,3,3) ;
 
 R(1,:,:) = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
 R(2,:,:) = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
