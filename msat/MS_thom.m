@@ -1,15 +1,23 @@
-%   CIJ_THOM - generate elastic constants from Thomsen parameters
+% CIJ_THOM - generate elastic constants from Thomsen parameters
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+%
+% Given Thomsen parameters for a VTI medium, return the elasticity 
+% matrx
 %
 %   [C]=MS_thom(vp,vs,rh,eps,gam,del)
 %
-%   Inputs: 
-%       rh  : Density (kg/m2 or g/cm3) (automatic conversion < 50) 
+%   Usage: 
+%       as above, inputs and outputs are:
+%       rh  : Density (kg/m3 or g/cm3) (automatic conversion to kg/m3 if < 50) 
 %       vp  : m/s or km/s (input is automatically to m/s converted if < 50)
 %       vs  : m/s or km/s (input is automatically to m/s converted if < 50)
-%       eps, gam, del : Dimensionless
+%       eps, gam, del : Dimensionless anisotropic parameters
+%       C : Stiffness tensor (6x6 Voigt notation, GPa)
 %
-%   Output:
-%        C : Stiffness tensor (6x6 notation, GPa)
+% See also: MS_isotropic, MS_VTI
+
+% (C) James Wookey and Andrew Walker, 2011
 
 function [C]=MS_thom(vp,vs,rh,eps,gam,del)
 
