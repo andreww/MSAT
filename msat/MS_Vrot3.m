@@ -2,9 +2,9 @@
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-% Short description of functionality. 
+% Rotates 3-vector(s). 
 %
-% [VR] = MS_rot3(V,alp,bet,gam)
+% [VR] = MS_Vrot3(V,alp,bet,gam)
 %     alp = clockwise about 1-axis (looking at origin, == yaw)
 %     bet = clockwise about 2-axis (looking at origin, == -dip)
 %     gam = clockwise about 3-axis (looking at origin, == azimuth)
@@ -20,9 +20,10 @@
 %  orientation of the matix by testing which this is. If the matrix is 3x3,
 %  it is assumed that it contains row vectors (i.e., 
 %  [x1,y1,z1; x2,y2,y2; x3 y3 y3])
+%
+%  See also: MS_ROT3
 
-% Change log / copyright statements.
-% 
+% (C) James Wookey and Andrew Walker, 2011 
 %
 
 %===============================================================================
@@ -75,7 +76,6 @@ end
       b = bet * pi/180. ;
       g = gam * pi/180. ;
       
-RM = zeros(3,3,3) ;
 
 R(1,:,:) = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
 R(2,:,:) = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
