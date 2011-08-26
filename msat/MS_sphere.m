@@ -107,6 +107,7 @@ end
 
 %% load the triangulation
 [x, y, z, faces, az, inc] =  get_mesh(velmesh);
+
 [~,avs,vs1,vs2,vp] = MS_phasevels(CC,rh,inc,az) ;
 
 if strcmpi(mode,'p')
@@ -217,7 +218,12 @@ function [x, y, z, tri, az, inc ] = get_mesh(level)
     y = FV.vertices(:,2);
     z = FV.vertices(:,3);
     tri = FV.faces;
-    [theta, phi, ~ ] = cart2sph(x, y, z);
+    
+%   cartesian to spherical conversion.
+    r = sqrt(x.^2 + y.^2 + z.^2);
+    phi = atan2(y,x);
+    theta = real(acos(z./r));
+
     az = -phi*(180.0/pi);
     inc = -(theta*(180.0/pi)-90.0);
     
