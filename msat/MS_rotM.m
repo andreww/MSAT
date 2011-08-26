@@ -10,8 +10,7 @@
 %     gam - clockwise about 3-axis (looking at origin, == azimuth)
 %           angles are in ** degrees **, they should be scalars. 
 %
-%  Output: is the rotated Cij elastic stiffness tensor                  
-%     M - rotation matrix (3x3)
+%  Output: is M, a 3x3 rotation matrix
 %
 %     [M] = MS_rotM(...,'order',V)                    
 %         order: V is a 3 element vector containing the order in which to apply the 3 rotations.
