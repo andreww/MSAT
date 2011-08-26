@@ -1,19 +1,23 @@
-%CIJ_load_list - Load a list of CIJs, in a specific format
+% MS_LOAD_LIST - Load a list of CIJs, in a specific format
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 % [x,C,rho] = MS_load_list(fname)
 %
-% Outputs
-% x is the independent variable (the first column in the file, 
-% of length n) 
-% C is an array 6*6*n where n is the number of tensors loaded 
-% rho is a vector of length n, the last column in the file
-% currently, only 21 constant elastic files can be loaded. Lines in the file
-% should be of the form:
+% Usage:
+%    As above, x is the independent variable (the first column in the file, 
+%    of length n) C is an array 6*6*n where n is the number of tensors 
+%    loaded rho is a vector of length n, the last column in the file
+%    currently, only 21 constant elastic files can be loaded. Lines in 
+%    the file should be of the form:
+%        x, c11,c12,...,c16,c22,...,c26,c33,...,c66,rho 
 %
-% x, c11,c12,...,c16,c22,...,c26,c33,...,c66,rho 
-%
+% See also: MS_LOAD, MS_ELASTICDB
 
-function [x,C,rho] = MS_load_list(fname) ;
+% (C) James Wookey and Andrew Walker, 2011
+
+
+function [x,C,rho] = MS_load_list(fname) 
 
 
 ecdata=load(fname) ;

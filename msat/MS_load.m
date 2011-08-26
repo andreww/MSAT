@@ -1,4 +1,6 @@
-% MS_load - Load a set of elastic constants from a file.
+% MS_LOAD - Load a set of elastic constants from a file.
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 % 
 % [ ... ] = MS_load( fname, ... )
 %
@@ -84,6 +86,9 @@
 %
 %    Elastic constants in the format read by EMATRIX (D. Mainprice). 
 %
+% See also: MS_LOAD_LIST, MS_ELASTICDB
+
+% (C) James Wookey and Andrew Walker, 2011
 
 %===============================================================================
    function [varargout] = MS_load(fname,varargin) ;

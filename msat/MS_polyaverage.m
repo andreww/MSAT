@@ -12,7 +12,7 @@
 %         an isotropic aggregate composed of randomly orentated ansiotropic
 %         crystals described by the elasticity matrix C.
 %
-%     [ K_vrh, G_vrh, K_v, G_v, K_r, K_r ] = MS_polyavarage( C )
+%     [ K_vrh, G_vrh, K_v, G_v, K_r, G_r ] = MS_polyavarage( C )
 %         Also return Voigt and Reuss bounds on the bulk and shear moduli.
 %
 % Notes:

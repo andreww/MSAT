@@ -1,5 +1,27 @@
-% Database of various elastic constants. 
-% These are reference by a string uid, output is stiffness matrix (GPa) and density (kg/m3)
+% MS_ELASTICDB - Database of various elastic constants..
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+%
+% Given a reference string, uid, output the elastic stiffness matrix (in 
+% GPa), density (in kg/m3) and a descriptive string. 
+%
+%  %  [ ... ] = MS_elasticDB( uid )
+%
+% Usage: 
+%     [ C ] = MS_elasticDB( uid )                    
+%          Output the elasticity matrix corresponding to the reference 
+%          string uid (e.g. 'olivine'). C is a 6x6 matrix and is in GPa. 
+%
+%     [ C, rh ] = MS_elasticDB( uid )                   
+%          Also return the density in kg/m3.
+%
+%     [ C, rh, info ] = MS_elasticDB( uid )                    
+%          Also return a descriptive string describing the material and 
+%          source.
+%
+% See also: MS_LOAD MS_LOAD_LIST
+
+% (C) James Wookey and Andrew Walker, 2011
 
 function [ varargout ] = MS_elasticDB( uid )
 
@@ -49,8 +71,45 @@ function [ varargout ] = MS_elasticDB( uid )
                 7.9    5.9  39.7   0.0 68.2   0.0 ; ...
                 0.0    0.0   0.0   6.4  0.0  78.1 ];
          rh = 3400 ;
-      otherwise
-         error('MS_elasticDB: Unknown identifier') ;
+       case {'halite', 'nacl'}
+           info = 'Single crystal halite (NaCl, rock-salt).';
+           C = [ 49.5  13.2  13.2  0.0  0.0  0.0 ; ...
+                 13.2  49.5  13.2  0.0  0.0  0.0 ; ...
+                 13.2  13.2  49.5  0.0  0.0  0.0 ; ...
+                  0.0   0.0   0.0 12.8  0.0  0.0 ; ...
+                  0.0   0.0   0.0  0.0 12.8  0.0 ; ...
+                  0.0   0.0   0.0  0.0  0.0 12.8];
+           rh = 2170;
+       case {'sylvite', 'kcl'}
+           info = 'Single crystal sylvite (KCl).';
+           C = [ 40.1   6.6   6.6  0.0  0.0  0.0 ; ...
+                  6.6  40.1   6.6  0.0  0.0  0.0 ; ...
+                  6.6   6.6  40.1  0.0  0.0  0.0 ; ...
+                  0.0   0.0   0.0  6.4  0.0  0.0 ; ...
+                  0.0   0.0   0.0  0.0  6.4  0.0 ; ...
+                  0.0   0.0   0.0  0.0  0.0  6.4];
+           rh = 1990;
+       case 'galena'
+           info = 'Single crystal galena (Bhagavantam and Rao, Nature, 1951 168:42)';
+           C = [127.0  29.8  29.8  0.0  0.0  0.0 ; ...
+                 29.8 127.0  29.8  0.0  0.0  0.0 ; ...
+                 29.8  29.8 127.0  0.0  0.0  0.0 ; ...
+                  0.0   0.0   0.0 24.8  0.0  0.0 ; ...
+                  0.0   0.0   0.0  0.0 24.8  0.0 ; ...
+                  0.0   0.0   0.0  0.0  0.0 24.8];
+           rh = 7600;
+       case 'stishovite'
+           info = 'Single crystal stishovite, SiO2 (Weidner et al., JGR, 1982, 87:4740-4746)';
+           C = [453.0 211.0 203.0   0.0   0.0   0.0 ; ...
+                211.0 453.0 203.0   0.0   0.0   0.0 ; ...
+                203.0 203.0 776.0   0.0   0.0   0.0 ; ...
+                  0.0   0.0   0.0 252.0   0.0   0.0 ; ...
+                  0.0   0.0   0.0   0.0 252.0   0.0 ; ...
+                  0.0   0.0   0.0   0.0   0.0 302.0];
+           rh = 4290;
+       otherwise
+         error('MS:ELASTICDB:UNKNOWN', ...
+             'MS_elasticDB: Unknown identifier') ;
    end
    
    switch nargout
@@ -66,7 +125,8 @@ function [ varargout ] = MS_elasticDB( uid )
       varargout(2) = {rh} ;
       varargout(3) = {info} ;
    otherwise
-      error('MS_elasticDB requires 1-3 output arguments.') ;
+      error('MS:BADOUTPUT', ...
+          'MS_elasticDB requires 1-3 output arguments.') ;
    end   
 return
 

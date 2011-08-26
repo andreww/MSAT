@@ -1,12 +1,10 @@
-%-------------------------------------------------------------------------------
-%                  MSAT - Matlab Seismic Anisotropy Toolkit 
-%-------------------------------------------------------------------------------
+% MS_DECOMP - Browaeys and Chevrot decomposition of the elasticity matrix.
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 %  Apply a decomposition of the elasticity tensor C, after: 
 %     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
-%
-%  Assumes that C is in its optimal orientation for decomposition
-%
+%  
 %  [Ciso] = MS_decomp(C)
 %     Isotropic projection of the elastic tensor.
 %
@@ -15,7 +13,24 @@
 %
 %  [Ciso,Chex,Ctet,Cort,Cmon,Ctri] = MS_decomp(C)
 %     All parts of the elastic tensor
-%   
+%     
+%
+% Notes:
+%     Output matricies are the partial components of the input elasticity
+%     matrix which maximise the norm of the high symmetry parts. This 
+%     function assumes that C is in its optimal orientation for 
+%     decomposition (use MS_axes to make this so).
+%
+% References:
+%     Browaeys, J. T. and S. Chevrot (2004) Decomposition of the elastic
+%         tensor and geophysical applications. Geophysical Journal 
+%         international v159, 667-678.
+
+%
+% See also: MS_NORMS, MS_AXES
+
+% (C) James Wookey and Andrew Walker, 2011
+
 function [ varargout ] = MS_decomp( C )
 
    i=nargout ;

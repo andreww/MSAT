@@ -18,7 +18,11 @@
 % Notes:
 %     Angles are given in degrees and correspond to yaw, -dip and aximuth,
 %     respectvly. The rotations are applied in order, ie: alpha, then beta
-%     then gamma (by default).
+%     then gamma (by default). The variables C, alp, bet and gam can be 
+%     arrays or scalars but (1) the angles must all be the
+%     same length and (2) either C or all the angles must be scalars unless
+%     they are the same length.
+%
 
 % (C) James Wookey and Andrew Walker, 2011.
 % 
@@ -26,53 +30,90 @@
 
 function [CR] = MS_rot3(C,alp,bet,gam,varargin)
 
-try 
-   MS_checkC(C) ;
-catch ME
-   error('MS:ROT3BadInputMatrix', ...
-      ['Invalid input elasticity matrix: ' ME.message]) ;
+    orderV = [1 2 3] ;
+
+    %  ** process the optional arguments
+    iarg = 1 ;
+    while iarg <= (length(varargin))
+       switch lower(varargin{iarg})
+          case 'order' 
+             orderV = varargin{iarg+1} ;
+             if (length(find(orderV==1))+length(find(orderV==2))+length(find(orderV==3)))~=3
+                error('MS:ROT3:BadOrder',...
+                'Order vector must be 3-element, containing 1,2 and 3') ;   
+             end
+             if (length(orderV)~=3)
+                error('MS:ROT3:BadOrder',...
+                'Order vector must be 3-element, containing 1,2 and 3') ;  
+             end                  
+             iarg = iarg + 2 ;
+           otherwise 
+             error('MS:ROT3:UnknownOption',...
+                ['Unknown option: ' varargin{iarg}]) ;   
+       end   
+    end
+
+    % How many angles - are lists correct length.
+    numrs = size(alp, 1);
+    assert(numrs == size(bet, 1), 'MS:ListsMustMatch',...
+        'The number of alp angles must be the same as the number of bet angles') 
+    assert(numrs == size(gam, 1), 'MS:ListsMustMatch',...
+        'The number of alp angles must be the same as the number of gam angles')
+    
+
+    a = alp * pi/180. ;
+    b = bet * pi/180. ;
+    g = gam * pi/180. ;
+
+    numdimCs = ndims(C);
+    if ((numrs == 1) && (numdimCs == 2))
+        % Two matrix scalar case
+        CR = rot_3_scalar(C, a, b, g, orderV);  
+    elseif ((numrs > 1) && (numdimCs == 2))
+        % Many rotations and one matrix case
+        CR = zeros(6,6,numrs);
+        for i = 1:numrs
+            CR(:,:,i) = rot_3_scalar(C, a(i), b(i), g(i), orderV);
+        end
+    elseif ((numrs == 1) && (numdimCs == 3))
+        % Many matrix and one rotation case
+        CR = zeros(6,6,size(C, 3));
+        for i = 1:size(C, 3)
+            CR(:,:,i) = rot_3_scalar(C(:,:,i), a, b, b, orderV);
+        end
+    elseif ((numrs > 1) && (numdimCs == 3))
+        % List of rotatiosn and matrices case
+        assert((numrs == size(C, 3)), 'MS:ListsMustMatch', ...
+            'The length of the lists of rotations and matrices must match');
+        CR = zeros(6,6,size(C, 3));
+        for i = 1:size(C,3)
+            CR(:,:,i) = rot_3_scalar(C(:,:,i), a(i), b(i), g(i), orderV);
+        end
+    end
+    
 end
 
-orderV = [1 2 3] ;
+function [CR] = rot_3_scalar(C, a, b, g, orderV)
 
-%  ** process the optional arguments
-iarg = 1 ;
-while iarg <= (length(varargin))
-   switch lower(varargin{iarg})
-      case 'order' 
-         orderV = varargin{iarg+1} ;
-         if (length(find(orderV==1))+length(find(orderV==2))+length(find(orderV==3)))~=3
-            error('MS:ROT3:BadOrder',...
-            'Order vector must be 3-element, containing 1,2 and 3') ;   
-         end
-         if (length(orderV)~=3)
-            error('MS:ROT3:BadOrder',...
-            'Order vector must be 3-element, containing 1,2 and 3') ;  
-         end                  
-         iarg = iarg + 2 ;
-      otherwise 
-         error('MS:ROT3:UnknownOption',...
-            ['Unknown option: ' varargin{iarg}]) ;   
-   end   
+    try 
+        MS_checkC(C) ;
+    catch ME
+        error('MS:ROT3BadInputMatrix', ...
+           ['Invalid input elasticity matrix: ' ME.message]) ; 
+    end
+
+    R = zeros(3,3,3) ;
+
+    R(1,:,:) = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
+    R(2,:,:) = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
+    R(3,:,:) = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+
+    RR =  squeeze(R(orderV(3),:,:)) * ...
+             squeeze(R(orderV(2),:,:)) * ...
+                squeeze(R(orderV(1),:,:));
+ 
+    %  Delegate the rotation
+    CR = MS_rotR(C, RR) ;
+
 end
-
-a = alp * pi/180. ;
-b = bet * pi/180. ;
-g = gam * pi/180. ;
-
-RM = zeros(3,3,3) ;
-
-R(1,:,:) = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
-R(2,:,:) = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
-R(3,:,:) = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
-
-RR =  squeeze(R(orderV(3),:,:)) * ...
-         squeeze(R(orderV(2),:,:)) * ...
-            squeeze(R(orderV(1),:,:));
-
-%  Delegate the rotation
-CR = MS_rotR(C, RR) ;
-
-
-return
 

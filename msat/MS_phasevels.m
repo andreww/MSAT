@@ -49,8 +49,9 @@
 
 function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 
-		if (length(inc)~=length(azi))
-			error('AZI and INC must be scalars or vectors of the same dimension');
+      if (length(inc)~=length(azi))
+			error('MS:ListsMustMatch', ...
+                'AZI and INC must be scalars or vectors of the same dimension');
       end
       
 %  ** convert inc, azi to column vectors if necessary      
@@ -96,7 +97,7 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 		[V,EIGVEC]=velo(XI,rh,C) ;
 		
 %  ** pull out the eigenvectors
-		P  = EIGVEC(:,1) ;
+      P  = EIGVEC(:,1) ;
       S1 = EIGVEC(:,2) ;
 
   		if ~isreal(S1)
@@ -109,7 +110,7 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
                 sprintf('    %f %f %f %f %f %f\n',C(1:6,5)) ...
                 sprintf('    %f %f %f %f %f %f\n\n',C(1:6,6)) ...
                 sprintf('S1 = %f %f %f\n',S1)];
-  			error('MS_PHASEVELS:vectornotreal', error_str) ;
+  			error('MS:PHASEVELS:vectornotreal', error_str) ;
   		end
       S2 = EIGVEC(:,3) ;
 

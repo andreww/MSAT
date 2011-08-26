@@ -1,31 +1,36 @@
-%-------------------------------------------------------------------------------
-%                  MSAT - Matlab Seismic Anisotropy Toolkit 
-%-------------------------------------------------------------------------------
-% MS_expand - expand a minimal set of elastic constants based on a specifed
+% MS_EXPAND - fill out elasticity matrix.
+%
+% // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+%
+% Expand a minimal set of elastic constants based on a specifed
 %             symmetry to a full Cij tensor. 
-%-------------------------------------------------------------------------------
-% 
+%
+%  %  [ Cf ] = MS_expand( C, mode )
+%
 % Usage: (some parts not yet implemented!)
-%     [ Cf ] = MS_expand( C, mode )
-%         Fill out elastic tensor C based on symmetry, defined by mode. This can
-%         take the following values:
-%            'auto' - assume symmetry based on number of Cijs specified 
-%            'iso' - isotropic (nec=2) ; C33 and C66 must be specified.
-%            'hex' - hexagonal (nec=5) ; C33, C44, C11, C66 and C13 must be
-%                       specified, x3 is symmetry axis
-%            'vti' - synonym for hexagonal
-%            'cubic' - cubic (nec=3) ; C33, C66 and C12 must be specified
+%     Fill out elastic tensor C based on symmetry, defined by mode. This 
+%     can take the following values:
+%        'auto' - assume symmetry based on number of Cijs specified 
+%        'iso' - isotropic (nec=2) ; C33 and C66 must be specified.
+%        'hex' - hexagonal (nec=5) ; C33, C44, C11, C66 and C13 must be
+%                specified, x3 is symmetry axis
+%        'vti' - synonym for hexagonal
+%        'cubic' - cubic (nec=3) ; C33, C66 and C12 must be specified
 %
-%     Cijs *not* specified in the appropriate symmetry should be zero in the 
-%     input matrix. 
+%     Cijs *not* specified in the appropriate symmetry should be zero in 
+%     the input matrix. 
 %
+%
+% See also: MS_ELSTICDB MS_LOAD MS_LOAD_LIST
+
+% (C) James Wookey and Andrew Walker, 2011
 
 function [ C ] = MS_expand( Cin, mode )
 
 try 
    MS_checkC(Cin,'fast') ; 
 catch ME
-   error(['Bad input elasticity matrix:' ME.message])
+   error(ME.identifier, ['Bad input elasticity matrix:' ME.message])
 end   
 
 C = zeros( 6 , 6 ) ;
