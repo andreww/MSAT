@@ -34,3 +34,32 @@ function test_MS_phasevels_stishovite_graph
     assert((vs2-7.7)^2<0.1^2, 'vs wrong'); % From graph
 
 end 
+
+function test_MS_phasevels_stishovite_list
+
+    [C, rh] = MS_elasticDB('stishovite');
+    
+    % [001], symmetry axis
+    [~, avs, vs1, vs2, vp] = MS_phasevels(C, rh, [90 90 90], [0 0 0]);
+    
+    assertElementsAlmostEqual(vs1, vs2); % By symmetry
+    assertElementsAlmostEqual(avs, [0.0, 0.0, 0.0]'); % By symmetry 
+    assertElementsAlmostEqual(vp, [13.5, 13.5, 13.5]', 'absolute', 0.5); % From graph
+    assertElementsAlmostEqual(vs1, [7.7, 7.7, 7.7]', 'absolute', 0.5); % From graph
+    
+
+end
+
+function test_MS_phasevels_stishovite_errors
+
+    [C, rh] = MS_elasticDB('stishovite');
+    
+    f = @()MS_phasevels(C, rh, [90 90 90], [0 0]);
+    assertExceptionThrown(f, 'MS:ListsMustMatch');
+    
+    f = @()MS_phasevels(C, rh, [90 90], [0 0 0]);
+    assertExceptionThrown(f, 'MS:ListsMustMatch');
+    
+    % How shoould we test MS:PHASEVELS:vectornotreal
+    
+end
