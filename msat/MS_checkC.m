@@ -74,6 +74,10 @@ function [isgood] = MS_checkC(C,varargin)
       isgood = 1 ;
 
 %  ** start with basic checks
+      if ~isnumeric(C)
+         error('MS:CHECKCNotNumeric', ...
+	         'Elasticity matrix error: Appears not to be numeric.')
+      end
       try 
           if ~ismatrix(C)
 		    isgood = 0 ;

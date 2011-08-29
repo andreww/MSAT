@@ -5,9 +5,9 @@
 % Expand a minimal set of elastic constants based on a specifed
 %             symmetry to a full Cij tensor. 
 %
-%  %  [ Cf ] = MS_expand( C, mode )
+% [ Cf ] = MS_expand( C, mode )
 %
-% Usage: (some parts not yet implemented!)
+% Usage: 
 %     Fill out elastic tensor C based on symmetry, defined by mode. This 
 %     can take the following values:
 %        'auto' - assume symmetry based on number of Cijs specified 
@@ -21,7 +21,7 @@
 %     the input matrix. 
 %
 %
-% See also: MS_ELSTICDB MS_LOAD MS_LOAD_LIST
+% See also: MS_ELASTICDB MS_LOAD MS_LOAD_LIST
 
 % (C) James Wookey and Andrew Walker, 2011
 
@@ -60,17 +60,48 @@ case 'iso'
    if nec~=2, error('MS:EXPANDbadiso',...
       'Isotropic expansion requires C33 and C66 to be set') ;, end
 %  check that C(1,1) and C(6,6) are set
-   if Cin(3,3)==0 | Cin(6,6)==0
+   if Cin(3,3)==0 | Cin(6,6)==0 
       error('MS:EXPANDbadiso',...
-         'Isotropic expansion requires C33 and C66 to be set.')
+         'Isotropic expansion requires C33 and C66 to be set.') ;
    end
+   
    C(3,3) = Cin(3,3) ;
    C(6,6) = Cin(6,6) ;
    
    C(1,1) = C(3,3) ; C(2,2) = C(3,3) ;
    C(5,5) = C(6,6) ; C(4,4) = C(6,6) ;
    C(1,2) = (C(3,3)-2.*C(4,4)) ;
-   C(1,3) = C(1,2) ; C(2,3) = C(1,2) ;   
+   C(1,3) = C(1,2) ; C(2,3) = C(1,2) ;
+
+case 'cubic'
+   if nec~=3, error('MS:EXPANDbadcubic',...
+      'Cubic expansion requires C33, C66 and C12 to be set') ;, end
+%  check that C(1,1) and C(6,6) are set
+   if Cin(3,3)==0 | Cin(6,6)==0 | Cin(1,2) == 0
+      error('MS:EXPANDbadcubic',...
+         'Isotropic expansion requires C33, C66 and C12 to be set.') ;
+   end
+   
+   C = Cin ;
+   C(1,1) = C(3,3) ; C(2,2) = C(3,3) ;
+   C(1,3) = C(1,2) ; C(2,3) = C(1,2) ;
+   C(4,4) = C(6,6) ; C(5,5) = C(6,6) ;
+
+case {'hex', 'vti'}
+   if nec~=5, error('MS:EXPANDbadhex',...
+      'Hexagonal expansion requires C11, C33, C44, C66 and C13 to be set.') ;, end
+%  check that C(1,1) and C(6,6) are set
+   if Cin(1,1)==0 | Cin(3,3)==0 | Cin(1,3) == 0 | Cin(4,4)==0 | Cin(6,6) == 0 
+      error('MS:EXPANDbadhex',...
+         'Isotropic expansion requires C11, C33, C44, C66 and C13 to be set.') ;
+   end
+   
+   C = Cin ;
+   
+   C(1,2) = (C(1,1)-2.*C(6,6)) ;
+   C(2,2) = C(1,1) ; C(2,3) = C(1,3) ;
+   C(5,5) = C(4,4) ;
+         
 otherwise
    error('MS:EXPANDunsupportsymmetry','Unsupported symmetry.') ;
 end
