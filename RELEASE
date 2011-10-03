@@ -1,0 +1,24 @@
+To make a release:
+
+(1) Check that all docuemntation is up-to-date
+    and committed. (Run "make install" in 
+    doc_src, then git commit any changed 
+    files).
+
+(2) In Matlab, check all tests run without error.
+    If fixes are needed commit them and check (1)
+    is still true.
+
+(3) Update the RELEASE_NOTES and commit
+
+(4) Check dates in licences.
+
+(5) Tag the last commit of this release:
+    git tag 0.8
+
+(6) Generate tar file by:
+    git archive --format=tar --prefix=msat-0.8/ HEAD | gzip -9 > ../msat-0.8.tar.gz
+
+(7) Generate MD5 and SHA1 digests of tar file for verification of distribution.
+    openssl dgst -md5 ../msat-0.8.tar.gz > ../msat-0.8-digest
+    openssl dgst -sha1 ../msat-0.8.tar.gz >> ../msat-0.8-digest
