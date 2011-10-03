@@ -1,3 +1,91 @@
 == MS_load
 
- [C,rho] = CIJ_load(str)
+ MS_LOAD - Load a set of elastic constants from a file.
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+ 
+ [ ... ] = MS_load( fname, ... )
+
+ Usage: 
+     [C] = MS_load(fname)                    
+         Load the elastic constants in file 'fname'. See file format below. 
+
+     [C,r] = MS_load(fname,...)                    
+         Load the elastic constants and density in file 'fname'. See file 
+         format below.
+
+     [C,...] = MS_load(fname,...,'format',fmt)                    
+         Specify format for file. See below for descriptions. Available options 
+         are:
+            'simple' : Formatted text file (default)
+
+     [C,...] = MS_load(fname,...,'symmetry', mode) 
+         ** some parts not yet implemented **
+         Fill out elastic tensor based on symmetry, defined by mode. This can
+         take the following values:
+            'none' - nothing attempted, unspecified Cijs are zero (default)
+            'auto' - assume symmetry based on number of Cijs specified 
+            'iso' - isotropic (nCij=2) ; C33 and C66 must be specified.
+            'hex' - hexagonal (nCij=5) ; C11, C33, C44, C66 and C13 must be
+                       specified, x3 is symmetry axis
+            'vti' - synonym for hexagonal
+            'cubic' - cubic (nCij=3) ; C33, C66 and C12 must be specified
+
+     [C,...] = MS_load(fname,...,'eunit',unit)
+         Specify elasticity unit; this is used to convert to GPa (msat's 
+         default operating unit)
+            'GPa' - elastic constants are already in GPa (default)
+            'Mbar' - elastic constants are in Mbar
+            'Pa' - elastic constants are in Pascals
+            'bar' - elastic constants are in bar
+
+     [C,...] = MS_load(fname,...,'dunit',unit)
+         Specify density unit; this is used to convert to kg/m3 (msat's 
+         default operating unit)
+            'kgm3' - density is already in kg/m3 (default)
+            'gcc' - density is in g/cc
+
+     [C,...] = MS_load(fname,...,'Aij')
+         Elasticities are specified in density normalised form. This option
+         requires a density to be specified, the elasticities are returned with
+         the normalisation reversed (default format for msat). The density
+         normalisation is assumed to have been performed using the density 
+         specified in the file (so, obviously, one is required) without any
+         different unit scalings. It is *highly* advisable to check (for 
+         example using MS_phasevels) that sensible numbers result. The default
+         is to assume that the input is not density normalised. 
+
+     [C,...] = MS_load(fname,...,'force')
+         Disable post-load checking. You're on your own, buddy.
+
+  Supported file formats:
+  -----------------------
+
+  * 'simple' (default)
+        
+     In this mode MS_load expects an ascii file containing lines of the form:
+
+     I J C(I,J)
+
+     Elasticity tensor components are specified by their indices (i,j). Any 
+     number other than 1-6 in the i or j column denotes that a density is 
+     being given. 
+
+     So, for olivine, the file might look like:
+     
+     
+     1 1 320.5
+     1 2 68.1
+     1 3 71.6
+     ...
+     6 6 78.7
+     0 0 3325
+     
+     Text following a '' in any line is ignored (useful for header lines or 
+     comments)
+
+  * 'ematrix'
+
+    Elastic constants in the format read by EMATRIX (D. Mainprice). 
+
+ See also: MS_LOAD_LIST, MS_ELASTICDB

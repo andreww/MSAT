@@ -1,0 +1,22 @@
+== MS_VTI
+
+   MS_VTI - generate elastic constants for a vertically transverse isotropic
+             medium from Thomsen parameters. Symmetry is in the 3-axis. 
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+
+ Given Thomsen parameters for a VTI medium, return the elasticity 
+ matrx
+
+   [C]=MS_VTI(vp,vs,rh,eps,gam,del)
+
+   Inputs: 
+       rh  : Density (kg/m2) 
+       vp  : km/s 
+       vs  : km/s 
+       eps, gam, del : Dimensionless
+
+   Output:
+        C : Stiffness tensor (6x6 notation, GPa)
+
+ See also: MS_iso, MS_elasticDB

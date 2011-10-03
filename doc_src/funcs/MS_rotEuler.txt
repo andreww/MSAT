@@ -1,0 +1,37 @@
+== MS_rotEuler
+
+ MS_ROTEULER - Rotate an elasticity matrix using Bunge's Euler angles
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+
+ Rotate one or more elasticity matrices usign Bunge's Euler angles 
+
+ [ CC ] = MS_rotEuler( C, phi1, theta, phi2 )
+
+ Usage: 
+     For three angles in degrees (phi1, theta, phi2) representing a
+     rotation in Bunge convention rotate the elasticity matrix C. All
+     variables can be arrays or scalars but (1) the angles must all be the
+     same length and (2) either C or all the angles must be scalars unless
+     they are the same length.
+
+ Notes:
+    In the context of this function the term 'Euler angle' is used in 
+    the sense common in texture analysis not computer graphics etc. where
+    the three angles are rotations around a fixes axis system (see 
+    MS_rot3 for this case). In the (Bunge) convention used here the object
+    (crystal) reference frame is first assumed to be alligned with the 
+    sample reference frame. The object is then rotated around the common
+    z axis by an angle phi1. The second rotation (theta) is about 
+    the object's x axis (which is no longer parallel to the external 
+    x axis). The third rotation, phi2, is about the samples z axis 
+    (which, by this point, is not paralell with the external z axis). See
+    Figure 5 of Bunge 1985 for a graphical example.
+
+ References:
+    Bunge, H. J. (1985) "Representaton of Preferred Orientations" in H.-R.
+    Wenk (ed.) "Preferred Orientation in Deformed Metals and Rocks: 
+     An Introduction to Modern Texture Analysis" Academic Press inc.
+     Orlando.
+
+ See also: MS_ROT3 MS_ROTR

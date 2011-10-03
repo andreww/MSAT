@@ -1,20 +1,31 @@
 == MS_sphere
 
- CIJ_sphere : Plot a spherical plot from a set of elastic constants
-   
- Usage: CIJ_sphere(CC,rh,mode,...)
-     mode can be 'p'(-wave) or 's'(-wave).
-     extra arguments are EVALed; parameters that can be (re)set are:
+ MS_SPHERE - Plot a spherical plot of phasevels/anisotropy from a set of 
+              elastic constants.
 
-        cmap = jet(64) ; colourmap
-        icmapflip = 1 ; reverse the sense of the colourscale     
-        scale=0.08 ; FSW vector length
-        dirs = [] ; directions of interest
-        dlen = 1.5 ; length of doi vectors 
-        plotlabels = 1 ;
-        plotaxes = 1 ;
-        nofig = 0 ; suppress the figure command, so plot can be sub-plotted
-        nocbar = 0 ; suppress the colorbar
-        cax = NaN ; colour axis, define to use - default is auto
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 
- (C) James Wookey, December 2007.	
+ Given an elasticity matrix and density, produce spherical figures showing 
+     the P- or S-wave anisotrpy. 
+
+ MS_sphere(CC,rh,mode,...)
+
+ Usage: 
+     MS_sphere(CC,rh,mode)                    
+         Mode can be 'p'(-wave), 's'(-wave), 's1' (fast s-wave) or 's2'
+         (slow s-wave).
+
+     MS_sphere(CC,rh,mode,...)                    
+          Further arguments are EVALed. Parameters that can be (re)set 
+          are:
+            cmap = jet(64) ; colourmap
+            icmapflip = 1 ; reverse the sense of the colourscale     
+            FSWTickLength=0.08 ; Fast shear wave vector length
+            plotlabels = 1 ;
+            plotaxes = 1 ;
+            nofig = 0 ; suppress the figure command, so plot can be sub-plotted
+            nocbar = 0 ; suppress the colorbar
+            cax = NaN ; colour axis, define to use - default is auto
+            dirs = [] ; directions of interest, this should be a vector of azi, 
+                           inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4]
+            dlen = 1.5 ; length of doi vectors 

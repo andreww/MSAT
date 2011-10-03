@@ -1,0 +1,31 @@
+== MS_info
+
+ MS_INFO - Information about an elasticity matrix.
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+
+ Prints out or returns a variety of information about an input elasticity
+ matrix.
+
+ [ ... ] = MS_info( C, ... )
+
+ Usage: 
+     [] = MS_info(C)                    
+         Prints to the screen the default information about the matrix. 
+
+     [] = MS_info(C, rho)                    
+         If the density is provided, velocity information is returned. 
+
+     [] = MS_info(C, rho, 'mode', MODE)
+         Choose the set of outputs to return. Currently supported are:
+           'all' : all available information (default)
+           'vel' : just report velocity information
+           'rot' : just report rotational information
+
+     [] = MS_info(C, 'mode', MODE)
+         As above, be default to 'rot'.
+
+     [report] = MS_info(C, ...)                    
+         As above, but return information in a string. Don't print to 
+         screen.
+

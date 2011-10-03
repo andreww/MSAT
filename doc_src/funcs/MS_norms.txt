@@ -1,0 +1,31 @@
+== MS_norms
+
+ MS_NORMS - Browaeys and Chevrot analysis of the elasticity matrix.
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+
+  Calculate the percentages of the original matrix norm represented by the
+  individual decompositions of an elasticity tensor C, after: 
+     Browaeys and Chevrot (GJI, v159, 667-678, 2004)
+  
+  [P] = MS_norms(C,Ciso)
+     Isotropic part (scalar)
+
+  [P] = MS_norms(C,Ciso,Chex)
+     Isotropic, and hexagonal parts of the elastic tensor (vector)
+
+  [P] = MS_norms(C,Ciso,Chex,Ctet,Cort,Cmon,Ctri)
+     All parts of the elastic tensor (vector)
+     
+
+ Notes:
+     Input components of of C must first be calculated using MS_decomp.
+     The output vector P will have as may elements as the number of
+     decomposed parts of the input matrix that are provided.
+
+ References:
+     Browaeys, J. T. and S. Chevrot (2004) Decomposition of the elastic
+         tensor and geophysical applications. Geophysical Journal 
+         international v159, 667-678.
+
+ See also: MS_AXES, MS_DECOMP

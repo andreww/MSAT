@@ -1,17 +1,27 @@
 == MS_rot3
 
- Script to rotate a set of elastic constants (Cij) by 3 angles:
+ MS_ROT3 - Elasticity matrix rotation.
 
- alp = clockwise about 1-axis (looking at origin, == yaw)
- bet = clockwise about 2-axis (looking at origin, == -dip)
- gam = clockwise about 3-axis (looking at origin, == azimuth)
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 
- [CR] = CIJ_rot3(C,alp,bet,gam)
+ Rotates an elasticity matrix around the three axes. 
 
-  Inputs: the Cij elastic stiffness tensor, 3 angles (degrees)
+ Usage: 
+     [CR] = MS_rot3(C,alp,bet,gam)                    
+         C: input 6x6 elasticity matrix 
+         alp: clockwise rotation about 1-axis, looking at origin
+         bet: clockwise rotation about 2-axis, looking at origin
+         gam: clockwise rotation about 3-axis, looking at origin
 
-  Output is the rotated Cij elastic stiffness tensor                  
+     [CR] = MS_rot3(...,'order',V)                    
+         order: V is a 3 element vector containing the order in which to apply the 3 rotations.
+                Default is [1 2 3].
 
-  NOTE: The rotations are applied in order, ie: alpha, then beta then gamma
-
+ Notes:
+     Angles are given in degrees and correspond to yaw, -dip and aximuth,
+     respectvly. The rotations are applied in order, ie: alpha, then beta
+     then gamma (by default). The variables C, alp, bet and gam can be 
+     arrays or scalars but (1) the angles must all be the
+     same length and (2) either C or all the angles must be scalars unless
+     they are the same length.
 

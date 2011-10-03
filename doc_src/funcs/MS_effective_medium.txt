@@ -1,0 +1,48 @@
+== MS_effective_medium
+
+ [Ceff,rh]=MS_effective_medium(theory, ...)
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+  
+  Generate elastic constants for the effective medium parameters based on 
+  various theories, identified by the string 'theory'. Subsequent required 
+  arguments depend on the theory invoked. 
+
+  Currently available theories:
+
+  ** Tandon and Weng, 84 ('tandon' or 't&w')
+     (Isotropic host matrix with unidirectionally aligned isotropic spheroid 
+      inclusions) 
+
+     [Ceff,rh]=MS_effective_medium('t&w',vpm,vsm,rhm,vpi,vsi,rhi,del,f) or
+        Input parameters:
+           vpm,vsm,rhm : isotropic parameters of the matrix (km/s, kg/m3)
+                   del : aspect ratio of spheroids:
+                            del < 1 = smarties
+                            del = 1 = spheres
+                            del > 1 = cigars
+                    f : volume fractions of inclusions       
+        vpi, vsi, rhi : isotropic parameters of the inclusions
+
+     [Ceff,rh]=MS_effective_medium('t&w',Cm,rhm,Ci,rhi,del,f) or
+        Input parameters:
+             Cm,rh : elasticity and density of the matrix (GPa, kg/m3)
+                   del : aspect ratio of spheroids:
+                            del < 1 = smarties
+                            del = 1 = spheres
+                            del > 1 = cigars
+                    f : volume fractions of inclusions       
+         Ci, rhi : isotropic parameters of the inclusions
+
+       Output parameters:
+          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
+          rh : aggregate density (kg/m3)
+
+
+  References:
+ - Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the 
+   Elastic Properties of Unidirectionally Aligned Composites. Polymer 
+   Composites, 5, pp 327-333, 1984. 
+
+
+ See also: MS_elasticDB

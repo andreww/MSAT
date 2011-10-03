@@ -1,0 +1,34 @@
+== MS_checkC
+
+ MS_CHECKC - check consistency of a stiffness matrix against various criteria
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+
+ [ isgood ] = MS_checkC( C,... )
+
+	Inputs:
+     C = Stiffness tensor for checking
+
+  Outputs:
+     isgood = 1 for OK
+
+  Options:
+     Various checks can be disabled/enabled by specifying extra options:
+        'fast' - run a minimal set of checks (size and type only)
+        'warn' - warn only on more sophisticated errors than size/type
+        'nosymchk' - disable upper, lower symmetry checking
+        'nozerochk' - disable top left / trace zero checking 
+        'nopdefchk' - disable positive definiteness check 
+ 
+     Various control parameters can be set by adding parameter,value pairs 
+     to the arguments
+        'thresh',x - set numerical threshold for zero to x (default = 1e-6)
+
+  Notes:
+  Currently, the following properties of the input elastic stiffness
+  matrix, C, are tested: (1) The maxtrix must be of rank 2 and size (6,6).
+  (2) The matrix must be symmetrical along the leading diagonal (i.e. 
+  the major symmetry of the elastic constants tensor, Cijkl == Cklij, must
+  be present). (3) The matrix must be positive-definite and be none zero
+  in the leading diagonal and top left corner.
+

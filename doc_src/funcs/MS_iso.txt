@@ -1,0 +1,13 @@
+== MS_iso
+
+   MS_iso - generate elastic matrix from isotropic velocities
+
+   [C]=MS_iso(vp,vs,rh)
+
+   Inputs: 
+       rh  : Density (kg/m3) 
+       vp  : p-wave velocity (km/s) 
+       vs  : s-wave velocity (km/s)
+
+   Output:
+        C : Stiffness tensor (6x6 notation, GPa)

@@ -1,0 +1,10 @@
+== MS_rotRC4
+
+ Script to rotate a set of elastic constants (Cij) by a rotation matrix
+ 
+ [CR] = CIJ_rot3(C,R)
+
+  Inputs: the Cij elastic stiffness tensor, 3x3 rotation matrix
+
+  Output is the rotated Cij elastic stiffness tensor                  
+
