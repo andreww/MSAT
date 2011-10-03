@@ -1,0 +1,41 @@
+MSAT Readme
+===========
+
+This directory contains the MATLAB source and support files for 
+the MATLAB Seismic Anisotropy Toolkit (MSAT). To install and use
+the toolkit, follow the instructions below.
+
+License and copyright
+---------------------
+
+MSAT is distributed under the terms of a 3-clause BSD style license. This
+means you can redistribute the toolkit as long as you follow three simple
+rules outlined near the top of each Matlab source file.  Copyright remains 
+with the authors, James Wookey and Andrew Walker with other copyright 
+holders named in individual source files. 
+
+Installing
+----------
+
+Once you have uncompressed the distributed tar file installation is completed
+by telling Matlab where to find the source code and documentation. Start up 
+Matlab and use the "Set Path..." option from the File menu to open the path 
+setting dialogue. Use the "Add Folder..." button to open a file browser, 
+navigate the msat subdirectory (of the directory containing this file), 
+select it and choose "open". This adds the MSAT functions and documentation 
+to your path. Choose "Save" to make this change permanent.  
+
+Documentation
+-------------
+
+Once MSAT has been installed documentation on all functions can be found by 
+typing "help MS_funcname" at the Matlab command prompt. Documentation can 
+also be found using the Matlab help browser and clicking on the MSAT Toolbox 
+section of the contents page.
+
+Further help
+------------
+
+For additional assistance contact the authors, James Wookey 
+<j.wookey@bristol.ac.uk> and Andrew Walker <andrew.walker@bristol.ac.uk>.
+
