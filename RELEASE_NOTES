@@ -1,0 +1,19 @@
+MSAT Release Notes
+==================
+
+Version 0.8 - 4 October 2011
+----------------------------
+
+This is the first version of MSAT 
+so there are no backwards incompatibility 
+issues.  However, this is an alpha 
+release and note that:
+
+* Elastic constant interpolation for 
+  trigonal symmetry does not work correctly.
+* Several examples are incomplete. 
+* Many of the functions are derived from 
+  older "CIJ_" code. Argument orders and 
+  details of what must be passed have been 
+  freely changed. Do read the documentation.
+
