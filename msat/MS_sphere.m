@@ -27,21 +27,50 @@
 %            dirs = [] ;  % directions of interest, this should be a vector of azi, 
 %                           inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4]
 %            dlen = 1.5 ; % length of doi vectors 
-
 %
 % See also: MS_SPHERE, MS_PHASEVELS
 
-% (C) James Wookey, 2007-2011.	
-% (C) James Wookey and Andrew Walker, 2011
-% Portions of this function are:
-% (C) Darren Weber, Jon Leech and Jim Buddenhagen 1989 - 2002. 
-%-------------------------------------------------------------------------------
-%  This software is distributed in the hope that it will be useful,
-%  but WITHOUT ANY WARRANTY; without even the implied warranty of
-%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-%-------------------------------------------------------------------------------
 
-%%
+% Copyright (c) 2007 - 2011, James Wookey
+% Copyright (c) 2011, James Wookey and Andrew Walker
+% Portions of this function are:
+% Copyright (c) 1989 - 2002, Darren Weber, Jon Leech and Jim Buddenhagen.
+% All rights reserved.
+% 
+% Redistribution and use in source and binary forms, 
+% with or without modification, are permitted provided 
+% that the following conditions are met:
+% 
+%    * Redistributions of source code must retain the 
+%      above copyright notice, this list of conditions 
+%      and the following disclaimer.
+%    * Redistributions in binary form must reproduce 
+%      the above copyright notice, this list of conditions 
+%      and the following disclaimer in the documentation 
+%      and/or other materials provided with the distribution.
+%    * Neither the name of the University of Bristol nor the names 
+%      of its contributors may be used to endorse or promote 
+%      products derived from this software without specific 
+%      prior written permission.
+% 
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS 
+% AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
+% WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+% PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
+% THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY 
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+% PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF 
+% USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+% CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+% OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+% NB: redistributors must also comply with the GPL. See below.
+
+
 function MS_sphere(CC,rh,mode,varargin)
 
 cmap = jet(64) ;
@@ -105,7 +134,7 @@ if (nofig~=1)
 end
 
 
-%% load the triangulation
+% load the triangulation
 [x, y, z, faces, az, inc] =  get_mesh(velmesh);
 
 [~,avs,vs1,vs2,vp] = MS_phasevels(CC,rh,inc,az) ;
@@ -128,7 +157,7 @@ hold on
 
 if ~isnan(cax), caxis(cax), end
 
-%% plot the shear-wave polarisation
+% plot the shear-wave polarisation
 if sum(strcmpi({'s','s1','s2'},mode))==1 
    [x, y, z, ~, az, inc] =  get_mesh(polmesh);
 
@@ -147,7 +176,7 @@ if sum(strcmpi({'s','s1','s2'},mode))==1
    end
    
    [~,~,~,~,~, SF, SS] = MS_phasevels(CC,rh,inc,az) ;
-   %% calculate PM vectors
+   % calculate PM vectors
    nv = length(x) ;
    if sum(strcmpi(mode,{'s','s1'}))==1 
       for iv=1:nv
@@ -168,7 +197,7 @@ if sum(strcmpi({'s','s1','s2'},mode))==1
    end
 end
 
-%% draw the axes
+% draw the axes
 if plotaxes
    plot3([-1.5 1.5],[0 0],[0 0],'Color',[0.5 0.5 0.5],'LineWidth',2,'LineStyle','--')
    plot3([0 0],[-1.5 1.5],[0 0],'Color',[0.5 0.5 0.5],'LineWidth',2,'LineStyle','--')
@@ -190,7 +219,7 @@ for i=1:ndir
    end        
 end   
 
-%% final commands
+% final commands
 
 axis off
 daspect([1 1 1]) ;
@@ -209,7 +238,7 @@ end
 return
 
 
-%% Tooling to build the triangulation... 
+% Tooling to build the triangulation... 
 
 function [x, y, z, tri, az, inc ] = get_mesh(level)
 
@@ -287,7 +316,7 @@ function [FV] = sphere_tri(shape,maxlevel,r,winding)
 % clockwise!  Now the surface normals are directed outward.  Also reset the
 % default recursions to zero, so we can get out just the platonic solids.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 
 
 if ~exist('shape','var') || isempty(shape),
