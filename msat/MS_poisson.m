@@ -67,6 +67,16 @@
 
 function [ nu ] = MS_poisson( C, m, n )
 
+    % check the inputs: C
+    assert(MS_checkC(C)==1, 'MS:POISSON:badC',  ...
+        'MS_checkC error MS_poisson') ;
+    assert(MS_checkUnit(m)==1, 'MS:POISSON:badM',  ...
+        'MS_checkUnit error for m in MS_poisson') ;
+    assert(MS_checkUnit(n)==1, 'MS:POISSON:badN',  ...
+        'MS_checkUnit error for n in MS_poisson') ;
+    assert((abs(dot(m,n))<sqrt(eps)), 'MS:POISSON:NotOrthogonal',  ...
+        'Unit vectors M and N are not orthogonal') ;
+
     S4 = MS_cij2cijkl(inv(C));
     
     Smmnn = 0.0;
@@ -82,5 +92,28 @@ function [ nu ] = MS_poisson( C, m, n )
       end
     end
     nu = -1.0*(Smmnn/Snnnn);
+
+end
+
+function [ isgood ] = MS_checkUnit( V )
+
+    error = sqrt(eps);
+    % Is V a unit vector?
+    if ~isnumeric(V)
+         error('MS:CHECKUNITNotNumeric', ...
+	      'Unit vector error: Appears not to be numeric.');
+    end
+    s = size(V);
+    if ~(length(s) == 2) && ... 
+        (((s(1) == 1) && (s(2) == 3)) || ((s(1) == 3) && (s(2) == 1)))
+         error('MS:CHECKUNITNotVec', ...
+	      'Unit vector error: Not a 3-d row or column vector.');
+    end
+    if ((sqrt(V(1)^2 + V(2)^2 + V(3)^2) - 1.0) > error)
+        error('MS:CHECKUNITNotUnit', ...
+	      'Unit vector error: Length not equal to 1.');
+    end
+    isgood = 1;
+    
 
 end
