@@ -15,6 +15,11 @@
 %     MS_plot(..., 'fontsize', f)                    
 %          Set minimum fontsize in plots to f.
 %
+%     MS_plot(..., 'wtitle', S)                    
+%          Set the (window) title to be string S. If a minus sign is prepended
+%          to this title, the figure number is also suppressed (the minus sign
+%          is not shown). 
+%
 %     MS_plot(..., 'cmap', CM)                    
 %          Redefine the colormap. CM can either be a (nx3) matrix containing a 
 %          colormap, or a string describing a function to generate such a 
@@ -79,6 +84,9 @@ function MS_plot(C,rh,varargin)
       cmap = jet(64) ;
       icmapflip = 1 ; % reverse the sense of the colourscale
 
+%  ** default window title
+      wtitle = 'MSAT polefigure.' ;
+            
 %  ** process the optional arguments
       iarg = 1 ;
       while iarg <= (length(varargin))
@@ -91,6 +99,12 @@ function MS_plot(C,rh,varargin)
                iarg = iarg + 2 ;
             case 'fontsize'
                fntsz = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'wtitle'
+               wtitle = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'wtitle'
+               wtitle = varargin{iarg+1} ;
                iarg = iarg + 2 ;
             case 'cmap'
                cmarg = varargin{iarg+1} ;
@@ -133,7 +147,7 @@ function MS_plot(C,rh,varargin)
       % Set up inc-az grids...
       [INC,AZ] = meshgrid([90:-6:0],[0:6:360]) ;
       
-      % Invoke MS_phasevels to get wave velocs etc.
+      % Invoke MS_phasevels to get wave velocities etc.
       [~,~,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,...
         reshape(INC,61*16,1),reshape(AZ,61*16,1));
     
@@ -155,8 +169,13 @@ function MS_plot(C,rh,varargin)
       fprintf('Isotropic average velocities: VP=%f, VS=%f\n',VPiso,VSiso) ;
 
 %  ** Prepare window
-      figure('Position',[1 1 1400 400]) ;
-
+      if strcmp(wtitle(1),'-')
+         figure('Position',[1 1 1400 400],'name', ...
+                wtitle(2:end),'NumberTitle','off') ;
+      else
+         figure('Position',[1 1 1400 400],'name',wtitle) ;
+      end   
+      
 %  ** Setup a seismic colourmap (i.e. red->green->blue)
       if icmapflip
          cmap = flipud(cmap) ;
@@ -165,7 +184,7 @@ function MS_plot(C,rh,varargin)
       [X,Y,Z] = sph2cart(AZ.*rad,INC.*rad,ones(size(AZ))) ;
 
 %-------------------------------------------------------------------------------
-%  ** VP anisotropy plot 
+%  ** VP velocity plot 
 %-------------------------------------------------------------------------------
       subplot(1,3,1)
 
