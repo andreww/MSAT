@@ -12,9 +12,20 @@
 %         Produce three pole figures showing P-wave velocity, S-wave
 %         anisotropy and fast S-wave polarisation direction
 %
-%     MS_plot(C, rh, ...)                    
-%          Further arguments are EVALed (most useful to change various 
-%          options, see source-code for details).
+%     MS_plot(..., 'fontsize', f)                    
+%          Set minimum fontsize in plots to f.
+%
+%     MS_plot(..., 'cmap', CM)                    
+%          Redefine the colormap. CM can either be a (nx3) matrix containing a 
+%          colormap, or a string describing a function to generate such a 
+%          matrix (such as the built-in MATLAB colormap functions). E.g.:
+%             MS_plot(C,rh,'cmap','cool(64)') - uses the MATLAB function cool
+%                to generate a cyan-to-purple colourmap.
+%          The default is 'jet', reversed so blue is fast/high, as is 
+%          conventional for seismic velocity colorscales. 
+%
+%     MS_plot(..., 'reverse')
+%          Reverse the sense of the colour map. 
 %
 % See also: MS_SPHERE, MS_PHASEVELS
 
@@ -60,8 +71,6 @@ function MS_plot(C,rh,varargin)
 %  ** Set defaults, these can be overriden in the function call
 %  ** configure contouring options
       cvect = 10 ;     % number of contours
-      VPcvect = NaN ;  % set these for different number of contours for VP
-      AVScvect = NaN ; % and AVS plots
 
 %  ** configure font options
       fntsz = 12;
@@ -71,16 +80,33 @@ function MS_plot(C,rh,varargin)
       icmapflip = 1 ; % reverse the sense of the colourscale
 
 %  ** process the optional arguments
-      for i=1:length(varargin) 
-         eval(varargin{i}) ; 
-      end    
+      iarg = 1 ;
+      while iarg <= (length(varargin))
+         switch lower(varargin{iarg})
+            case 'reverse'
+               icmapflip = 1 ;
+               iarg = iarg + 1 ;
+            case 'contours'
+               cvect = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'fontsize'
+               fntsz = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'cmap'
+               cmarg = varargin{iarg+1} ;
+               if isstr(cmarg)
+                  eval(['cmap = ' cmarg ';']) ;
+               else
+                  cmap = cmarg ;
+               end
+               iarg = iarg + 2 ;
+            otherwise 
+               error(['Unknown option: ' varargin{iarg}]) ;   
+         end   
+      end 
 
-      if isnan(VPcvect)
-         VPcvect = cvect ;
-      end   
-      if isnan(AVScvect)
-         AVScvect = cvect ;
-      end   
+      VPcvect = cvect ;
+      AVScvect = cvect ;
       
       % check the inputs: C
       assert(MS_checkC(C)==1, 'MS:PLOT:badC', 'MS_checkC error MS_plot') ;
@@ -300,9 +326,11 @@ function MS_plot(C,rh,varargin)
       
 %  ** rotate the particle motion vector so the normal to sphere is vertical
       for ip = 1:np
-         [VS1R_xR(ind1(ip),ind2(ip)),VS1R_yR(ind1(ip),ind2(ip)),VS1R_zR(ind1(ip),ind2(ip))] = ...
+         [VS1R_xR(ind1(ip),ind2(ip)),VS1R_yR(ind1(ip),...
+                  ind2(ip)),VS1R_zR(ind1(ip),ind2(ip))] = ...
                     rotate_pm_vector(...
-         VS1R_x(ind1(ip),ind2(ip)),VS1R_y(ind1(ip),ind2(ip)),VS1R_z(ind1(ip),ind2(ip)),...
+         VS1R_x(ind1(ip),ind2(ip)),VS1R_y(ind1(ip),...
+                ind2(ip)),VS1R_z(ind1(ip),ind2(ip)),...
          AZ(ind1(ip),ind2(ip)),INC(ind1(ip),ind2(ip)));          
       end   
 
@@ -335,11 +363,9 @@ function MS_plot(C,rh,varargin)
       h=quiver(X2,Y2,U2,V2,0.18,'k.') ;
       set(h,'LineWidth',2.0) ;
 
-%      h=quiver3(X2,Y2,Z2,-U2,-V2,-W2,0.18,'k.') ;
       h=quiver(X2,Y2,-U2,-V2,0.18,'k.') ;
       set(h,'LineWidth',2.0) ;
 
-%		plot(X2,Y2,'k.','MarkerSize',2.0) ;
 
       view(view_angle);
       daspect([1 1 1]);
@@ -409,7 +435,7 @@ function MS_plot(C,rh,varargin)
 %===============================================================================
 %           
 %     Find the maximum and minimum values in a (2d) matrix and return their
-%     values and incidces
+%     values and indices
 %
       [A,I] = min(Z) ; [Zmin,II] = min(A) ; imin = I(II) ; jmin = II ;
       [A,I] = max(Z) ; [Zmax,II] = max(A) ; imax = I(II) ; jmax = II ;
