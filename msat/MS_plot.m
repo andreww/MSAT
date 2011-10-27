@@ -32,6 +32,9 @@
 %     MS_plot(..., 'reverse')
 %          Reverse the sense of the colour map. 
 %
+%     MS_plot(..., 'quiet')
+%          Don't write isotropic velocities to the terminal. 
+%
 % See also: MS_SPHERE, MS_PHASEVELS
 
 % Copyright (c) 2011, James Wookey and Andrew Walker
@@ -83,6 +86,9 @@ function MS_plot(C,rh,varargin)
 %  ** configure colormap options
       cmap = jet(64) ;
       icmapflip = 1 ; % reverse the sense of the colourscale
+      
+%  ** Write to matlab terminal?
+      silentterm = 0 ;
 
 %  ** default window title
       wtitle = 'MSAT polefigure.' ;
@@ -94,14 +100,14 @@ function MS_plot(C,rh,varargin)
             case 'reverse'
                icmapflip = 1 ;
                iarg = iarg + 1 ;
+            case 'quiet'
+               silentterm = 1;
+               iarg = iarg + 1 ;
             case 'contours'
                cvect = varargin{iarg+1} ;
                iarg = iarg + 2 ;
             case 'fontsize'
                fntsz = varargin{iarg+1} ;
-               iarg = iarg + 2 ;
-            case 'wtitle'
-               wtitle = varargin{iarg+1} ;
                iarg = iarg + 2 ;
             case 'wtitle'
                wtitle = varargin{iarg+1} ;
@@ -166,8 +172,10 @@ function MS_plot(C,rh,varargin)
       VPiso=mean(mean(VP)) ;
       VSiso=mean([mean(mean(VS1)) mean(mean(VS2))]) ;
 
-      fprintf('Isotropic average velocities: VP=%f, VS=%f\n',VPiso,VSiso) ;
-
+      if ~silentterm
+          fprintf('Isotropic average velocities: VP=%f, VS=%f\n',...
+              VPiso,VSiso) ;
+      end
 %  ** Prepare window
       if strcmp(wtitle(1),'-')
          figure('Position',[1 1 1400 400],'name', ...
