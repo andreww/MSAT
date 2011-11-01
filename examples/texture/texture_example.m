@@ -48,17 +48,17 @@ function texture_example()
     % and KCl data ends up in ebsd(2). 
     tic; fprintf('Loading EBSD data ...');
     
-    % specify file name
-    fname = fullfile(mtexDataPath,'aachen_ebsd','85_829grad_07_09_06.txt');
+    % specify file name. Use a local copy as the MTEX version seems to move
+    % about between versions.
+    fname = 'aachen_ebsd_85_829grad_07_09_06.txt';
     
-    % create an EBSD variable containing the data
+    % create an MTEX EBSD object containing the data
     ebsd = loadEBSD(fname,CS,SS,'interface','generic' ...
         , 'ColumnNames', { 'Index' 'Phase' 'x' 'y' 'Euler1' 'Euler2' ...
           'Euler3' 'MAD' 'BC' 'BS' 'Bands' 'Error' 'ReliabilityIndex'}, ...
           'Bunge', 'ignorePhase', 0);
 
     telap = toc; fprintf(' done (%4.2f secs)\n',telap);
-
     
     % For each EBSD measurment, create an elastic matrix with the measured 
     % orentation. Work on NaCl, then KCl before joining the elastic
@@ -109,8 +109,8 @@ function texture_example()
     
     % Finally, plot the S-wave anisotropy of the rock sample and report 
     % some data on elastic constants.
-    
-    MS_sphere(Cav, rhoav, 'S');
+    plot(ebsd);
+    MS_plot(Cav, rhoav);
     MS_info(Cav, rhoav);
     fprintf('\ndone.\n\n');
 end
