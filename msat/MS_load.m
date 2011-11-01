@@ -36,6 +36,9 @@
 %            'Mbar' - elastic constants are in Mbar
 %            'Pa' - elastic constants are in Pascals
 %            'bar' - elastic constants are in bar
+%         Note: when using a density normalised tensor, specify the unit 
+%         *before* normalisation (i.e., a unit of pressure).
+%
 %
 %     [C,...] = MS_load(fname,...,'dunit',unit)
 %         Specify density unit; this is used to convert to kg/m3 (msat's 

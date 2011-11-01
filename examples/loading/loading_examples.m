@@ -6,7 +6,8 @@
 %  ** ^^ with density
       [C,rh] = MS_load('Olivine.txt') ;
 
-%  ** density normalised elasticities, in Pa
+%  ** density normalised elasticities, where the pre-normalised elasticities are
+%     in Pa.
       [C,rh] = MS_load('Olivine.Aij','Aij','eunit','Pa') ;
       
 %  ** in Ematrix format      
