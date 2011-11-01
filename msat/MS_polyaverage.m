@@ -4,15 +4,15 @@
 %
 % Calculate the bulk and shear moduli of an isotropic polycrystal. 
 %
-% [ K_vrh, G_vrh, ... ] = MS_polyavarage( C )
+% [ K_vrh, G_vrh, ... ] = MS_polyaverage( C )
 %
 % Usage: 
-%     [ K_vrh, G_vrh ] = MS_polyavarage( C )                    
-%         Return Voigt-Reuss-Hill avarage bulk (K) and shear (G) moduli of 
+%     [ K_vrh, G_vrh ] = MS_polyaverage( C )                    
+%         Return Voigt-Reuss-Hill average bulk (K) and shear (G) moduli of 
 %         an isotropic aggregate composed of randomly orentated ansiotropic
 %         crystals described by the elasticity matrix C.
 %
-%     [ K_vrh, G_vrh, K_v, G_v, K_r, G_r ] = MS_polyavarage( C )
+%     [ K_vrh, G_vrh, K_v, G_v, K_r, G_r ] = MS_polyaverage( C )
 %         Also return Voigt and Reuss bounds on the bulk and shear moduli.
 %
 % Notes:
