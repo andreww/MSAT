@@ -1,4 +1,0 @@
-Matlab Seismic Anisotropy Toolbox
-=================================
-
-ToDo: Write the (longer) user guide
