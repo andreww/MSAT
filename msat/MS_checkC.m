@@ -111,30 +111,7 @@ function [isgood] = MS_checkC(C,varargin)
          error('MS:CHECKCNotNumeric', ...
 	         'Elasticity matrix error: Appears not to be numeric.')
       end
-      try 
-          if ~ismatrix(C)
-		    isgood = 0 ;
-	       error('MS:CHECKCNotMatrix', ...
-	         'Elasticity matrix error: Appears not to be a 2D matrix')
-          end
-      catch e
-          % ismatrix is quite new, so suppress Undef func error and 
-          % do open coded check on Matrix. Otherwise, rethrow the exception
-          if ~strcmp(e.identifier, 'MATLAB:UndefinedFunction')
-              rethrow(e)
-          elseif strcmp(e.identifier, 'MS:CHECKCNotMatrix')
-              rethrow(e)
-          elseif (length(size(C)) ~= 2)
-             error('MS:CHECKCNotMatrix', ...
-	         'Elasticity matrix error: Appears not to be a 2D matrix')
-          else
-              dim = size(C);
-              if (dim(1) ~= dim(2))
-                  error('MS:CHECKCNotMatrix', ...
-	             'Elasticity matrix error: Appears not to be a 2D matrix')
-              end
-          end
-      end
+
       [nr nc] = size(C) ;
       if (nr~=6 | nc~=6)
          isgood = 0;

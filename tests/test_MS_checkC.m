@@ -2,21 +2,24 @@ function test_suite = test_MS_checkC
 initTestSuite;
 end
 
-function test_MS_checkC_isMat
-    f = @()MS_checkC([1 1 1 1 1 1]);
-    assertExceptionThrown(f, 'MS:CHECKCNotMatrix');
-    f = @()MS_checkC(ones(6,6,6));
-    assertExceptionThrown(f, 'MS:CHECKCNotMatrix');
+function test_MS_checkC_isNum
+    f = @()MS_checkC('My matrix');
+    assertExceptionThrown(f, 'MS:CHECKCNotNumeric');
+    f = @()MS_checkC({23,22});
+    assertExceptionThrown(f, 'MS:CHECKCNotNumeric');
     
 end
 
 
 function test_MS_checkC_size
+    f = @()MS_checkC([1 1 1 1 1 1]);
+    assertExceptionThrown(f, 'MS:CHECKCnot6x6');
+    f = @()MS_checkC(ones(6,6,6));
+    assertExceptionThrown(f, 'MS:CHECKCnot6x6');
     f = @()MS_checkC(ones(5,5));
     assertExceptionThrown(f, 'MS:CHECKCnot6x6');
     f = @()MS_checkC(ones(7,7));
     assertExceptionThrown(f, 'MS:CHECKCnot6x6');
-
 end
 
 function test_MS_checkC_psodef
