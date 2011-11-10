@@ -26,7 +26,7 @@
 %    equation 3 of Wojciechowski (2005)
 %
 % 
-% Reference: Wojciechowski, K. W. (2005) "Poisson?s ratio of anisotropic
+% Reference: Wojciechowski, K. W. (2005) "Poisson's ratio of anisotropic
 %     systems" COMPUTATIONAL METHODS IN SCIENCE AND TECHNOLOGY 11, 73-79.
 %
 % See also: MS_PHASEVELS
@@ -97,19 +97,19 @@ end
 
 function [ isgood ] = MS_checkUnit( V )
 
-    error = sqrt(eps);
+    errorval = sqrt(eps);
     % Is V a unit vector?
     if ~isnumeric(V)
          error('MS:CHECKUNITNotNumeric', ...
 	      'Unit vector error: Appears not to be numeric.');
     end
     s = size(V);
-    if ~(length(s) == 2) && ... 
-        (((s(1) == 1) && (s(2) == 3)) || ((s(1) == 3) && (s(2) == 1)))
+    if (length(s) ~= 2) || ... 
+        ~(((s(1) == 1) && (s(2) == 3)) || ((s(1) == 3) && (s(2) == 1)))
          error('MS:CHECKUNITNotVec', ...
 	      'Unit vector error: Not a 3-d row or column vector.');
     end
-    if ((sqrt(V(1)^2 + V(2)^2 + V(3)^2) - 1.0) > error)
+    if (abs((sqrt(V(1)^2 + V(2)^2 + V(3)^2)) - 1.0) > errorval)
         error('MS:CHECKUNITNotUnit', ...
 	      'Unit vector error: Length not equal to 1.');
     end
