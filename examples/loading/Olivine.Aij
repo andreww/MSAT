@@ -1,4 +1,6 @@
-% Olivine elastic constants (Abramson et al, 1996) in density normalised Pascals
+% Olivine elastic constants (Abramson et al, 1996) in density normalised 
+% units with density in kg.m^-3 and (pre-normalised) elastic constants
+% in Pascals.
 % Text following the '%' character is ignored. 
 1 1 9.552906e+07 
 1 2 2.029806e+07

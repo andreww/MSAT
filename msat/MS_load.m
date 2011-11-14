@@ -18,7 +18,6 @@
 %            'simple' : Formatted text file (default)
 %
 %     [C,...] = MS_load(fname,...,'symmetry', mode) 
-%         ** some parts not yet implemented **
 %         Fill out elastic tensor based on symmetry, defined by mode. This can
 %         take the following values:
 %            'none' - nothing attempted, unspecified Cijs are zero (default)
@@ -52,9 +51,12 @@
 %         the normalisation reversed (default format for msat). The density
 %         normalisation is assumed to have been performed using the density 
 %         specified in the file (so, obviously, one is required) without any
-%         different unit scalings. It is *highly* advisable to check (for 
-%         example using MS_phasevels) that sensible numbers result. The default
-%         is to assume that the input is not density normalised. 
+%         different unit scalings. That is, the values of the elastic 
+%         constants are read from the file and multiplied by the value of the 
+%         density read from the file before any unit conversion is performed.
+%         It is *highly* advisable to check (for example using MS_phasevels) 
+%         that sensible numbers result. The default is to assume that the 
+%         input is not density normalised. 
 %
 %     [C,...] = MS_load(fname,...,'force')
 %         Disable post-load checking. You're on your own, buddy.
@@ -89,7 +91,7 @@
 %
 %    Elastic constants in the format read by EMATRIX (D. Mainprice). 
 %
-% See also: MS_LOAD_LIST, MS_ELASTICDB
+% See also: MS_LOAD_LIST, MS_ELASTICDB, MS_EXPAND
 
 % Copyright (c) 2011, James Wookey and Andrew Walker
 % All rights reserved.
@@ -180,7 +182,8 @@
       case 'ematrix'
 %     ** forbid expansion from ematrix files. 
          if ~strcmp(smode,'none'), error('MS:LOAD:ExpandForbidden',...
-            'Symmetry expansion is not supported from this file format.') ;,end
+            'Symmetry expansion is not supported from this file format.') ;
+         end
          [C,rh,eunit,dunit] = MS_load_ematrix(fname,eunit,dunit) ;
       otherwise
          error('MS:LOAD:BadFileFormat',...
@@ -223,7 +226,9 @@
       end
 
 %  ** unnormalise for density (if required)
-      if aij, C = C .* rh;, end
+      if aij
+          C = C .* rh;
+      end
 
 %  ** perform unit conversions
       switch lower(eunit)
