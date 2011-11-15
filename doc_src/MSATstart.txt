@@ -1,0 +1,36 @@
+== MSAT quick start guide. 
+
+ // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
+
+Installation
+~~~~~~~~~~~~
+
+Installation of the MATLAB toolbox is described http:http://www1.gly.bris.ac.uk[here].
+
+Seismic anisotropy in MSAT
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Seismic anisotropy - the variation of seismic wavespeed with direction, is a fundamental property of most solid Earth materials. This variation is encapsulated in the elasticity tensor C (sometimes called the 'stiffness'), which describes the relationship between stress and strain in a material:
+
+latexmath:[$\epsilon_{ij} = C_{ijkl} \sigma_{kl}$]
+
+This is, in general, a 4th rank tensor (3x3x3x3). However, it can be shown (ref) that it can be represented in a more convenient symmetric 6x6 matrix (usually called 'Voigt' notation) with no loss of information. This 6x6 notation is the default used by MSAT (though utilities for conversion to and from the 3x3x3x3 form are provided).
+
+Default units
+~~~~~~~~~~~~~
+
+We adopt unit conventions which should be familiar to most people conversant with the current literature:
+
+.MSAT default units
+[width="40%",cols="^,2m",frame="topbot",options="header,footer"]
+|======================
+|Quantity|Unit
+|Elasticity|gigapascals
+|Density|kg/m3
+|Velocity|km/s
+|======================
+ 
+Option exist to import elasticities in other units, however (see http:MS_load.html[MS_load] for details).
+
+ 
+
