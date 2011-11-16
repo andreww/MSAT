@@ -59,7 +59,7 @@
 %     measure" Journal of Applied Physics vol.100 art.num.063516
 %     http://dx.doi.org/10.1063/1.2338835
 %
-%     Shivakumar, I. and M. Ostoja-Starzewski (2008) "Universal Elastic
+%     Ranganathan, S. I. and M. Ostoja-Starzewski (2008) "Universal Elastic
 %     Anisotropy Index" Physical Review Letters vol.101 art.num.055504.
 %     http://dx.doi.org/10.1103/PhysRevLett.101.055504
 %
