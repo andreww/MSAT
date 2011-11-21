@@ -1,4 +1,4 @@
-% MS_ROTM - CREATE A CARTESIAN ROTATION MATRIX
+% MS_ROTM - Create a cartesian rotation matrix.
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %

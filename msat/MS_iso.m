@@ -1,4 +1,4 @@
-%   MS_iso - generate elastic matrix from isotropic velocities
+% MS_iso - generate elastic matrix from isotropic velocities.
 %
 %   [C]=MS_iso(vp,vs,rh)
 %

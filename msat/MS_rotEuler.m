@@ -1,4 +1,4 @@
-% MS_ROTEULER - Rotate an elasticity matrix using Bunge's Euler angles
+% MS_ROTEULER - Rotate an elasticity matrix using Bunge's Euler angles.
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %

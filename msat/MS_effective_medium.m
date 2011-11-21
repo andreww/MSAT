@@ -1,4 +1,5 @@
-% [Ceff,rh]=MS_effective_medium(theory, ...)
+% MS_effective_medium - generate elastic constants from various effective
+%                       medium theories. 
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %  
