@@ -14,7 +14,8 @@ def matlab2asciidoc(matlab_file, path='./funcs'):
             exit
         elif re.match(r'\s*\%', line):
             inhelp = True
-            helptext.append(re.sub(r'\s*\%', '', line))
+            helptext.append(re.sub(r'// Part of MSAT - The Matlab Seismic Anisotropy Toolkit //',
+                            '', re.sub(r'\s*\%', '', line)))
         elif inhelp:
             gothelp = True
 
