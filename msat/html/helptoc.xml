@@ -17,8 +17,10 @@
         <tocitem target="MSATstart.html" image="$toolbox/matlab/icons/greenarrowicon.gif">Getting Started</tocitem>
         <tocitem target="MSATguide.html" image="$toolbox/matlab/icons/greenarrowicon.gif">User Guide</tocitem>
 	<tocitem target="./funcs/index.html" image="$toolbox/matlab/icons/help_fx.png">Functions 
+
         <tocitem target="./funcs/MS_VRH.html" image="$toolbox/matlab/icons/help_fx.png">MS_VRH</tocitem>
         <tocitem target="./funcs/MS_VTI.html" image="$toolbox/matlab/icons/help_fx.png">MS_VTI</tocitem>
+        <tocitem target="./funcs/MS_VTI2.html" image="$toolbox/matlab/icons/help_fx.png">MS_VTI2</tocitem>
         <tocitem target="./funcs/MS_Vrot3.html" image="$toolbox/matlab/icons/help_fx.png">MS_Vrot3</tocitem>
         <tocitem target="./funcs/MS_anisotropy.html" image="$toolbox/matlab/icons/help_fx.png">MS_anisotropy</tocitem>
         <tocitem target="./funcs/MS_axes.html" image="$toolbox/matlab/icons/help_fx.png">MS_axes</tocitem>
@@ -40,6 +42,7 @@
         <tocitem target="./funcs/MS_norms.html" image="$toolbox/matlab/icons/help_fx.png">MS_norms</tocitem>
         <tocitem target="./funcs/MS_phasevels.html" image="$toolbox/matlab/icons/help_fx.png">MS_phasevels</tocitem>
         <tocitem target="./funcs/MS_plot.html" image="$toolbox/matlab/icons/help_fx.png">MS_plot</tocitem>
+        <tocitem target="./funcs/MS_poisson.html" image="$toolbox/matlab/icons/help_fx.png">MS_poisson</tocitem>
         <tocitem target="./funcs/MS_polyaverage.html" image="$toolbox/matlab/icons/help_fx.png">MS_polyaverage</tocitem>
         <tocitem target="./funcs/MS_rot3.html" image="$toolbox/matlab/icons/help_fx.png">MS_rot3</tocitem>
         <tocitem target="./funcs/MS_rotEuler.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotEuler</tocitem>

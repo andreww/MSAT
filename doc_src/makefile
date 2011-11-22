@@ -6,7 +6,7 @@ asciidoc_funcs:
 	(mkdir -p funcs; ./extract_matlab_help.py ../msat/*.m)
 
 html_funcs: asciidoc_funcs
-	(cd funcs ; for f in *.txt ; do $(AD) $$f ; done)
+	(mkdir -p funcs; cd funcs ; for f in *.txt ; do $(AD) $$f ; done)
 
 html_docs: MSATstart.txt MSATguide.txt
 	$(AD) -a latexmath MSATstart.txt
@@ -30,6 +30,7 @@ external-install: html_funcs html_docs
 clean:
 	rm -f ./funcs/*.html ./funcs/*.txt helptoc.xml_funcs
 	rm -f MSATstart.html MSATguide.html
+	rm -rf funcs
 
 clean_all: clean
 	rm -rf ../msat/html/*	

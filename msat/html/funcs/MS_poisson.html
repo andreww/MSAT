@@ -738,57 +738,51 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_vrh">MS_VRH</h2>
+<h2 id="_ms_poisson">MS_poisson</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_VRH - n phase Voigt-Reuss-Hill average of elasticity.</tt></pre>
+<pre><tt>MS_POISSON - Poisson's ratio in anisotropic media.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>// Part of MSAT - The Matlab Seismic Anisotropy Toolkit //</tt></pre>
+<pre><tt>Calculate Poisson's ration from an elsticity matrix.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Given n elasticity matricies, densities and phase volume fractions,
-    calculate the avarage of the Voigt upper and Reuss lower bound of the
-    composite material.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>[Cave,rhave]=MS_VRH(VF, C, rh, ...)</tt></pre>
+<pre><tt>nu = MS_poisson( C, m, n )</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>Usage:
-    [Cave,rhave]=MS_VRH(VF, C, rh)
-         The volume fractions and densities (VF and rh) can be provided as
-         vectors of common length n and the elasticities as a (6,6,n)
-         matrix.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>[Cave,rhave]=MS_VRH(VF, C1, rh1, C2, rh2, C3, rh3, ...)
-     Alternitivly, VF can be a vector of volume fractions and the
-     elasticity matricies and densities given as sequence of arguments
-     as (6,6) matricies and scalars. There should be a C,rho argument
-     pair for each entry in the VF vector.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>[Cave,rhave,Cvoigt,Creuss]=MS_VRH(VF, C, rh, ...)
-     For both input argument forms, it is possible to access the upper
-     and lower bound on the composite elasticity by adding output
-     arguments.</tt></pre>
+    nu = MS_poisson( C, m, n )
+        Calculate Poisson's ration for anisotropic media given an
+        elasticity matrix, C, longitudinal direction described by
+        a unit vector, n, and transverse direction given by the
+        unit vector m.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>Notes:
-    The sum of the elements of VF is normalised to 1 before averaging.</tt></pre>
+   Poisson's ratio, nu, is normally described as the negative ratio of
+   a (typically) compressive strain normal a direction of extensional
+   strain. In an isotropic material nu takes a single value between -1.0
+   an 0.5 (positive values around 0.2 or 0.3 are common). For the general
+   anisotropic case Poisson's ratio depends on the longitudinal extension
+   direction and the direction perpendicular to this (the transverse
+   direction) where the compression (positive nu) or extension (negative
+   nu) is measured. This function allows nu to be calculated as a function
+   of these two directions, given as unit vectors. The approach follows
+   equation 3 of Wojciechowski (2005)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See also: MS_POLYAVERAGE</tt></pre>
+<pre><tt>Reference: Wojciechowski, K. W. (2005) "Poisson's ratio of anisotropic
+    systems" COMPUTATIONAL METHODS IN SCIENCE AND TECHNOLOGY 11, 73-79.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>See also: MS_PHASEVELS</tt></pre>
 </div></div>
 </div>
 </div>
@@ -796,7 +790,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-10-03 14:38:48 BST
+Last updated 2011-11-22 14:09:34 GMT
 </div>
 </div>
 </body>

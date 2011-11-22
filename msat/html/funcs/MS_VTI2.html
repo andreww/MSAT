@@ -738,40 +738,33 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_cij2cijkl">MS_cij2cijkl</h2>
+<h2 id="_ms_vti2">MS_VTI2</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_CIJ2CIJKL - Convert from Voigt elasticity matrix to tensor</tt></pre>
+<pre><tt>MS_VTI2 - generate elastic constants for a vertically transverse isotropic
+            medium from xi, phi, eta parameters. Symmetry is in the 3-axis.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>// Part of MSAT - The Matlab Seismic Anisotropy Toolkit //</tt></pre>
+<pre><tt>[C]=MS_VTI2(vp,vs,rh,xi,phi,eta)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Converts between a a 6x6 Voigt representation and a 3x3x3x3 tensor
-    representation of anisotropic elasticity.</tt></pre>
+<pre><tt>Inputs:
+    rh  : Density (kg/m2)
+    vp  : km/s (isotropic average)
+    vs  : km/s (isotropic average)
+    xi, phi, eta : Dimensionless anisotropy parameters</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[CC] = MS_cij2cijkl(C)</tt></pre>
+<pre><tt>Output:
+     C : Stiffness tensor (6x6 notation, GPa)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Usage:
-    C must be a rank 2 array with size (6,6). The returned array C will
-    be rank 4 with size (3,3,3,3).</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Notes:
-    Do not use this function for the elastic compliance as additional
-    terms are needed in this case.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See also: MS_cijkl2cij</tt></pre>
+<pre><tt>See also: MS_VTI, MS_iso, MS_elasticDB</tt></pre>
 </div></div>
 </div>
 </div>
@@ -779,7 +772,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-10-03 14:38:48 BST
+Last updated 2011-11-22 14:09:34 GMT
 </div>
 </div>
 </body>
