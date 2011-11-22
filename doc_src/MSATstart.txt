@@ -3,7 +3,7 @@
 Installation
 ~~~~~~~~~~~~
 
-Installation of the MATLAB toolbox is described http:http://www1.gly.bris.ac.uk[here].
+Installation of the MATLAB toolbox is described link:http://www1.gly.bris.ac.uk/MSAT[here].
 
 Seismic anisotropy in MSAT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,12 +28,12 @@ We adopt unit conventions which should be familiar to most people conversant wit
 |Velocity|km/s
 |======================
  
-Option exist to import elasticities in other units, however (see http:MS_load.html[MS_load] for details).
+Option exist to import elasticities in other units, however (see link:funcs/MS_load.html[MS_load] for details).
 
 Loading elastic constants.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Elastic constants can be sourced from MSATs own built-in database (see http:MS_elastic.html[MS_elasticDB] for details) which contains a number of useful minerals, or from an ascii file. The available formats of the files are given in the documentation to http:MS_load.html[MS_load], and examples are available in the msat/examples/loading.
+Elastic constants can be sourced from MSATs own built-in database (see link:MS_elastic.html[MS_elasticDB] for details) which contains a number of useful minerals, or from an ascii file. The available formats of the files are given in the documentation to link:MS_load.html[MS_load], and examples are available in the msat/examples/loading.
 
 To get elastic constants for olivine (from REF) for example:
 
@@ -62,7 +62,7 @@ rho =
 Manipulating elastic constants
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once the stiffness matrix (and density) are laoded MSAT provides a set of routines for performing various manipulations and transforms of them (see XXX for full list). For example, the function http://MS_rot3.html[MS_rot3] applies  rotations about the principle cartesian axes to an elastic tensor. So, for example:
+Once the stiffness matrix (and density) are laoded MSAT provides a set of routines for performing various manipulations and transforms of them (see XXX for full list). For example, the function link://MS_rot3.html[MS_rot3] applies  rotations about the principle cartesian axes to an elastic tensor. So, for example:
 
 --------------------------------------
 >> C = MS_elasticDB('Olivine')
@@ -98,7 +98,7 @@ which is the expected orientation of horizontally-strained olivine under dry upp
 Analysis 
 ~~~~~~~~
 
-As well as transformations, MSAT provides routines for analysing various aspects of stiffness tensors (see XX_list_XX). For example, http://MS_anisotropy.html[MS_anisotropy] calculates a variety of simple measures of the anisotropy of an input elastic tensor:
+As well as transformations, MSAT provides routines for analysing various aspects of stiffness tensors (see XX_list_XX). For example, link://MS_anisotropy.html[MS_anisotropy] calculates a variety of simple measures of the anisotropy of an input elastic tensor:
 
 --------------------------------------
 >> C = MS_elasticDB('Albite') ;
@@ -135,60 +135,60 @@ MSAT function tables
 [width="80%",cols="3,10",frame="topbot",options="header"]
 |======================
 |Function|Purpose
-| http:funcs/MS_VTI.html[MS_VTI]                                     | Generate elastic constants for a vertically transverse isotropic medium from Thomsen parameters. Symmetry is in the 3-axis. 
-| http:funcs/MS_VTI2.html[MS_VTI2]                                   | Generate elastic constants for a vertically transverse isotropic medium from xi, phi, eta parameters. Symmetry is in the 3-axis. 
-| http:funcs/MS_build_isotropic.html[MS_build_isotropic]             | Create elasticity matrix from pairs of isotropic moduli.
-| http:funcs/MS_checkC.html[MS_checkC]                               | Check consistency of a stiffness matrix against various criteria
-| http:funcs/MS_effective_medium.html[MS_effective_medium]           | Generate elastic constants from various effective medium theories. 
-| http:funcs/MS_elasticDB.html[MS_elasticDB]                         | Database of various elastic constants..
-| http:funcs/MS_expand.html[MS_expand]                               | Fill out elasticity matrix.
-| http:funcs/MS_iso.html[MS_iso]                                     | Generate elastic matrix from isotropic velocities.
-| http:funcs/MS_load.html[MS_load]                                   | Load a set of elastic constants from a file.
-| http:funcs/MS_load_list.html[MS_load_list]                         | Load a list of CIJs, in a specific format
+| link:funcs/MS_VTI.html[MS_VTI]                                     | Generate elastic constants for a vertically transverse isotropic medium from Thomsen parameters. Symmetry is in the 3-axis. 
+| link:funcs/MS_VTI2.html[MS_VTI2]                                   | Generate elastic constants for a vertically transverse isotropic medium from xi, phi, eta parameters. Symmetry is in the 3-axis. 
+| link:funcs/MS_build_isotropic.html[MS_build_isotropic]             | Create elasticity matrix from pairs of isotropic moduli.
+| link:funcs/MS_checkC.html[MS_checkC]                               | Check consistency of a stiffness matrix against various criteria
+| link:funcs/MS_effective_medium.html[MS_effective_medium]           | Generate elastic constants from various effective medium theories. 
+| link:funcs/MS_elasticDB.html[MS_elasticDB]                         | Database of various elastic constants..
+| link:funcs/MS_expand.html[MS_expand]                               | Fill out elasticity matrix.
+| link:funcs/MS_iso.html[MS_iso]                                     | Generate elastic matrix from isotropic velocities.
+| link:funcs/MS_load.html[MS_load]                                   | Load a set of elastic constants from a file.
+| link:funcs/MS_load_list.html[MS_load_list]                         | Load a list of CIJs, in a specific format
 |======================                                                
                                                                        
 .MSAT Manipulation / transformation                                    
 [width="80%",cols="3,10",frame="topbot",options="header"]              
 |======================                                                
 |Function|Purpose                                                      
-| http:funcs/MS_VRH.html[MS_VRH]                                     | N phase Voigt-Reuss-Hill average of elasticity.
-| http:funcs/MS_axes.html[MS_axes]                                   | Reorient elasticity matrix for optimal decomposition.
-| http:funcs/MS_decomp.html[MS_decomp]                               | Browaeys and Chevrot decomposition of the elasticity matrix.
-| http:funcs/MS_interpolate.html[MS_interpolate]                     | Symmetry preserving elasticity interpolation 
-| http:funcs/MS_norms.html[MS_norms]                                 | Browaeys and Chevrot analysis of the elasticity matrix.
-| http:funcs/MS_polyaverage.html[MS_polyaverage]                     | Isotropic elasticity for polycrystal 
-| http:funcs/MS_rot3.html[MS_rot3]                                   | Elasticity matrix rotation.
-| http:funcs/MS_rotEuler.html[MS_rotEuler]                           | Rotate an elasticity matrix using Bunge's Euler angles.
-| http:funcs/MS_rotR.html[MS_rotR]                                   | Script to rotate a set of elastic constants by a rotation matrix
+| link:funcs/MS_VRH.html[MS_VRH]                                     | N phase Voigt-Reuss-Hill average of elasticity.
+| link:funcs/MS_axes.html[MS_axes]                                   | Reorient elasticity matrix for optimal decomposition.
+| link:funcs/MS_decomp.html[MS_decomp]                               | Browaeys and Chevrot decomposition of the elasticity matrix.
+| link:funcs/MS_interpolate.html[MS_interpolate]                     | Symmetry preserving elasticity interpolation 
+| link:funcs/MS_norms.html[MS_norms]                                 | Browaeys and Chevrot analysis of the elasticity matrix.
+| link:funcs/MS_polyaverage.html[MS_polyaverage]                     | Isotropic elasticity for polycrystal 
+| link:funcs/MS_rot3.html[MS_rot3]                                   | Elasticity matrix rotation.
+| link:funcs/MS_rotEuler.html[MS_rotEuler]                           | Rotate an elasticity matrix using Bunge's Euler angles.
+| link:funcs/MS_rotR.html[MS_rotR]                                   | Script to rotate a set of elastic constants by a rotation matrix
 |======================                                                
                                                                        
 .MSAT Analysis                                                         
 [width="80%",cols="3,10",frame="topbot",options="header"]              
 |======================                                                
 |Function|Purpose                                                      
-| http:funcs/MS_anisotropy.html[MS_anisotropy]                       | Simple measures of anisotropy 
-| http:funcs/MS_info.html[MS_info]                                   | Information about an elasticity matrix.
-| http:funcs/MS_phasevels.html[MS_phasevels]                         | Wave velocities in anisotropic media.
-| http:funcs/MS_plot.html[MS_plot]                                   | Plot phasevels/anisotropy on pole figures.
-| http:funcs/MS_poisson.html[MS_poisson]                             | Poisson's ratio in anisotropic media.
+| link:funcs/MS_anisotropy.html[MS_anisotropy]                       | Simple measures of anisotropy 
+| link:funcs/MS_info.html[MS_info]                                   | Information about an elasticity matrix.
+| link:funcs/MS_phasevels.html[MS_phasevels]                         | Wave velocities in anisotropic media.
+| link:funcs/MS_plot.html[MS_plot]                                   | Plot phasevels/anisotropy on pole figures.
+| link:funcs/MS_poisson.html[MS_poisson]                             | Poisson's ratio in anisotropic media.
 |======================                                                
                                                                        
 .MSAT Visualisation                                                    
 [width="80%",cols="3,10",frame="topbot",options="header"]              
 |======================                                                
 |Function|Purpose                                                      
-| http:funcs/MS_plot.html[MS_plot]                                   | Plot phasevels/anisotropy on pole figures.
-| http:funcs/MS_sphere.html[MS_sphere]                               | Plot a spherical plot of phasevels/anisotropy from a set of elastic constants.
+| link:funcs/MS_plot.html[MS_plot]                                   | Plot phasevels/anisotropy on pole figures.
+| link:funcs/MS_sphere.html[MS_sphere]                               | Plot a spherical plot of phasevels/anisotropy from a set of elastic constants.
 |======================                                                
                                                                        
 .MSAT Miscellaneous / utility                                          
 [width="80%",cols="3,10",frame="topbot",options="header"]              
 |======================                                                
 |Function|Purpose                                                      
-| http:funcs/MS_Vrot3.html[MS_Vrot3]                                 | Rotate a (set of) 3-vector(s) by 3 angles.
-| http:funcs/MS_cij2cijkl.html[MS_cij2cijkl]                         | Convert from Voigt elasticity matrix to tensor
-| http:funcs/MS_cijkl2cij.html[MS_cijkl2cij]                         | Convert from elastic tensor to Voigt elasticity matrix
-| http:funcs/MS_list.html[MS_list]                                   | Print elasticity matrix (in 'list' format)
-| http:funcs/MS_rotM.html[MS_rotM]                                   | Create a cartesian rotation matrix.
-| http:funcs/MS_unwind_pm_90.html[MS_unwind_pm_90]                   | Unwind an angle until it is between 0 and 360 degrees
+| link:funcs/MS_Vrot3.html[MS_Vrot3]                                 | Rotate a (set of) 3-vector(s) by 3 angles.
+| link:funcs/MS_cij2cijkl.html[MS_cij2cijkl]                         | Convert from Voigt elasticity matrix to tensor
+| link:funcs/MS_cijkl2cij.html[MS_cijkl2cij]                         | Convert from elastic tensor to Voigt elasticity matrix
+| link:funcs/MS_list.html[MS_list]                                   | Print elasticity matrix (in 'list' format)
+| link:funcs/MS_rotM.html[MS_rotM]                                   | Create a cartesian rotation matrix.
+| link:funcs/MS_unwind_pm_90.html[MS_unwind_pm_90]                   | Unwind an angle until it is between 0 and 360 degrees
 |======================
