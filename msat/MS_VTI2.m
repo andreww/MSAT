@@ -14,6 +14,18 @@
 %   Output:
 %        C : Stiffness tensor (6x6 notation, GPa)
 %
+%   Calculates the elastic tensor for a hexagonal (aka VTI) medium from
+%   average Vp and Vs, and anisotropic parameters xi, phi and eta. 
+%
+%   See, for example, Panning and Romanowicz (2006) for a definition of the 
+%   parameters. 
+%
+%   References:
+%     Mark Panning and Barbara Romanowicz (2006) A three-dimensional radially 
+%        anisotropic model of shear velocity in the whole mantle. Geophysical  
+%        Journal International v167, 361–379. 
+%        doi: 10.1111/j.1365-246X.2006.03100.x
+%
 % See also: MS_VTI, MS_iso, MS_elasticDB
 
 % Copyright (c) 2011, James Wookey and Andrew Walker
@@ -56,11 +68,13 @@ function [C]=MS_VTI2(vp,vs,rh,xi,phi,eta)
    vp=vp*1e3;
    vs=vs*1e3;
 
+%  note: xi and phi are defined oppositely; i.e.: 
+%  xi = vsv^2/vsh^2 and phi = vph^2/vpv^2
    vsv = sqrt((3.*vs.^2)./(2+xi)) ;
    vsh = sqrt(xi.*vsv.^2) ;
    
-   vpv = sqrt((3.*vp.^2)./(2+phi)) ;
-   vph = sqrt(phi.*vpv.^2) ;
+   vph = sqrt((5.*vp.^2)./(4+phi)) ;
+   vpv = sqrt(phi.*vph.^2) ;
    
    C11 = vph.^2.*rh ; % A
    C33 = vpv.^2.*rh ; % C
@@ -68,7 +82,7 @@ function [C]=MS_VTI2(vp,vs,rh,xi,phi,eta)
    C66 = vsh.^2.*rh ; % N
    
    C12 = C11-2.*C66 ;
-   C13 = eta.*(C11-2.*C44) ;
+   C13 = eta.*(C11-2.*C44) ; % F
    
    C22 = C11 ;
    C23 = C13 ;
