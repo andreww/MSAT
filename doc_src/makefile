@@ -7,7 +7,7 @@ html_funcs: asciidoc_funcs
 	(cd funcs ; for f in *.txt ; do asciidoc $$f ; done)
 
 html_docs: MSATstart.txt MSATguide.txt
-	asciidoc MSATstart.txt
+	asciidoc -a latexmath MSATstart.txt
 	asciidoc MSATguide.txt
 
 install: html_funcs html_docs
