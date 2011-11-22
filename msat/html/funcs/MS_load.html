@@ -746,10 +746,6 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>// Part of MSAT - The Matlab Seismic Anisotropy Toolkit //</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
 <pre><tt>[ ... ] = MS_load( fname, ... )</tt></pre>
 </div></div>
 <div class="literalblock">
@@ -774,7 +770,6 @@ asciidoc.install();
 <div class="literalblock">
 <div class="content">
 <pre><tt>[C,...] = MS_load(fname,...,'symmetry', mode)
-    ** some parts not yet implemented **
     Fill out elastic tensor based on symmetry, defined by mode. This can
     take the following values:
        'none' - nothing attempted, unspecified Cijs are zero (default)
@@ -793,7 +788,9 @@ asciidoc.install();
        'GPa' - elastic constants are already in GPa (default)
        'Mbar' - elastic constants are in Mbar
        'Pa' - elastic constants are in Pascals
-       'bar' - elastic constants are in bar</tt></pre>
+       'bar' - elastic constants are in bar
+    Note: when using a density normalised tensor, specify the unit
+    *before* normalisation (i.e., a unit of pressure).</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -811,9 +808,12 @@ asciidoc.install();
     the normalisation reversed (default format for msat). The density
     normalisation is assumed to have been performed using the density
     specified in the file (so, obviously, one is required) without any
-    different unit scalings. It is *highly* advisable to check (for
-    example using MS_phasevels) that sensible numbers result. The default
-    is to assume that the input is not density normalised.</tt></pre>
+    different unit scalings. That is, the values of the elastic
+    constants are read from the file and multiplied by the value of the
+    density read from the file before any unit conversion is performed.
+    It is *highly* advisable to check (for example using MS_phasevels)
+    that sensible numbers result. The default is to assume that the
+    input is not density normalised.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -873,7 +873,7 @@ comments)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See also: MS_LOAD_LIST, MS_ELASTICDB</tt></pre>
+<pre><tt>See also: MS_LOAD_LIST, MS_ELASTICDB, MS_EXPAND</tt></pre>
 </div></div>
 </li>
 </ul></div>
@@ -883,7 +883,7 @@ comments)</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-10-03 14:38:48 BST
+Last updated 2011-11-22 14:43:59 GMT
 </div>
 </div>
 </body>

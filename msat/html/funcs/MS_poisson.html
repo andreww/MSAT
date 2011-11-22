@@ -738,40 +738,51 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_cij2cijkl">MS_cij2cijkl</h2>
+<h2 id="_ms_poisson">MS_poisson</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_CIJ2CIJKL - Convert from Voigt elasticity matrix to tensor</tt></pre>
+<pre><tt>MS_POISSON - Poisson's ratio in anisotropic media.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>// Part of MSAT - The Matlab Seismic Anisotropy Toolkit //</tt></pre>
+<pre><tt>Calculate Poisson's ration from an elsticity matrix.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Converts between a a 6x6 Voigt representation and a 3x3x3x3 tensor
-    representation of anisotropic elasticity.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>[CC] = MS_cij2cijkl(C)</tt></pre>
+<pre><tt>nu = MS_poisson( C, m, n )</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>Usage:
-    C must be a rank 2 array with size (6,6). The returned array C will
-    be rank 4 with size (3,3,3,3).</tt></pre>
+    nu = MS_poisson( C, m, n )
+        Calculate Poisson's ration for anisotropic media given an
+        elasticity matrix, C, longitudinal direction described by
+        a unit vector, n, and transverse direction given by the
+        unit vector m.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>Notes:
-    Do not use this function for the elastic compliance as additional
-    terms are needed in this case.</tt></pre>
+   Poisson's ratio, nu, is normally described as the negative ratio of
+   a (typically) compressive strain normal a direction of extensional
+   strain. In an isotropic material nu takes a single value between -1.0
+   an 0.5 (positive values around 0.2 or 0.3 are common). For the general
+   anisotropic case Poisson's ratio depends on the longitudinal extension
+   direction and the direction perpendicular to this (the transverse
+   direction) where the compression (positive nu) or extension (negative
+   nu) is measured. This function allows nu to be calculated as a function
+   of these two directions, given as unit vectors. The approach follows
+   equation 3 of Wojciechowski (2005)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See also: MS_cijkl2cij</tt></pre>
+<pre><tt>Reference: Wojciechowski, K. W. (2005) "Poisson's ratio of anisotropic
+    systems" COMPUTATIONAL METHODS IN SCIENCE AND TECHNOLOGY 11, 73-79.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>See also: MS_PHASEVELS</tt></pre>
 </div></div>
 </div>
 </div>
@@ -779,7 +790,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-10-03 14:38:48 BST
+Last updated 2011-11-22 14:43:59 GMT
 </div>
 </div>
 </body>

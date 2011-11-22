@@ -746,10 +746,6 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>// Part of MSAT - The Matlab Seismic Anisotropy Toolkit //</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
 <pre><tt>Given an elasticity matrix and density, produce pole figures showing
     the P- and S-wave anisotrpy.</tt></pre>
 </div></div>
@@ -766,9 +762,36 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(C, rh, ...)
-     Further arguments are EVALed (most useful to change various
-     options, see source-code for details).</tt></pre>
+<pre><tt>MS_plot(..., 'fontsize', f)
+     Set minimum fontsize in plots to f.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'wtitle', S)
+     Set the (window) title to be string S. If a minus sign is prepended
+     to this title, the figure number is also suppressed (the minus sign
+     is not shown).</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'cmap', CM)
+     Redefine the colormap. CM can either be a (nx3) matrix containing a
+     colormap, or a string describing a function to generate such a
+     matrix (such as the built-in MATLAB colormap functions). E.g.:
+        MS_plot(C,rh,'cmap','cool(64)') - uses the MATLAB function cool
+           to generate a cyan-to-purple colourmap.
+     The default is 'jet', reversed so blue is fast/high, as is
+     conventional for seismic velocity colorscales.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'reverse')
+     Reverse the sense of the colour map.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'quiet')
+     Don't write isotropic velocities to the terminal.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -780,7 +803,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-10-03 14:38:48 BST
+Last updated 2011-11-22 14:43:59 GMT
 </div>
 </div>
 </body>
