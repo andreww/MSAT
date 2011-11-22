@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.6" />
-<title>tlab Seismic Anisotropy Toolbox</title>
+<title>Matlab Seismic Anisotropy Toolbox</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -735,19 +735,242 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>tlab Seismic Anisotropy Toolbox</h1>
+<h1>Matlab Seismic Anisotropy Toolbox</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>ToDo: Write the (longer) user guide</p></div>
+<div class="paragraph"><p>This user guide is incomplete and will be updated soon. A full list of the MSAT functions (with links to more information) is below.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_msat_function_tables">MSAT function tables</h2>
+<div class="sectionbody">
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 1. MSAT Input / generation of elastic constants.</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_VTI.html">MS_VTI</a></p></td>
+<td align="left" valign="top"><p class="table">Generate elastic constants for a vertically transverse isotropic medium from Thomsen parameters. Symmetry is in the 3-axis.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_VTI2.html">MS_VTI2</a></p></td>
+<td align="left" valign="top"><p class="table">Generate elastic constants for a vertically transverse isotropic medium from xi, phi, eta parameters. Symmetry is in the 3-axis.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_build_isotropic.html">MS_build_isotropic</a></p></td>
+<td align="left" valign="top"><p class="table">Create elasticity matrix from pairs of isotropic moduli.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_checkC.html">MS_checkC</a></p></td>
+<td align="left" valign="top"><p class="table">Check consistency of a stiffness matrix against various criteria</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_effective_medium.html">MS_effective_medium</a></p></td>
+<td align="left" valign="top"><p class="table">Generate elastic constants from various effective medium theories.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_elasticDB.html">MS_elasticDB</a></p></td>
+<td align="left" valign="top"><p class="table">Database of various elastic constants..</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_expand.html">MS_expand</a></p></td>
+<td align="left" valign="top"><p class="table">Fill out elasticity matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_iso.html">MS_iso</a></p></td>
+<td align="left" valign="top"><p class="table">Generate elastic matrix from isotropic velocities.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_load.html">MS_load</a></p></td>
+<td align="left" valign="top"><p class="table">Load a set of elastic constants from a file.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_load_list.html">MS_load_list</a></p></td>
+<td align="left" valign="top"><p class="table">Load a list of CIJs, in a specific format</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 2. MSAT Manipulation / transformation</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_VRH.html">MS_VRH</a></p></td>
+<td align="left" valign="top"><p class="table">N phase Voigt-Reuss-Hill average of elasticity.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_axes.html">MS_axes</a></p></td>
+<td align="left" valign="top"><p class="table">Reorient elasticity matrix for optimal decomposition.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_decomp.html">MS_decomp</a></p></td>
+<td align="left" valign="top"><p class="table">Browaeys and Chevrot decomposition of the elasticity matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_interpolate.html">MS_interpolate</a></p></td>
+<td align="left" valign="top"><p class="table">Symmetry preserving elasticity interpolation</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_norms.html">MS_norms</a></p></td>
+<td align="left" valign="top"><p class="table">Browaeys and Chevrot analysis of the elasticity matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_polyaverage.html">MS_polyaverage</a></p></td>
+<td align="left" valign="top"><p class="table">Isotropic elasticity for polycrystal</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rot3.html">MS_rot3</a></p></td>
+<td align="left" valign="top"><p class="table">Elasticity matrix rotation.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotEuler.html">MS_rotEuler</a></p></td>
+<td align="left" valign="top"><p class="table">Rotate an elasticity matrix using Bunge&#8217;s Euler angles.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotR.html">MS_rotR</a></p></td>
+<td align="left" valign="top"><p class="table">Script to rotate a set of elastic constants by a rotation matrix</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 3. MSAT Analysis</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_anisotropy.html">MS_anisotropy</a></p></td>
+<td align="left" valign="top"><p class="table">Simple measures of anisotropy</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_info.html">MS_info</a></p></td>
+<td align="left" valign="top"><p class="table">Information about an elasticity matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_phasevels.html">MS_phasevels</a></p></td>
+<td align="left" valign="top"><p class="table">Wave velocities in anisotropic media.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_plot.html">MS_plot</a></p></td>
+<td align="left" valign="top"><p class="table">Plot phasevels/anisotropy on pole figures.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_poisson.html">MS_poisson</a></p></td>
+<td align="left" valign="top"><p class="table">Poisson&#8217;s ratio in anisotropic media.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 4. MSAT Visualisation</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_plot.html">MS_plot</a></p></td>
+<td align="left" valign="top"><p class="table">Plot phasevels/anisotropy on pole figures.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_sphere.html">MS_sphere</a></p></td>
+<td align="left" valign="top"><p class="table">Plot a spherical plot of phasevels/anisotropy from a set of elastic constants.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 5. MSAT Miscellaneous / utility</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_Vrot3.html">MS_Vrot3</a></p></td>
+<td align="left" valign="top"><p class="table">Rotate a (set of) 3-vector(s) by 3 angles.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_cij2cijkl.html">MS_cij2cijkl</a></p></td>
+<td align="left" valign="top"><p class="table">Convert from Voigt elasticity matrix to tensor</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_cijkl2cij.html">MS_cijkl2cij</a></p></td>
+<td align="left" valign="top"><p class="table">Convert from elastic tensor to Voigt elasticity matrix</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_list.html">MS_list</a></p></td>
+<td align="left" valign="top"><p class="table">Print elasticity matrix (in <em>list</em> format)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotM.html">MS_rotM</a></p></td>
+<td align="left" valign="top"><p class="table">Create a cartesian rotation matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_unwind_pm_90.html">MS_unwind_pm_90</a></p></td>
+<td align="left" valign="top"><p class="table">Unwind an angle until it is between 0 and 360 degrees</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-22 13:06:20 GMT
+Last updated 2011-11-22 14:42:43 GMT
 </div>
 </div>
 </body>
