@@ -1,6 +1,46 @@
 MSAT Release Notes
 ==================
 
+Version 0.9 - 24 November 2011
+------------------------------
+
+This is the public beta version of 
+MSAT with expanded documentation, 
+new examples, some bug fixes and 
+a few new functions. Users of version
+0.8 are advised to upgrade. All users 
+are encouraged to report bugs and 
+request missing features. Major changes
+from version 0.8 are:
+
+* The way MS_plot handles optional 
+arguments has been made consistent 
+with the rest of the code. New 
+optional arguments have been added. 
+
+* An MSAT quick start guide has been 
+added to the built-in and web based 
+documentation. The full user guide 
+has been started but is incomplete. 
+
+* Six usage examples have been provided. 
+They are located in subdirectories of 
+the distributed examples directory.
+
+* A new function, MS_poisson, has been 
+added to evaluate Poisson's ratio for 
+generally anisotropic materials as a 
+function of strain direction.
+
+* A new function, MS_VTI2, has been added 
+to generate an elasticity matrix with 
+hexagonal symmetry from the vp, vs, xi, 
+phi and eta parameters sometimes used 
+in global tomography.
+
+* Provide a work around for Matlab version 
+dependent compatibility issue in MS_checkC.
+
 Version 0.8 - 4 October 2011
 ----------------------------
 
