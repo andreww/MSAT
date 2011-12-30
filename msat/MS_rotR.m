@@ -4,7 +4,7 @@
 %
 % Rotate an elasticity matrices using a rotation matrix
 %
-%  % [ CR ] = MS_rotEuler( C, R )
+%  % [ CR ] = MS_rotR( C, R )
 %
 % Usage: 
 %     For a three-by-three rotation matrix, R, rotate the elasticity matrix,
