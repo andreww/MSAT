@@ -16,6 +16,7 @@
 %         Specify format for file. See below for descriptions. Available options 
 %         are:
 %            'simple' : Formatted text file (default)
+%            'ematrix' : Format read by EMATRIX (D. Mainprice).
 %
 %     [C,...] = MS_load(fname,...,'symmetry', mode) 
 %         Fill out elastic tensor based on symmetry, defined by mode. This can
