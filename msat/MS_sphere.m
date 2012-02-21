@@ -228,11 +228,11 @@ cbax = colorbar('NorthOutside','FontSize',14,'FontWeight','bold');
 if strcmpi(mode,'s')
     title(cbax,'S-wave anisotropy (%)');
 elseif strcmpi(mode,'p')
-    title(cbax,'P-wave velocity (m/s)');
+    title(cbax,'P-wave velocity (km/s)');
 elseif strcmpi(mode,'s1')
-    title(cbax,'Fast S-wave velocity (m/s)');
+    title(cbax,'Fast S-wave velocity (km/s)');
 elseif strcmpi(mode,'s2')
-    title(cbax,'Slow S-wave velocity (m/s)');
+    title(cbax,'Slow S-wave velocity (km/s)');
 end
 end
 return
