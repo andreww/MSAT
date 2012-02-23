@@ -123,7 +123,7 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 		cinc = inc(ipair) ;
 
 %  ** create the cartesian vector
-		XI = cart2(1,cinc,cazi) ;
+		XI = cart2(cinc,cazi) ;
 
 %  ** compute phase velocities		
 		[V,EIGVEC]=velo(XI,rh,C) ;
@@ -147,23 +147,27 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       S2 = EIGVEC(:,3) ;
 
 %  ** calculate projection onto propagation plane      
-      S1N = cross(XI,S1) ;
-      S1P(ipair,:) = cross(XI,S1N);
-      S2N = cross(XI,S2) ;
-      S2P(ipair,:) = cross(XI,S2N);
+      S1N = V_cross(XI,S1) ;
+      S1P(ipair,:) = V_cross(XI,S1N);
+      S2N = V_cross(XI,S2) ;
+      S2P(ipair,:) = V_cross(XI,S2N);
 
 %  ** rotate into y-z plane to calculate angles
-      [S1PR] = V_rot3(S1P(ipair,:),0,0,cazi) ;
-	  [S1PRR] = V_rot3(S1PR,0,cinc,0) ;
+%     (use functions optimised for the two needed 
+%      rotations, see below).
+      [S1PR] = V_rot_gam(S1P(ipair,:),cazi) ;
+	  [S1PRR] = V_rot_bet(S1PR,cinc) ;
 
-	   ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
+
+      
+	  ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
 
 %  ** transform angle to between -90 and 90
-      if (ph < -90.), ph = ph + 180.;,end
-      if (ph >  90.), ph = ph - 180.;,end
+      if (ph < -90.), ph = ph + 180.;end
+      if (ph >  90.), ph = ph - 180.;end
 
 %	** calculate some useful values
-		dVS =  (V(2)-V(3)) ;
+      dVS =  (V(2)-V(3)) ;
       VSmean = (V(2)+V(3))/2.0 ;
 
       avs(ipair) = 100.0*(dVS/VSmean) ;
@@ -171,7 +175,7 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       vs1(ipair) = V(2) ;
       vs2(ipair) = V(3) ;
 		
-		pol(ipair) = ph ;
+      pol(ipair) = ph ;
 	end % ipair = 1:length(inc_in)
 
     % If any directions have zero avs (within machine accuracy)
@@ -186,27 +190,55 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 return
 %=======================================================================================  
 
-%=======================================================================================  
-function [VR] = V_rot3(V,alp,bet,gam)
+function [c] = V_cross(a, b)
+    % This is ~10 times quicker than the Matlab cross() function
+    % for me (AMW). We assume the arguments are both 3-vectors and
+    % avoid the checks and reshaping needed for the more general case.
+    % (According to the prfiler, this moves cross from the most expensive
+    % child function costing ~50% of the time to the third most expensive 
+    % child costing ~10% of the time).
+
+    c = [a(2).*b(3)-a(3).*b(2)
+         a(3).*b(1)-a(1).*b(3)
+         a(1).*b(2)-a(2).*b(1)];
+    
+return
+
+
+%=======================================================================================
+% Rather useing a general case rotation about three angles we use two 
+% special case rotations around the c and b axes. This saves time as
+% we don't need to convert 0 degrees to radians six times per call to 
+% phasevels, or do two double matrix multiplications. This saves ~60%
+% of the time spent in vector rotation (and, with the cross thing above)
+% reduces the 10000 evaulations needed for MS_anisotropy lma from ~19
+% secs to ~10 secs.
+
+function [VR] = V_rot_gam(V,gam)
 
 %  Make rotation matrix
-a = alp * pi/180. ;
-b = bet * pi/180. ;
 g = gam * pi/180. ;
 
-R1 = [ 1 0 0 ; 0 cos(a) sin(a) ; 0 -sin(a) cos(a) ] ;
-R2 = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
-R3 = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+RR = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+VR = V * RR ;
+ 
+return
 
-RR =  R3 * R2 * R1;
+function [VR] = V_rot_bet(V,bet)
+
+%  Make rotation matrix
+b = bet * pi/180. ;
+
+RR = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
 
 VR = V * RR ;
  
 return
+
 %=======================================================================================  
 
 %=======================================================================================  
-	function [X] = cart2(irev,inc,azm)
+	function [X] = cart2(inc,azm)
 %=======================================================================================  
 %c convert from spherical to cartesian co-ordinates
 %c north x=100  west y=010 up z=001
@@ -226,7 +258,6 @@ return
     r=sqrt(X(1)*X(1)+X(2)*X(2)+X(3)*X(3)) ;
    
 	X = X./r ;
-	if(irev == -1), X = -X;, end
    return
 %=======================================================================================  
 
