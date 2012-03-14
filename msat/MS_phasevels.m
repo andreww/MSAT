@@ -91,7 +91,11 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       azi = reshape(azi,length(azi),1) ;
 
       isotol = sqrt(eps); % Mbars
-%  ** convert GPa to MB file units (Mbars), density to g/cc
+
+      % Check that C is valid (if check not suppressed)
+      MS_checkC(C);
+      
+      %  ** convert GPa to MB file units (Mbars), density to g/cc
 
       C(:,:) = C(:,:) * 0.01 ;
       rh = rh ./ 1e3 ;
