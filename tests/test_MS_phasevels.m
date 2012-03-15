@@ -63,3 +63,13 @@ function test_MS_phasevels_stishovite_errors
     % How shoould we test MS:PHASEVELS:vectornotreal
     
 end
+
+function test_MS_phasevels_Cinvalid
+
+    [C, rh] = MS_elasticDB('stishovite');
+    C(3,6) = -675.0;
+    
+    f = @()MS_phasevels(C, rh, [90 90], [0 0]);
+    assertExceptionThrown(f, 'MS:CHECKCnotsym');
+    
+end

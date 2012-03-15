@@ -3,8 +3,8 @@
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-% Given Thomsen parameters for a VTI medium, return the elasticity 
-% matrx
+% Given Thomsen (1986) parameters for a weakly anisotropic 
+% VTI medium, return the elasticity matrx
 %
 %   [C]=MS_VTI(vp,vs,rh,eps,gam,del)
 %
@@ -16,6 +16,10 @@
 %
 %   Output:
 %        C : Stiffness tensor (6x6 notation, GPa)
+%
+% References: 
+%     Thomsen, L. (1986) "Weak elastic anisotropy" Geophysics 
+%         vol.51 pp.1954-1966
 %
 % See also: MS_iso, MS_elasticDB
 
