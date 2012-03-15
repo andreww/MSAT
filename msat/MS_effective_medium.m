@@ -9,7 +9,7 @@
 %
 %  Currently available theories:
 %
-%  ** Tandon and Weng, 84 ('tandon' or 't&w')
+%  ** Tandon and Weng, 84 ('tandon' or 't&w') Spheroids.
 %     (Isotropic host matrix with unidirectionally aligned isotropic spheroid 
 %      inclusions) 
 %
@@ -37,16 +37,44 @@
 %          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
 %          rh : aggregate density (kg/m3)
 %
+%  ** Hudson, 1981, 1982 ('hudson' or 'crack') Cracks.
+%
+%     [Ceff,rh]=MS_effective_medium('hudson',vpm,vsm,rhm,vpc,vsc,rhc,ar,cd) or
+%        Input parameters:
+%           vpm,vsm,rhm : isotropic parameters of the matrix (km/s, kg/m3)
+%                    ar : aspect ratio of cracks
+%                    cd : crack density       
+%        vpc, vsc, rhc : isotropic parameters of the fill material
+%
+%     [Ceff,rh]=MS_effective_medium('hudson',Cm,rhm,Ci,rhi,ar,cd) or
+%        Input parameters:
+%             Cm,rh : elasticity and density of the matrix (GPa, kg/m3)
+%                    ar : aspect ratio of cracks
+%                    cd : crack density     
+%         Cc, rhc : isotropic parameters of the fill material
+%
+%       Output parameters:
+%          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
+%          rh : aggregate density (kg/m3)
 %
 %  References:
+%
 % - Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the 
 %   Elastic Properties of Unidirectionally Aligned Composites. Polymer 
 %   Composites, 5, pp 327-333, 1984. 
 %
+% - Hudson, J. A., Wave speeds and attenuation of elastic waves in material 
+%   containing cracks, Geophys. J. R. Astr. Soc., 64, pp 133-150. 1981
+%
+% - Hudson, J. A., Overall properties of a cracked solid, Math. Proc. Camb. 
+%   Phil. Soc., 88, pp 371-384. 1982
+%   
+% - Crampin, S. Effective anisotropic elastic constants for wave propagation 
+%   through cracked solids. Geophys. J. R. Astr. Soc., 76, pp 135-145, 1984
 %
 % See also: MS_elasticDB
 
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011-2012, James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
@@ -119,6 +147,36 @@ switch lower(theory)
       end
       [Ceff,rh]=MS_tandon_and_weng(vpm,vsm,rhm,vpi,vsi,rhi,del,f) ;
 %-------------------------------------------------------------------------------
+   case {'hudson', 'crack'}
+      if length(varargin)~=8 & length(varargin)~=6
+         error('MS:EFFECTIVE_MEDIUM:HuWrongArgs', ...
+         'Hudson (1981,1982) cracks require 6 or 8 input parameters.') ;
+      end
+      if length(varargin)==6 % elasticity matrix form
+         Cm = varargin{1} ; rhm = varargin{2} ; 
+         Cc = varargin{3} ; rhc = varargin{4} ;
+         aspr = varargin{5} ; cden = varargin{6} ;
+%     ** check the matrices
+         MS_checkC(Cm) ;
+         if MS_anisotropy( Cm) > 10*sqrt(eps) % not isotropic           
+            error('MS:EFFECTIVE_MEDIUM:HuBadC', ...
+               'Hudson (1981,1982) cracks require isotropic inputs matrices.') ;
+         end
+         MS_checkC(Cc) ;
+         if MS_anisotropy( Cc ) > 10*sqrt(eps) % not isotropic           
+            error('MS:EFFECTIVE_MEDIUM:HuBadC', ...
+               'Hudson (1981,1982) cracks require isotropic input matrices.') ;
+         end
+%     ** unload the velocities
+         vpm = sqrt(Cm(3,3)*1e3./rhm) ;  vsm = sqrt(Cm(6,6)*1e3./rhm) ;
+         vpc = sqrt(Cc(3,3)*1e3./rhc) ;  vsc = sqrt(Cc(6,6)*1e3./rhc) ;
+      else % velocity form
+         vpm = varargin{1} ; vsm = varargin{2} ; rhm = varargin{3} ; 
+         vpc = varargin{4} ; vsc = varargin{5} ; rhc = varargin{6} ;
+         aspr = varargin{7} ; cden = varargin{8} ; 
+      end
+      [Ceff,rh]=MS_hudson_cracks(vpm,vsm,rhm,vpc,vsc,rhc,aspr,cden) ;
+%-------------------------------------------------------------------------------
    otherwise
       error('MS:EFFECTIVE_MEDIUM:UnknownTheory', ...
          'Specified theory is not supported.') ;
@@ -128,6 +186,7 @@ end % of switch
 end
 
 function [CC,rh]=MS_tandon_and_weng(vp,vs,rho,vpi,vsi,rhoi,del,c)
+% based on original FORTRAN code by Mike Kendall. 
 
 %  weighted average density
    rh = (1.0-c)*rho + c*rhoi ;
@@ -239,10 +298,98 @@ for i=1:6
       CC(j,i) = CC(i,j) ;
    end
 end
-   
 
-% convert to GPA
+% convert to GPa
 CC = CC./1e9 ; 
 
 end
 
+function [cc,rhoeff]=MS_hudson_cracks(vp,vs,rho,vpc,vsc,rhoc,aspr,cden)
+% based on original FORTRAN code by Mike Kendall. 
+
+%  convert to m/s
+   vp = vp * 1e3 ; 
+   vs = vs * 1e3 ; 
+   vpc = vpc * 1e3 ;
+   vsc = vsc * 1e3 ;
+
+
+%  calculate volume fraction       
+   fv = cden*aspr*pi ;
+   rhoeff = (1.0-fv)*rho + fv*rhoc ;
+ 
+%  amu=shear modulus (mu), alam=lambda, bm=bulk modulus (kappa)
+%  trailing "c" denotes crack property.
+   amu = vs*vs*rho ;
+   amuc = vsc*vsc*rhoc ;
+   alam = vp*vp*rho - 2.0*amu ;
+   alamc = vpc*vpc*rhoc - 2.0*amuc ;
+   bmc = alamc + amuc*2.0/3.0 ;
+ 
+%  Equation (4) of Crampin (1984, GJRAS)
+   term1 = alam + 2.0*amu ;
+   term2 = 3.0*alam + 4.0*amu ;
+   term3 = alam + amu ;
+   term4 = pi*aspr*amu ;
+   AK = ((bmc+amuc*4.0/3.0)/term4)*(term1/term3) ;
+   AM = (amuc*4.0/term4)*(term1/term2) ;
+%
+   U11 = (4.0/3.0)*(term1/term3)/(1.0+AK) ;
+   U33 = (16.0/3.0)*(term1/term2)/(1.0+AM) ;
+ 
+%  Equation (2) of Crampin (1984, GJRAS)
+   term5= -cden/amu ;
+   c111 = term1*term1*U11*term5 ;
+   c122 = alam*alam*U11*term5 ;
+   c133 = alam*alam*U11*term5 ;
+   c144 = 0.0 ;
+   c155 = amu*amu*U33*term5 ;
+   c166 = amu*amu*U33*term5 ;
+   c112 = alam*term1*U11*term5 ;
+   c113 = alam*term1*U11*term5 ;
+   c123 = alam*alam*U11*term5 ;
+ 
+%  Equation (3) of Crampin (1984, GJRAS)
+   term6= cden*cden/15.0 ;
+   qterm= 15.0*alam*alam/amu/amu + 28.0*alam/amu + 28.0 ;
+   Xterm= 2.0*amu*(3.0*alam + 8.0*amu)/term1 ;
+   c211 = term1*qterm*U11*U11*term6 ;
+   c222 = alam*alam*qterm*U11*U11*term6/term1 ;
+   c233 = alam*alam*qterm*U11*U11*term6/term1 ;
+   c244 = 0.0 ;
+   c255 = Xterm*U33*U33*term6 ;
+   c266 = Xterm*U33*U33*term6 ;
+   c212 = alam*qterm*U11*U11*term6 ;
+   c213 = alam*qterm*U11*U11*term6 ;
+   c223 = alam*alam*qterm*U11*U11*term6/term1 ;
+
+%  Host rock Cij
+   c11 = vp*vp*rho    ;
+   c22 = vp*vp*rho    ;
+   c33 = vp*vp*rho    ;
+   c44 = vs*vs*rho    ;
+   c55 = vs*vs*rho    ;
+   c66 = vs*vs*rho    ;
+   c12 = c11-2.0*c44  ;
+   c13 = c11-2.0*c44  ;
+   c23 = c11-2.0*c44  ;
+
+%  Build effective elastic tensor
+   cc(1,1)=(c11+c111+c211) ;
+   cc(2,2)=(c22+c122+c222) ;
+   cc(3,3)=(c33+c133+c233) ;
+   cc(4,4)=(c44+c144+c244) ;
+   cc(5,5)=(c55+c155+c255) ;
+   cc(6,6)=(c66+c166+c266) ;
+   cc(1,2)=(c12+c112+c212) ;
+   cc(1,3)=(c13+c113+c213) ;
+   cc(2,3)=(c23+c123+c223) ;
+ 
+   cc(2,1)=cc(1,2) ;
+   cc(3,1)=cc(1,3) ;
+   cc(3,2)=cc(2,3) ;
+ 
+%  convert to GPa       
+   cc = cc./1e9 ;
+
+end
