@@ -40,7 +40,7 @@
 %          rh : aggregate density (kg/m3)
 %
 %-------------------------------------------------------------------------------
-%  ** Hudson, 1981, 1982 ('hudson' or 'crack') Cracks.
+%  ** Hudson, 1980, 1981 ('hudson' or 'crack') Cracks.
 %-------------------------------------------------------------------------------
 %
 %     [Ceff,rh]=MS_effective_medium('hudson',vpm,vsm,rhm,vpc,vsc,rhc,ar,cd) or
@@ -90,13 +90,13 @@
 %
 % - Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the 
 %   Elastic Properties of Unidirectionally Aligned Composites. Polymer 
-%   Composites, 5, pp 327-333, 1984. 
+%   Composites, 5, pp 327-333, 1984.
+%
+% - Hudson, J. A., Overall properties of a cracked solid, Math. Proc. Camb. 
+%   Phil. Soc., 88, pp 371-384. 1980
 %
 % - Hudson, J. A., Wave speeds and attenuation of elastic waves in material 
 %   containing cracks, Geophys. J. R. Astr. Soc., 64, pp 133-150. 1981
-%
-% - Hudson, J. A., Overall properties of a cracked solid, Math. Proc. Camb. 
-%   Phil. Soc., 88, pp 371-384. 1982
 %   
 % - Crampin, S. Effective anisotropic elastic constants for wave propagation 
 %   through cracked solids. Geophys. J. R. Astr. Soc., 76, pp 135-145, 1984
