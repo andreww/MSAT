@@ -9,9 +9,11 @@
 %
 %  Currently available theories:
 %
+%-------------------------------------------------------------------------------
 %  ** Tandon and Weng, 84 ('tandon' or 't&w') Spheroids.
 %     (Isotropic host matrix with unidirectionally aligned isotropic spheroid 
 %      inclusions) 
+%-------------------------------------------------------------------------------
 %
 %     [Ceff,rh]=MS_effective_medium('t&w',vpm,vsm,rhm,vpi,vsi,rhi,del,f) or
 %        Input parameters:
@@ -37,7 +39,9 @@
 %          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
 %          rh : aggregate density (kg/m3)
 %
+%-------------------------------------------------------------------------------
 %  ** Hudson, 1981, 1982 ('hudson' or 'crack') Cracks.
+%-------------------------------------------------------------------------------
 %
 %     [Ceff,rh]=MS_effective_medium('hudson',vpm,vsm,rhm,vpc,vsc,rhc,ar,cd) or
 %        Input parameters:
@@ -57,6 +61,31 @@
 %          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
 %          rh : aggregate density (kg/m3)
 %
+%-------------------------------------------------------------------------------
+%  ** Backus, 1962 ('backus') stack of thin horizontal layers.
+%-------------------------------------------------------------------------------
+%
+%     [Ceff,rh]=MS_effective_medium('backus',thickness,vp,vs,rh) or
+%        Input parameters:
+%             thickness : layer thicknesses (vector)
+%              vp,vs,rh : isotropic parameters of the layers (km/s, kg/m3) (vector)
+%
+%       Output parameters:
+%          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
+%          rh : aggregate density (kg/m3)
+%
+%     [Ceff,rh]=MS_effective_medium('backus',thickness,C,rh) or
+%        Input parameters:
+%             thickness : layer thicknesses (vector)
+%                     C : elasticity of the layers (GPa) (6x6xn tensor)
+%                    rh : density of the layers (GPa, kg/m3) (vector)
+%
+%       Output parameters:
+%          Ceff : Elastic constants (GPa) (symmetry in X3 direction)
+%          rh : aggregate density (kg/m3)
+%
+%-------------------------------------------------------------------------------
+%
 %  References:
 %
 % - Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the 
@@ -71,6 +100,9 @@
 %   
 % - Crampin, S. Effective anisotropic elastic constants for wave propagation 
 %   through cracked solids. Geophys. J. R. Astr. Soc., 76, pp 135-145, 1984
+%
+% - Backus, G. E., Long-Wave Elastic Anisotropy Produced by Horizontal Layering.  
+%   J. Geophys. Res., pp 4427-4440
 %
 % See also: MS_elasticDB
 
@@ -177,6 +209,53 @@ switch lower(theory)
       end
       [Ceff,rh]=MS_hudson_cracks(vpm,vsm,rhm,vpc,vsc,rhc,aspr,cden) ;
 %-------------------------------------------------------------------------------
+   case {'backus'}
+      if length(varargin)~=3 & length(varargin)~=4
+         error('MS:EFFECTIVE_MEDIUM:BaWrongArgs', ...
+         'Backus (1962) layering requires 3 or 4 input parameters.') ;
+      end
+      if length(varargin)==3 % elasticity matrix form
+         h = varargin{1} ; C = varargin{2} ; rh = varargin{3} ; 
+         
+%     ** check the matrices
+         [dum dum nC] = size(C) ; 
+         
+         if length(rh)~=nC
+            error('MS:EFFECTIVE_MEDIUM:BaVectorLengths', ...
+                  'Backus (1962) layering requires equal length vectors.') ;
+         end         
+         
+         for iC = 1:nC
+            Ctmp = C(:,:,iC) ;
+            MS_checkC(Ctmp) ;
+            if MS_anisotropy(Ctmp) > 10*sqrt(eps) % not isotropic           
+               error('MS:EFFECTIVE_MEDIUM:BaBadC', ...
+                  'Backus (1962) layering requires isotropic input matrices.') ;
+            end
+         end   
+
+%     ** unload the velocities
+
+         vp = zeros(1,nC) ;
+         vs = zeros(1,nC) ;
+         vp = sqrt(squeeze(C(3,3,:)).*1e3./rh)  ;
+         vs = sqrt(squeeze(C(6,6,:)).*1e3./rh)  ;
+      else % velocity form
+         h = varargin{1} ; vp = varargin{2} ; 
+         vs = varargin{3} ; rh = varargin{4} ; 
+      end
+%  ** TODO: check vector lengths
+
+%  ** reshape so all vectors are the same orientation      
+      nl = length(h) ;
+      h =  reshape(h,1,nl) ;
+      vp = reshape(vp,1,nl) ;
+      vs = reshape(vs,1,nl) ;
+      rh = reshape(rh,1,nl) ;
+
+      
+      [Ceff,rh]=MS_backus_average(h,vp,vs,rh) ;
+%-------------------------------------------------------------------------------
    otherwise
       error('MS:EFFECTIVE_MEDIUM:UnknownTheory', ...
          'Specified theory is not supported.') ;
@@ -184,6 +263,69 @@ switch lower(theory)
 end % of switch
 
 end
+
+
+     function [Ceff,rheff] = MS_backus_average(h,vp,vs,rh)
+%-----------------------------------------------------------------------
+%     Subroutine to perform Backus Averaging of a stack of horizontal
+%     isotropic layers to form a homogenous VTI media.
+%
+%     Inputs:
+%     
+%     h(1..n)        : Individual thicknesses (not depths!) of the n layers
+%     vp(1..n)       : Isotropic P-wave velocities of the n layers (km/s)
+%     vs(1..n)       : Isotropic S-wave velocities of the n layers (km/s)
+%     rh(1..n)       : Densities of the n layers (kg/m^3)
+%
+%     Outputs:
+%
+%     Ceff(6,6)      : Effective elasticity of the package. 
+%     rheff          : Density of the package.
+%-----------------------------------------------------------------------
+   vp = vp.*1e3 ;
+   vs = vs.*1e3 ;
+   
+%
+%     Sum over all the layers, weighted by the layer thickness, to generate the
+%     Backus parameters.
+%
+   a1 = sum(h.*(4.*rh.*vs.^2.*(vp.^2-vs.^2))./(vp.^2))./sum(h) ;
+   a2 = sum(h.*(1./(rh.*vp.^2)))./sum(h) ;
+   a3 = sum(h.*(vp.^2 - 2.*vs.^2)./(vp.^2))./sum(h) ;
+   b1 = sum(h.*(2.*rh.*(vp.^2-2.*vs.^2).*vs.^2)./(vp.^2))./sum(h) ;
+   b2 = sum(h.*(1./(rh.*vp.^2)))./sum(h) ;
+   b3 = sum(h.*(vp.^2 - 2.*vs.^2)./(vp.^2))./sum(h) ;
+   c1 = sum(h.*(1./(rh.*vp.^2)))./sum(h) ;
+   f1 = sum(h.*(1./(rh.*vp.^2)))./sum(h) ;
+   f2 = sum(h.*(vp.^2 - 2*vs.^2)./(vp.^2))./sum(h) ;
+   l1 = sum(h.*(1./(rh.*vs.^2)))./sum(h) ;
+   m1 = sum(h.*(rh.*vs.^2))./sum(h) ;
+   rhave = sum(h.*rh)./sum(h) ;
+%  
+%  Form Backus coefficients
+%   
+   a = a1 + 1./a2 .* a3.^2 ;
+   b = b1 + 1./b2 .* b3.^2 ;
+   c = 1./c1 ;
+   f = 1./f1 .* f2 ;
+   l = 1./l1 ;
+   m = m1 ;
+%
+%  Form the effective matrix.   
+%   
+   Ceff = [a b f 0 0 0 ; ...
+           b a f 0 0 0 ; ...
+           f f c 0 0 0 ; ...
+           0 0 0 l 0 0 ; ...
+           0 0 0 0 l 0 ; ...
+           0 0 0 0 0 m ] ;
+   rheff = rhave ;
+
+%  convert to GPa
+   Ceff = Ceff ./ 1e9 ;
+   
+end
+
 
 function [CC,rh]=MS_tandon_and_weng(vp,vs,rho,vpi,vsi,rhoi,del,c)
 % based on original FORTRAN code by Mike Kendall. 

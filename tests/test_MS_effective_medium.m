@@ -2,6 +2,8 @@ function test_suite = test_MS_effective_medium
 initTestSuite;
 end
 
+
+
 function test_MS_effective_medium_TW
 
    Ceff = [2.7412    1.4338    1.4338         0         0         0 ; ...
@@ -86,3 +88,69 @@ function test_MS_effective_medium_Hudson
    assertElementsAlmostEqual(rheff, rheff2, 'absolute',0.01) ;
 
 end
+
+function test_MS_effective_medium_Backus
+   
+   [h,vp,vs,rh] = example_layering()  ;
+   
+   n = length(h) ;
+   
+   C = zeros(6,6,n) ;
+   
+   for i=1:n
+      C(:,:,i) = MS_iso(vp(i),vs(i),rh(i)) ;
+   end
+   
+   [Ceff1,rheff1] = MS_effective_medium('backus',h,vp,vs,rh) ;
+   
+   [Ceff2,rheff2] = MS_effective_medium('backus',h,C,rh) ;
+   
+   
+   Vp0 =   3360.728 ;
+   Vs0 =   1754.414 ;
+   Rho =   2439.401 ;
+
+   Eps =   0.122594 ;
+   Gam =   0.165415 ;
+   Del =  -0.007099 ;
+   
+   Ceffr = MS_VTI(Vp0./1e3,Vs0./1e3,Rho,Eps,Gam,Del) ;
+   
+   assertElementsAlmostEqual(Ceffr, Ceff1, 'absolute',0.001) ;
+   assertElementsAlmostEqual(Ceffr, Ceff2, 'absolute',0.001) ;
+   assertElementsAlmostEqual(Rho, rheff1, 'absolute',0.001) ;
+   assertElementsAlmostEqual(Rho, rheff2, 'absolute',0.001) ;
+   
+end
+
+function [h,vp,vs,rh] = example_layering()
+
+   data = [ 5.0  2659.99    1319.64    2265.49 ; ...
+            5.0  2666.03    1551.17    2120.92 ; ...
+            5.0  4666.90    2059.59    2551.36 ; ...
+            5.0  3718.53    2130.02    2483.37 ; ...
+            5.0  5169.32    2793.55    2732.48 ; ...
+            5.0  3328.20    1937.93    2435.49 ; ...
+            5.0  3183.62    1650.54    2282.05 ; ...
+            5.0  5193.23    2718.97    2788.21 ; ...
+            5.0  5447.86    2881.82    2823.21 ; ...
+            5.0  2931.93    1490.97    2282.22 ; ...
+            5.0  3017.37    1681.12    2217.13 ; ...
+            5.0  3115.85    1517.10    2393.99 ; ...
+            5.0  3451.60    1794.47    2390.58 ; ...
+            5.0  3083.05    1561.44    2216.66 ; ...
+            5.0  3317.40    1733.62    2283.42 ; ...
+            5.0  4734.10    2578.15    2588.18 ; ...
+            5.0  4238.52    1963.57    2662.89 ; ...
+            5.0  2484.67    1302.08    2247.81 ; ...
+            5.0  3642.96    2261.31    2387.66 ; ...
+            5.0  4385.17    2107.17    2693.91 ; ...
+            5.0  3234.26    1545.98    2380.38 ] ; 
+
+   h = data(:,1) ;
+   vp = data(:,2)./1e3 ;
+   vs = data(:,3)./1e3 ;
+   rh = data(:,4) ;
+
+end
+
