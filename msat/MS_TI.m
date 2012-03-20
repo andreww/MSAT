@@ -1,9 +1,16 @@
-% MS_VTI - generate elastic constants for a vertically transverse isotropic
-%             medium from Thomsen parameters. Symmetry is in the 3-axis. 
+% MS_TI - generate elastic constants for a vertically transverse isotropic
+%             medium from specified parameter sets. Symmetry is in the 3-axis. 
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
+%  [C]=MS_TI( list_of_parameters , parameter_set_string )
+%
+%  where parameter_set_string defines the set which precede it: 
+%
 %-------------------------------------------------------------------------------
+%   'thomsen' (default)
+%-------------------------------------------------------------------------------
+%
 %   [C]=MS_TI(vp,vs,rh,eps,gam,del) -or-
 %   [C]=MS_TI(vp,vs,rh,eps,gam,del,'thomsen')
 %
@@ -16,11 +23,15 @@
 %   Output:
 %        C : Stiffness tensor (6x6 notation, GPa)
 %
-%   Given Thomsen (1986) parameters for a weakly anisotropic 
-%   VTI medium, return the elasticity matrix
+%   Given Thomsen (1986) parameters for a weakly anisotropic VTI medium, 
+%   return the elasticity matrix
 %
 %-------------------------------------------------------------------------------
+%   'panning'
+%-------------------------------------------------------------------------------
+%
 %   [C]=MS_TI(vp,vs,rh,xi,phi,eta,'panning')
+%
 %   Inputs: 
 %       rh  : Density (kg/m2) 
 %       vp  : km/s (isotropic average)
@@ -30,19 +41,25 @@
 %   Output:
 %        C : Stiffness tensor (6x6 notation, GPa)
 %
-%   Calculates the elastic tensor for a VTI medium from
-%   average Vp and Vs, and anisotropic parameters xi, phi and eta. 
+%   Calculates the elastic tensor for a VTI medium from average Vp and Vs,
+%   and anisotropic parameters xi, phi and eta (see, e.g., Panning and 
+%   Romanowicz, 2006)
 %
 %-------------------------------------------------------------------------------
+%   'love'
+%-------------------------------------------------------------------------------
+%
 %   [C]=MS_TI(A,C,L,N,F,'love')
+%
 %   Inputs: 
 %        A,C,L,N,F : Love parameters (GPa)
 %
 %   Output:
 %        C : Stiffness tensor (6x6 notation, GPa)
 %
-%   Calculates the elastic tensor for a VTI medium from Love parameters.
+%   Calculates the elastic tensor for a VTI medium from Love (1927) parameters.
 %
+%-------------------------------------------------------------------------------
 % References: 
 %     Thomsen, L. (1986) "Weak elastic anisotropy" Geophysics 
 %         vol.51 pp.1954-1966
@@ -96,9 +113,19 @@ function [C]=MS_TI(varargin)
 % see if a parameter set type was selected. 
 if ischar(varargin{nargin})
    pset = varargin{nargin} ;
+   ncheck = nargin-1;
 else
    pset = 'thomsen' ;
+   ncheck = nargin ;
 end   
+
+% check that all other inputs are scalars
+for icheck=1:ncheck
+   if ~isscalar(varargin{icheck})
+      error('MS:TI:BadScalarInput',...
+      'MS_TI requires scalar inputs') ;
+   end   
+end
 
 %  call the appropriate routine.
 
@@ -136,7 +163,10 @@ switch lower(pset)
          'Specified parameter set is not supported.') ;
 %-------------------------------------------------------------------------------
 end % of switch
-
+   
+% check resulting matrix.
+MS_checkC(C) ;
+   
 end
 
 function [CC]=MS_love(A,C,L,N,F)
@@ -203,7 +233,7 @@ function [C]=MS_thomsen(vp,vs,rh,eps,gam,del)
    dsrmt = (btm*btm - 4.0*ctm) ;
    
 	if dsrmt < 0
-		error('MS:VTI:HiVS',...
+		error('MS:TI:ThomsenHiVS',...
 		   'S-velocity too high or delta too negative for Thomsen routine.') ;
 	end
    
