@@ -9,11 +9,11 @@
 %
 %  Currently available theories:
 %
-%-------------------------------------------------------------------------------
-%  ** Tandon and Weng, 84 ('tandon' or 't&w') Spheroids.
+%Tandon and Weng, 84 ('tandon' or 't&w') Spheroids
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %     (Isotropic host matrix with unidirectionally aligned isotropic spheroid 
 %      inclusions) 
-%-------------------------------------------------------------------------------
+%
 %
 %     [Ceff,rh]=MS_effective_medium('t&w',vpm,vsm,rhm,vpi,vsi,rhi,del,f) or
 %        Input parameters:
@@ -39,9 +39,9 @@
 %          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
 %          rh : aggregate density (kg/m3)
 %
-%-------------------------------------------------------------------------------
-%  ** Hudson, 1980, 1981 ('hudson' or 'crack') Cracks.
-%-------------------------------------------------------------------------------
+%
+%Hudson, 1980, 1981 ('hudson' or 'crack') Cracks
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %
 %     [Ceff,rh]=MS_effective_medium('hudson',vpm,vsm,rhm,vpc,vsc,rhc,ar,cd) or
 %        Input parameters:
@@ -61,9 +61,8 @@
 %          Ceff : Elastic constants (GPa) (symmetry in X1 direction)
 %          rh : aggregate density (kg/m3)
 %
-%-------------------------------------------------------------------------------
-%  ** Backus, 1962 ('backus') stack of thin horizontal layers.
-%-------------------------------------------------------------------------------
+%Backus, 1962 ('backus') stack of thin horizontal layers
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %
 %     [Ceff,rh]=MS_effective_medium('backus',thickness,vp,vs,rh) or
 %        Input parameters:
@@ -84,25 +83,24 @@
 %          Ceff : Elastic constants (GPa) (symmetry in X3 direction)
 %          rh : aggregate density (kg/m3)
 %
-%-------------------------------------------------------------------------------
+%References
+%~~~~~~~~~~
 %
-%  References:
+%  Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the 
+%       Elastic Properties of Unidirectionally Aligned Composites. Polymer 
+%       Composites, 5, pp 327-333, 1984.
 %
-% - Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the 
-%   Elastic Properties of Unidirectionally Aligned Composites. Polymer 
-%   Composites, 5, pp 327-333, 1984.
+%  Hudson, J. A., Overall properties of a cracked solid, Math. Proc. Camb. 
+%       Phil. Soc., 88, pp 371-384. 1980
 %
-% - Hudson, J. A., Overall properties of a cracked solid, Math. Proc. Camb. 
-%   Phil. Soc., 88, pp 371-384. 1980
-%
-% - Hudson, J. A., Wave speeds and attenuation of elastic waves in material 
-%   containing cracks, Geophys. J. R. Astr. Soc., 64, pp 133-150. 1981
+%  Hudson, J. A., Wave speeds and attenuation of elastic waves in material 
+%       containing cracks, Geophys. J. R. Astr. Soc., 64, pp 133-150. 1981
 %   
-% - Crampin, S. Effective anisotropic elastic constants for wave propagation 
-%   through cracked solids. Geophys. J. R. Astr. Soc., 76, pp 135-145, 1984
+%  Crampin, S. Effective anisotropic elastic constants for wave propagation 
+%       through cracked solids. Geophys. J. R. Astr. Soc., 76, pp 135-145, 1984
 %
-% - Backus, G. E., Long-Wave Elastic Anisotropy Produced by Horizontal Layering.  
-%   J. Geophys. Res., pp 4427-4440
+%  Backus, G. E., Long-Wave Elastic Anisotropy Produced by Horizontal Layering.  
+%       J. Geophys. Res., pp 4427-4440
 %
 % See also: MS_elasticDB
 
