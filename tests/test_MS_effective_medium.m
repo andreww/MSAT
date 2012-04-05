@@ -114,7 +114,7 @@ function test_MS_effective_medium_Backus
    Gam =   0.165415 ;
    Del =  -0.007099 ;
    
-   Ceffr = MS_VTI(Vp0./1e3,Vs0./1e3,Rho,Eps,Gam,Del) ;
+   Ceffr = MS_TI(Vp0./1e3,Vs0./1e3,Rho,Eps,Gam,Del,'thomsen') ;
    
    assertElementsAlmostEqual(Ceffr, Ceff1, 'absolute',0.001) ;
    assertElementsAlmostEqual(Ceffr, Ceff2, 'absolute',0.001) ;
