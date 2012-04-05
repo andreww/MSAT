@@ -7,9 +7,8 @@
 %
 %  where parameter_set_string defines the set which precede it: 
 %
-%-------------------------------------------------------------------------------
-%   'thomsen' (default)
-%-------------------------------------------------------------------------------
+%'thomsen' (default)
+%~~~~~~~~~~~~~~~~~~~
 %
 %   [C]=MS_TI(vp,vs,rh,eps,gam,del) -or-
 %   [C]=MS_TI(vp,vs,rh,eps,gam,del,'thomsen')
@@ -26,9 +25,8 @@
 %   Given Thomsen (1986) parameters for a weakly anisotropic VTI medium, 
 %   return the elasticity matrix
 %
-%-------------------------------------------------------------------------------
-%   'panning'
-%-------------------------------------------------------------------------------
+%'panning'
+%~~~~~~~~~
 %
 %   [C]=MS_TI(vp,vs,rh,xi,phi,eta,'panning')
 %
@@ -45,9 +43,8 @@
 %   and anisotropic parameters xi, phi and eta (see, e.g., Panning and 
 %   Romanowicz, 2006)
 %
-%-------------------------------------------------------------------------------
-%   'love'
-%-------------------------------------------------------------------------------
+%'love'
+%~~~~~~
 %
 %   [C]=MS_TI(A,C,L,N,F,'love')
 %
@@ -59,8 +56,8 @@
 %
 %   Calculates the elastic tensor for a VTI medium from Love (1927) parameters.
 %
-%-------------------------------------------------------------------------------
-% References: 
+%References
+%~~~~~~~~~~
 %     Thomsen, L. (1986) "Weak elastic anisotropy" Geophysics 
 %         vol.51 pp.1954-1966
 %
