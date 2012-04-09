@@ -16,7 +16,7 @@ what each function does.
 
 We also provide copies of the link:MSATrelease_notes.html[release notes],
 link:MSATreadme.html[installation guide], link:MSATreadme.html[licencing details]  and some tips
-for people intrested in link:MSATdevelop[developing] or 
+for people intrested in link:MSATdevelop.html[developing] or 
 modifying the toolkit (this includes information on 
 how to run the test suite). 
 

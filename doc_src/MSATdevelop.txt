@@ -1,0 +1,20 @@
+Matlab Seismic Anisotropy Toolkit – development tips
+====================================================
+
+Beyond an installed and working version of Matlab, the use of MSAT depends on no other software. However, there are a number of useful tools  which developers intending to modify the code are encouraged to utilise. While we are always happy to receive reports of defects or suggestions for future developments, the results of direct modification to the MSAT code base can result in much more rapid integration to the distributed version. Such changes can be communicated by way of modified or additional files attached to an email but the easer it is to read and incorporate changes the quicker the changes can be made. The information below should help make this painless.
+
+Contributing code
+-----------------
+
+We make use of link:http://git-scm.com/[git], a fast distributed version control system, to manage the development of MSAT. Using this tool will make it easer for us to review, merge and distribute changes to code. We also make use of hosting provided by link:https://github.com/andreww/MSAT[github] and, to minimize friction, developers should "fork" the source code on github then use the "pull request" tool to enable new code to be merged. 
+
+Documentation
+-------------
+
+Functions should be documented in a comment block at the start of each Matlab file; see MS_template.m (in the distributed doc_src directory). This documentation block is presented by the Matlab help() built-in function. In order to simplify the generation of html documentation for viewing using the Matlab help browser or on the web the link: http://www.methods.co.nz/asciidoc/[asciidoc] processing system is used. Developers may want to install the asciidoc software in order to re-generate the documentation but this is not essential. Other items of documentation, and the machinery used to re-generation of the html files, are found in the doc_src directory.
+
+Testing
+-------
+
+MSAT is distributed with a large number of test cases. These are run using the link: http://www.mathworks.com/matlabcentral/fileexchange/22846-matlab-xunit-test-framework[xUnit test framework]. This must be installed and present in the Matlab path for the tests to be run. Once this is done the tests can be run from within Matlab by navigating to the tests subdirectory and executing the "runtests" command. Tests for new functions (and new tests for existing functions) should be added to this directory.
+
