@@ -5,11 +5,18 @@ The Matlab Seismic Anisotropy Toolkit (MSAT) is designed to
 facilitate the analysis and modelling of observations of seismic
 and elastic anisotropy. This user guide provides information on
 the range of link:MSATfunctions.html[functions] provided by the 
-toolkit, some brief comments on the MSATbackground.html[background
-theory] needed and link:MSATexamples.html[exmples] of how MSAT can be
-used. Alongside the user guide is a shorter document describing 
-how to link:MSATstart.html[get started] with MSAT and a full list 
-of link:funcs/index.html[list of functions] with in-depth 
-documentation for each one.
+toolkit along with some brief comments on the background theory 
+implemented within them. There are also link:MSATexamples.html[exmples] 
+of how MSAT can be used. 
 
+For the impatient there is a shorter document describing 
+how to link:MSATstart.html[get started] with MSAT and a 
+of link:funcs/index.html[list of functions] with links to 
+what each function does. 
+
+We also provide copies of the link:MSATrelease_notes.html[release notes],
+link:MSATreadme.html[installation guide], link:MSATreadme.html[licencing details]  and some tips
+for people intrested in link:MSATdevelop[developing] or 
+modifying the toolkit (this includes information on 
+how to run the test suite). 
 
