@@ -1,0 +1,14 @@
+Examples
+========
+
+MSAT is distributed with several example scripts designed to 
+illustrate the sort of calculation that can be perfomed 
+using the toolkit. Source code and data files for the 
+examples can be found in the /examples directory. The 
+examples include:
+
+* link:loading_examples.html[Example 1: Loading data]
+* link:diopside_example.html[Example 2: Analysis of single crystal elasticity]
+* link:texture_example.html[Example 3: Texture analysis and MTEX]
+* link:lmm_anisotropy_example.html[Example 4: Lowermost mantle anisotropy]
+* link:split_model_example.html[Example 5: modelling shear-wave splitting variation with backazimuth]

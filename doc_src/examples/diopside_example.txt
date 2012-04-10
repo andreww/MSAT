@@ -1,0 +1,76 @@
+Example 2: Analysis of single crystal elasticity
+================================================
+
+This example shows how MSAT can be used to perform analysis of single
+crystal elasticity data. 
+The source code for this 
+example are contained in the file
+diopside_example.m in the examples/diopside
+directory distributed with MSAT. This
+directory also contains the data file needed to run the example.
+In this case the data is taken from calculations
+using density functional theory stored in the file diopside_P.txt - see
+link:http://dx.doi.org/10.1016/j.pepi.2011.10.002[Walker 2012]. From this data the
+the properties of an aggregate, along with some measures of anisotropy 
+are calculated and the anisotropy plotted as a function of wave
+propogation direction.
+
+The first task is to load the input data (1D arrays of pressure, `P`,
+and density, `r`, and a 3D size 6x6xn array of elasticity matrices). 
+Note that MS_load_list allows multiple sets of elasticity data 
+(in thes case, each representing a different pressure point) to 
+be loaded in one go:
+[code,python]
+----
+[P, C, r] = MS_load_list('diopside_P.txt');
+----
+
+The remaining part of the example involves looping over the 
+data and performing analysis for each pressure point.
+
+First, `MS_anisotropy` is used to calculate
+various measures of the "strength" of the anisotropy 
+exhibited by the elasticity matrix at this pressure.
+[code,python]
+----
+for i = 1:length(P)
+    
+    % Calculate anisotropy index
+    [ uA, lmA ] = MS_anisotropy( C(:,:,i) );
+----
+
+The second step is to build the elasticity matrix
+representing an isotropic rock made up of pure
+diopside at the pressure point and use this to 
+calculate the P and S wave velocities:
+[code,python]
+----
+    % Calculate isotropic elasticity
+    [ K_vrh, G_vrh ] = MS_polyaverage( C(:,:,i) );
+     
+    % Get isotropic phase velocities
+    Ciso = MS_build_isotropic('lam', G_vrh, 'K', K_vrh);
+    [ ~, ~, VSiso, ~, VPiso ] = MS_phasevels( Ciso, r(i), 0.0, 0.0 );
+----
+
+The third step is to calculate the fast and slow S wave velocities
+and from this the expected delay time (splitting magnitude) for 
+a 10 km thick layer of fully aligned diopside:     
+[code,python]
+----
+    % Calculate splitting for [010] direction (10km layer)
+    % This is along the y axis.
+    [ ~, aVS, VS1, VS2, ~ ] = MS_phasevels( C(:,:,i), r(i), 0.0, 90.0 );
+    dt = (10/VS2 - 10/VS1);
+----
+
+The final step is to produce a set of pole figures showing the 
+seismic anisotropy at the pressure represented by this 
+loop iteration.        
+[code,python]
+----
+    % Plot polefigs
+    title = sprintf('Diopside seismic anisotropy at %2.1f GPa', P(i));
+    MS_plot(C(:,:,i),r(i), 'wtitle', title, 'fontsize', 10, 'quiet');
+end
+----

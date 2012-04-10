@@ -1,0 +1,36 @@
+Example 4: Lowermost mantle anisotropy
+======================================
+
+This code demonstrates the use of MSAT to calculate derived properties from
+a set of elastic constants. The model used is a model of lowermost mantle
+anisotropy from link:http://dx.doi.org/10.1029/2011GC003732[Walker et al (2011)],
+specifically 'TX2008.V1.P010.dat'. See
+link:http://www1.gly.bris.ac.uk/CoMITAC/software.htm[www1.gly.bris.ac.uk/CoMITAC/software.htm] for details. 
+
+The source code for this 
+example are contained in the file
+lmm_anisotropy_example.m in the examples/lowermost
+directory distributed with MSAT. This
+directory also contains the data file needed to run the example.
+
+Much of the example is similar to the calculations 
+described in example 2. Howerver, one important 
+additional calculation is performed, specifically
+the symmetry based analysis of  
+link:http://dx.doi.org/10.1111/j.1365-246X.2004.02415.x[Browaeys and Chevrot (2004)].
+This analysis is performed in three stages. First `MS_axes` is used to 
+find the principal axes of the stress tensor needed to cause an isotropic
+strain and the elasticity tensor `Chere` rotated to be aligned with this. 
+The second step uses `MS_decomp` to split the matrix into contributions 
+from the six symmetry classes. `MS_norms` then calculates the Euclidean
+norm of each contributing elasticity matrix before, for this application,
+the percentage of the sum of the norms that is contributed from the 
+hexagonal matrix is calculated.
+[code, python]
+----
+         ChereR = MS_axes(Chere) ;
+         [C_iso,C_hex,C_tet,C_ort,C_mon,C_tri] = MS_decomp(ChereR);
+         P = MS_norms(ChereR,C_iso,C_hex,C_tet,C_ort,C_mon,C_tri) ;
+         SumA = sum(P(2:end)) ;
+         PercH(ila(i),ilo(i)) = P(2)./SumA ;
+----
