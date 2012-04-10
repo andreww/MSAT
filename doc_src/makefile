@@ -18,6 +18,7 @@ html_docs: MSATstart.txt MSATguide.txt MSATfunctions.txt ../RELEASE_NOTES exampl
 
 install: html_funcs html_docs example-docs
 	mkdir -p ../msat/html/funcs
+	mkdir -p ../msat/html/examples
 	cat helptoc.xml_header helptoc.xml_funcs helptoc.xml_footer > ../msat/html/helptoc.xml
 	cp MSATdevelop.html MSATrelease_notes.html MSATreadme.html MSATfunctions.html  MSATstart.html MSATguide.html albite.png MSATfunctions.html ../msat/html
 	cp ./funcs/*.html ../msat/html/funcs
