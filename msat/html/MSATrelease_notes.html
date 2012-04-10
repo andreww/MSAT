@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.5" />
-<title></title>
+<title>MSAT Release Notes</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -712,60 +712,96 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
+<h1>MSAT Release Notes</h1>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_vti2">MS_VTI2</h2>
+<h2 id="_version_0_9_24_november_2011">Version 0.9 - 24 November 2011</h2>
 <div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre><tt>MS_VTI2 - generate elastic constants for a vertically transverse isotropic
-            medium from xi, phi, eta parameters. Symmetry is in the 3-axis.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>[C]=MS_VTI2(vp,vs,rh,xi,phi,eta)</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Inputs:
-    rh  : Density (kg/m2)
-    vp  : km/s (isotropic average)
-    vs  : km/s (isotropic average)
-    xi, phi, eta : Dimensionless anisotropy parameters</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Output:
-     C : Stiffness tensor (6x6 notation, GPa)</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Calculates the elastic tensor for a hexagonal (aka VTI) medium from
-average Vp and Vs, and anisotropic parameters xi, phi and eta.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See, for example, Panning and Romanowicz (2006) for a definition of the
-parameters.</tt></pre>
-</div></div>
+<div class="paragraph"><p>This is the public beta version of
+MSAT with expanded documentation,
+new examples, some bug fixes and
+a few new functions. Users of version
+0.8 are advised to upgrade. All users
+are encouraged to report bugs and
+request missing features. Major changes
+from version 0.8 are:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Note: this is wrapper for MS_TI, provided for back-compatibility. **
+The way MS_plot handles optional
+arguments has been made consistent
+with the rest of the code. New
+optional arguments have been added.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>References:
-  Mark Panning and Barbara Romanowicz (2006) A three-dimensional radially
-     anisotropic model of shear velocity in the whole mantle. Geophysical
-     Journal International v167, 361–379.
-     doi: 10.1111/j.1365-246X.2006.03100.x</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See also: MS_TI, MS_VTI, MS_iso, MS_elasticDB</tt></pre>
-</div></div>
+</li>
+<li>
+<p>
+An MSAT quick start guide has been
+added to the built-in and web based
+documentation. The full user guide
+has been started but is incomplete.
+</p>
+</li>
+<li>
+<p>
+Six usage examples have been provided.
+They are located in subdirectories of
+the distributed examples directory.
+</p>
+</li>
+<li>
+<p>
+A new function, MS_poisson, has been
+added to evaluate Poisson&#8217;s ratio for
+generally anisotropic materials as a
+function of strain direction.
+</p>
+</li>
+<li>
+<p>
+A new function, MS_VTI2, has been added
+to generate an elasticity matrix with
+hexagonal symmetry from the vp, vs, xi,
+phi and eta parameters sometimes used
+in global tomography.
+</p>
+</li>
+<li>
+<p>
+Provide a work around for Matlab version
+dependent compatibility issue in MS_checkC.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_version_0_8_4_october_2011">Version 0.8 - 4 October 2011</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This is the first version of MSAT
+so there are no backwards incompatibility
+issues.  However, this is an alpha
+release and note that:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Elastic constant interpolation for
+  trigonal symmetry does not work correctly.
+</p>
+</li>
+<li>
+<p>
+Several examples are incomplete.
+</p>
+</li>
+<li>
+<p>
+Many of the functions are derived from
+  older "CIJ_" code. Argument orders and
+  details of what must be passed have been
+  freely changed. Do read the documentation.
+</p>
 </li>
 </ul></div>
 </div>
@@ -774,7 +810,7 @@ Note: this is wrapper for MS_TI, provided for back-compatibility. **
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-10 14:40:45 BST
+Last updated 2011-12-30 15:47:42 GMT
 </div>
 </div>
 </body>

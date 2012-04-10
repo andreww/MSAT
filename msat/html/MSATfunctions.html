@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.5" />
-<title></title>
+<title>Matlab Seismic Anisotropy Toolkit - using the functions</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -1939,146 +1939,395 @@ else
 </head>
 <body class="article">
 <div id="header">
+<h1>Matlab Seismic Anisotropy Toolkit - using the functions</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_msat_quick_start_guide">MSAT quick start guide.</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_installation">Installation</h3>
-<div class="paragraph"><p>Installation of the MATLAB toolbox is described <a href="http://www1.gly.bris.ac.uk/MSAT/installing.html">here</a>.</p></div>
+<div class="paragraph"><p>This section of the user guide includes some information on the functions provided in, and
+theory implemented by, the MSAT toolkit.
+The functions provided by MSAT can be classified into groups according to how they are used. These groups
+broadly correspond to how elasticity matricies appear in the input and output arguments lists. In all
+cases function names begin with "MS_" and argument lists typically begin with the elasticity
+followed, where needed, by the density. Units are always GPa for the elasticity,
+km/s for phase velocities and kg/m^3 for densities.</p></div>
+<div class="paragraph"><p>In all cases when elastic constants (stiffness) tensors are used they
+are represented using Voigt notation. This takes advantage of the
+major ($C_{ijkl} = C_{klij}$) and minor ($C_{ijkl} = C_{jikl}$ and
+$C_{ijkl} = C_{ijlk}$) symmetries of the tensor to
+limit the number of constants needed with no loss of data. The
+4th order tensor $C_{ijkl}$ is expressed
+as a symmetric $6\times 6$ Matlab array $C_{\alpha \beta}$
+with elements given by:</p></div>
+<div class="paragraph"><p>$
+\begin{array}{ccccc}
+ij &amp;\mathrm{or} &amp;kl &amp;: &amp; \\
+\downarrow &amp; &amp;\downarrow &amp; &amp; \\
+\alpha &amp; &amp;\beta &amp; &amp;
+\end{array}
+\begin{array}{cccccc}
+11 &amp;22 &amp;33 &amp;32=23 &amp;31=13 &amp;12=21 \\
+\downarrow &amp;\downarrow &amp;\downarrow
+&amp;\downarrow &amp;\downarrow &amp;\downarrow \\
+1 &amp;2 &amp;3 &amp;4 &amp;5 &amp;6
+\end{array}.
+$</p></div>
+<div class="paragraph"><p>In the MSAT documentation we call the Voigt representation of
+the elastic constants tensor the elasticity matrix (in an attempt to
+avoid confusion) and note that, if the matrix is to make physical sense,
+it must be symmetric, consist of real numbers, and be positive definate.
+Conversion and validation functions are described in the section
+"Other functions", below. Functions are otherwise classified as follows.</p></div>
 </div>
-<div class="sect2">
-<h3 id="_seismic_anisotropy_in_msat">Seismic anisotropy in MSAT</h3>
-<div class="paragraph"><p>Seismic anisotropy - the variation of seismic wavespeed with direction, is a fundamental property of most solid Earth materials. This variation is encapsulated in the elasticity tensor <strong>C</strong> (sometimes called the <em>stiffness</em>), which describes the relationship between stress and strain in a material:</p></div>
-<div class="paragraph"><p>$\sigma_{ij} = C_{ijkl}\epsilon_{kl}$</p></div>
-<div class="paragraph"><p>This is, in general, a 4th rank tensor (3x3x3x3). However, it can be represented as a more convenient symmetric 6x6 matrix (usually called <em>Voigt</em> notation) with no loss of information. This 6x6 notation is the default used by MSAT (though utilities for conversion to and from the 4th rank form are provided). The 6x6 <strong>C</strong> matrix (along with the density for some functions) are the main data used in MSAT, which provides functionality to load, manipulate, analyse and plot elasticities.</p></div>
 </div>
-<div class="sect2">
-<h3 id="_default_units">Default units</h3>
-<div class="paragraph"><p>We adopt unit conventions which should be familiar to most people conversant with the current literature:</p></div>
+<div class="sect1">
+<h2 id="_the_input_and_generation_functions">The input and generation functions</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The first group of functions generate elasticity matrices from input
+arguments (see the table below). MS_load and MS_load_list
+read data from input files
+while MS_elasticDB extracts elasticity information from a
+builtin database. Other functions create elasticity matrices
+from summary information and a knowledge of the symmetry.</p></div>
+<div class="paragraph"><p>In the most general case 21 elastic constants are required to represent minerals and materials
+with a triclinic symmetry, but systems with a higher symmetry
+(e.g. orthorhombic, hexagonal or cubic) require fewer elastic constants. In the simplest case,
+that of isotropic materials, this reduces to two parameters.
+The limitations of what
+can usually be resolved using seismology mean that higher symmetry classes are often assumed.
+A class which is commonly invoked is transverse isotropy (TI, also known as radial
+or polar anisotropy). In a TI medium properties only vary with angle from the
+symmetry axis. This can arise in a number of ways and is exhibited by: crystalline materials with a
+hexagonal symmetry, isotropic thin layers of different stiffness,
+aligned inclusions
+or cracks which are uniformly oriented. TI requires five
+independent constants to parameterise. There are a number of commonly used choices of
+parameter sets (depending on the area of literature); MSAT has functions to work with
+several of these.</p></div>
+<div class="paragraph"><p>It is also possible to model the effective anisotropic elasticity caused by particular
+rock fabrics; an effect that can be important even if all the components of the rock are isotropic
+on a short length scale compared to the seismic wavelength. Several effecive medium models are
+supported by the MS_effective_medum function. These include the case of an
+elastically isotropic medium contains aligned ellipsoidal
+inclusions filled with an elastically isotropic material of a different stiffnes,
+the case of layering of isotropic materials of different stiffness, and the effect of
+alligned cracks.</p></div>
 <div class="tableblock">
 <table rules="all"
-width="40%"
+width="80%"
 frame="hsides"
 cellspacing="0" cellpadding="4">
-<caption class="title">Table 1. MSAT default units</caption>
-<col width="50%" />
-<col width="50%" />
+<caption class="title">Table 1. MSAT Input / generation of elastic constants.</caption>
+<col width="23%" />
+<col width="76%" />
 <thead>
 <tr>
-<th align="center" valign="top">Quantity</th>
-<th align="center" valign="top">Unit</th>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center" valign="top"><p class="table">Elasticity</p></td>
-<td align="center" valign="top"><p class="table">gigapascals</p></td>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_build_isotropic.html">MS_build_isotropic</a></p></td>
+<td align="left" valign="top"><p class="table">Create elasticity matrix from pairs of isotropic moduli.</p></td>
 </tr>
 <tr>
-<td align="center" valign="top"><p class="table">Density</p></td>
-<td align="center" valign="top"><p class="table">kg/m<sup>3</sup></p></td>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_TI.html">MS_TI</a></p></td>
+<td align="left" valign="top"><p class="table">Generate elastic constants for a vertically transverse isotropic medium from Thomsen parameters or other parameterisation. Symmetry is in the 3-axis.</p></td>
 </tr>
 <tr>
-<td align="center" valign="top"><p class="table">Velocity</p></td>
-<td align="center" valign="top"><p class="table">km/s</p></td>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_effective_medium.html">MS_effective_medium</a></p></td>
+<td align="left" valign="top"><p class="table">Generate elastic constants from various effective medium theories.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_elasticDB.html">MS_elasticDB</a></p></td>
+<td align="left" valign="top"><p class="table">Database of various elastic constants.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_expand.html">MS_expand</a></p></td>
+<td align="left" valign="top"><p class="table">Fill out elasticity matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_iso.html">MS_iso</a></p></td>
+<td align="left" valign="top"><p class="table">Generate elastic matrix from isotropic velocities.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_load.html">MS_load</a></p></td>
+<td align="left" valign="top"><p class="table">Load a set of elastic constants from a file.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_load_list.html">MS_load_list</a></p></td>
+<td align="left" valign="top"><p class="table">Load a list of CIJs, in a specific format</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="paragraph"><p>Option exist to import elasticities in other units, however (see <a href="funcs/MS_load.html">MS_load</a> for details).</p></div>
 </div>
-<div class="sect2">
-<h3 id="_loading_elastic_constants">Loading elastic constants.</h3>
-<div class="paragraph"><p>Elastic constants can be sourced from MSATs own built-in database (see <a href="funcs/MS_elasticDB.html">MS_elasticDB</a> for details) which contains a number of useful minerals, or from an ascii file. The available formats of the files are given in the documentation to <a href="funcs/MS_load.html">MS_load</a>, and examples are available in the msat/examples/loading.</p></div>
-<div class="paragraph"><p>To get elastic constants for olivine (from REF) for example:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; [C,rho] = MS_elasticDB('Olivine')</tt></pre>
-</div></div>
-<div class="paragraph"><p>returns</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>C =
-
-  320.5000   68.1000   71.6000         0         0         0
-   68.1000  196.5000   76.8000         0         0         0
-   71.6000   76.8000  233.5000         0         0         0
-         0         0         0   64.0000         0         0
-         0         0         0         0   77.0000         0
-         0         0         0         0         0   78.7000
-
-
-rho =
-
-        3355</tt></pre>
-</div></div>
 </div>
-<div class="sect2">
-<h3 id="_manipulating_elastic_constants">Manipulating elastic constants</h3>
-<div class="paragraph"><p>Once the stiffness matrix (and density) are laoded MSAT provides a set of routines for performing various manipulations and transforms of them (see <a href="MSATguide.html">the user guide</a> for full list). For example, the function <a href="funcs/MS_rot3.html">MS_rot3</a> applies rotations about the principle cartesian axes to an elastic tensor. So, for example:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; C = MS_elasticDB('Olivine')
-
-C =
-
-  320.5000   68.1000   71.6000         0         0         0
-   68.1000  196.5000   76.8000         0         0         0
-   71.6000   76.8000  233.5000         0         0         0
-         0         0         0   64.0000         0         0
-         0         0         0         0   77.0000         0
-         0         0         0         0         0   78.7000
-
-&gt;&gt; CR = MS_rot3(C,90,0,0)</tt></pre>
-</div></div>
-<div class="paragraph"><p>returns</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>CR =
-
-  320.5000   71.6000   68.1000    0.0000         0         0
-   71.6000  233.5000   76.8000    0.0000         0         0
-   68.1000   76.8000  196.5000    0.0000         0         0
-    0.0000    0.0000    0.0000   64.0000         0         0
-         0         0         0         0   78.7000   -0.0000
-         0         0         0         0   -0.0000   77.0000</tt></pre>
-</div></div>
-<div class="paragraph"><p>which is the expected orientation of horizontally-strained olivine under dry upper mantle conditions.</p></div>
+<div class="sect1">
+<h2 id="_the_manipulation_functions">The manipulation functions</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>A second group of functions include elasticity matrices as input and output. These
+functions, listed below, are used to manipulate or
+transform an elasticity matrix.</p></div>
+<div class="paragraph"><p>One important manipulation is tensor rotation. MS_rot3,
+MS_rotEuler and MS_rotR all rotate an elasticity matrix (the
+functions differ in the way the rotation is specified: in all
+cases a rotation matrix is constructed and MS_rotR is used
+to perform the actual manipulation). To understand the approach
+recall that a vector, $\mathbf{v}$ is
+rotated from to a new orientation, $\mathbf{v}^{(R)}$, by multiplication by a rotation matrix:
+$\mathbf{v}^{(R)}=\mathbf{g}\mathbf{v}$, where the rotation matrix, $\mathbf{g}$, is a
+$3 \times 3$ orthogonal matrix with determinant 1 and elements that represent the cosines of
+angles of the rotation. This transformation be also be written element-wise as:
+$v_i^{(R)}$ = $g_{ij}v_j$ (with an implicit summation over $j=1,3$). This formula
+can be extended for higher order Cartesian tensors. For example, the second order
+stress tensor is rotated: $\sigma_{ij}^{(R)}$ = $g_{ik}g_{jl}\sigma_{kl}$ (with two
+implicit summations) and the elastic stiffness tensor rotated:
+$C_{ijkl}^{(R)}$ = $g_{im}g_{jn}g_{kp}g_{lq}C_{mnpq}$ (with four summations and avoiding Voigt
+notation). For second
+order tensors the transformation can also be written in the form of matrix multiplication by the
+rotation matrix and its transpose: $\mathbf{\sigma}^{(R)} = \mathbf{g} \mathbf{\sigma} \mathbf{g}^{T}$,
+but this shortcut is not available for higher order tensors. However,
+it is possible (in fact, highly desirable for performance reasons) to perform rotations on
+elastic constants in Voigt form without requiring to transform to the $3\times3\times3\times3$
+tensor form. In order to do this we use the basis change formula from
+Bower (2009; Section 3.2.11):</p></div>
+<div class="paragraph"><p>$
+\mathrm{C}^{(R)}=\mathrm{K}\,\mathrm{C}\,\mathrm{K}^T
+$</p></div>
+<div class="paragraph"><p>where $\mathrm{C}^{(R)}$ is the rotated version of $\mathrm{C}$. In this equation
+$\mathrm{K}$ is a $6\times6$ matrix derived from combinations of the normal
+is its matrix transpose.</p></div>
+<div class="paragraph"><p>MS_axes also rotates an
+input matrix but by an amount designed to allow the anisotropic nature of the
+matrix to be analysed. Such analysis makes use of two other functions,
+MS_decomp and MS_norms. Taken together, these three
+functions allow the symmetry of elasticity matrices to be expressed following
+the approach of Browaeys and Chevrot (2004). Example of this approach are
+provided elsewhere in the documentation.</p></div>
+<div class="paragraph"><p>Another type of manipulation concerns the
+averaging of elastic constants. In many fields we do not deal with
+single crystals. We need, therefore, a method of estimating
+the aggregate elastic properties of a polycrystalline material containing a range of crystal types
+and orientations. While much more rigorous treatments exist
+for many purposes simple
+averaging schemes suffice. These either assume constant strain (Voigt averaging)
+or stress (Reuss averaging) throughout the sample, and essentially amount to taking
+the arithmetic average of each element of the stiffness or compliance tensor, respectively. These two
+values place an upper (Voigt) and lower (Reuss) bound on the true value. It was
+observed by Hill (1952) that experimental values were often close to the
+average of these two bounds, a value which has become known as the
+Voigt-Reuss-Hill (VRH) average:</p></div>
+<div class="paragraph"><p>$
+C^{\mathrm{VRH}}=\frac{1}{2}\left(C^{\mathrm{Voigt}}+C^{\mathrm{Reuss}}\right)
+$</p></div>
+<div class="paragraph"><p>where</p></div>
+<div class="paragraph"><p>$
+C^{\mathrm{Voigt}}=\sum_{i=1}^{N}{v_iC_i}\;\;\;
+\mathrm{and}\;\;\;C^{\mathrm{Reuss}}=\left(\sum_{i=1}^{N}{v_iS_i}\right)^{-1}.
+$</p></div>
+<div class="paragraph"><p>Here, $v_i$ are the volume fractions of the $N$ individual components, with
+associated elasticities ($C_i$) and compliances ($S_i$). This is very commonly
+employed.
+It should be noted that it is an empirical relation with
+no strict theoretical foundation, albeit a useful one.
+MS_VRH calculates the Voigt, Reuss, and
+Voigt-Reuss-Hill average elasticity of an aggregate of materials,
+each described by their own elasticity matrix and volume fraction, while
+MS_polyaverage takes this averaging one step further and estimates the
+isotopic elasticity matrix if the components are randomly oriented.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 2. MSAT Manipulation / transformation</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_VRH.html">MS_VRH</a></p></td>
+<td align="left" valign="top"><p class="table">N phase Voigt-Reuss-Hill average of elasticity.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_axes.html">MS_axes</a></p></td>
+<td align="left" valign="top"><p class="table">Reorient elasticity matrix for optimal decomposition.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_decomp.html">MS_decomp</a></p></td>
+<td align="left" valign="top"><p class="table">Browaeys and Chevrot decomposition of the elasticity matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_interpolate.html">MS_interpolate</a></p></td>
+<td align="left" valign="top"><p class="table">Symmetry preserving elasticity interpolation</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_polyaverage.html">MS_polyaverage</a></p></td>
+<td align="left" valign="top"><p class="table">Isotropic elasticity for polycrystal</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rot3.html">MS_rot3</a></p></td>
+<td align="left" valign="top"><p class="table">Elasticity matrix rotation.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotEuler.html">MS_rotEuler</a></p></td>
+<td align="left" valign="top"><p class="table">Rotate an elasticity matrix using Bunge&#8217;s Euler angles.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotR.html">MS_rotR</a></p></td>
+<td align="left" valign="top"><p class="table">Script to rotate a set of elastic constants by a rotation matrix</p></td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="sect2">
-<h3 id="_analysis">Analysis</h3>
-<div class="paragraph"><p>As well as transformations, MSAT provides routines for analysing various aspects of stiffness tensors. For example, <a href="funcs/MS_anisotropy.html">MS_anisotropy</a> calculates a variety of simple measures of the anisotropy of an input elastic tensor:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; C = MS_elasticDB('Albite') ;
-&gt;&gt; uA = MS_anisotropy(C)
-
-uA =
-
-    2.0694</tt></pre>
-</div></div>
-<div class="paragraph"><p>where <strong>uA</strong> is the Universal Elastic Anisotropy Index of Ranganathan and Ostoja-Starzewski (<a href="http://dx.doi.org/10.1103/PhysRevLett.101.055504">2008</a>).</p></div>
 </div>
-<div class="sect2">
-<h3 id="_visualisation">Visualisation</h3>
-<div class="paragraph"><p>Finally, MSAT can be used to create various kinds of visualisations of elasticity matrices. For example:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; [C,rh] = MS_elasticDB('Albite') ;
-&gt;&gt; MS_sphere(C,rh,'S')</tt></pre>
-</div></div>
-<div class="paragraph"><p>produces:</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="albite.png" alt="albite" />
-</span></p></div>
-<div class="paragraph"><p>which shows the variation of shear-wave anisotropy (and fast-shear wave orientation) for single crystal albite.</p></div>
 </div>
-<div class="sect2">
-<h3 id="_more_help">More help</h3>
-<div class="paragraph"><p>A more in-depth guide to MSAT is provided by the  <a href="MSATguide.html">user guide</a>. Further information
-(upgrades, reporting bugs, how to install) can be found at the MSAT website (<a href="http://www1.gly.bris.ac.uk/msat">http://www1.gly.bris.ac.uk/msat</a>).</p></div>
+<div class="sect1">
+<h2 id="_the_analysis_functions">The analysis functions</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The third group of functions allow elasticity to be analysed or displayed.
+They take elasticity matrices as input arguments and either return derived
+quantities or cause graphics to be produced. Examples include MS_anisotropy,
+which implements some of the attempts to capture the degree of elastic anisotropy
+of a material as a single value and
+MS_poisson which calculates
+Poisson&#8217;s ratio for a general anisotropic material as a function of direction.</p></div>
+<div class="paragraph"><p>For seismology, one of the most important ways to analyse the anisotropic
+elasticity of a medium is in terms of seismic phase velocities.
+The propagation of motion through an elastic medium is governed
+by the elastodynamics equation:</p></div>
+<div class="paragraph"><p>$
+\rho\left(\frac{\partial^2u_i}{\partial t^2}\right) = C_{ijkl}\left(\frac{\partial^2u_l}{\partial x_jx_k}\right)
+$</p></div>
+<div class="paragraph"><p>where $\rho$ is the density, $u_i$ is the displacement, $x_j$ is position
+and $t$ is time. By substituting into this the displacement associated with a
+monochromatic plane wave as a function of time, we obtain the well-known
+Christoffel equation:</p></div>
+<div class="paragraph"><p>$
+\left(C_{ijkl}n_jn_l-\rho V^2\delta_{ik}\right)p_{k}=0
+$</p></div>
+<div class="paragraph"><p>where $n_j$ is the propagation unit vector, $V$ are the phase velocities, $p_k$ are
+the polarisation unit vectors and $\delta_{ik}$ is the Kronecker delta function.
+Solutions to this equation for a given direction ($n_j$) yield the three orthogonal
+waves with different phase velocities. One of these will be close to the wavefront
+normal (designated quasi-P or qP) and two will be near perpendicular (quasi-S1,
+quasi-S2; qS1 and qS2). In practice the quasi- prefix is often omitted. The reader
+is directed to Mainprice (2007) for a more complete treatment of the subject.
+MSAT follows the methodology of Mainprice (1990) to calculate phase
+velocities and this is implemented in  MS_phasevels.
+The function accepts a (set of) propagation direction(s) and returns the three seismic phase velocities
+along with their polarisations. This function is used by MS_plot and MS_sphere,
+which plot the resulting seismic anisotropy on a pole figures and a three-dimensional
+spherical representation, respectively.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 3. MSAT Analysis</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_anisotropy.html">MS_anisotropy</a></p></td>
+<td align="left" valign="top"><p class="table">Simple measures of anisotropy</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_phasevels.html">MS_phasevels</a></p></td>
+<td align="left" valign="top"><p class="table">Wave velocities in anisotropic media.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_plot.html">MS_plot</a></p></td>
+<td align="left" valign="top"><p class="table">Plot phasevels/anisotropy on pole figures.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_poisson.html">MS_poisson</a></p></td>
+<td align="left" valign="top"><p class="table">Poisson&#8217;s ratio in anisotropic media.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_norms.html">MS_norms</a></p></td>
+<td align="left" valign="top"><p class="table">Browaeys and Chevrot analysis of the elasticity matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_sphere.html">MS_sphere</a></p></td>
+<td align="left" valign="top"><p class="table">Plot a spherical plot of phasevels/anisotropy from a set of elastic constants.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_effective_spltting_N.html">MS_effective_splitting_N</a></p></td>
+<td align="left" valign="top"><p class="table">N-layer effective splitting operator calculation</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_other_functions">Other functions</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Finally, range of misellaneous and utility functions are provided to, for example, convert between different ways of representing elasticity or check that
+a particular Matlab array is a valid elasticity matrix.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="80%"
+frame="hsides"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 4. MSAT Miscellaneous / utility</caption>
+<col width="23%" />
+<col width="76%" />
+<thead>
+<tr>
+<th align="left" valign="top">Function</th>
+<th align="left" valign="top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_Vrot3.html">MS_Vrot3</a></p></td>
+<td align="left" valign="top"><p class="table">Rotate a (set of) 3-vector(s) by 3 angles.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_cij2cijkl.html">MS_cij2cijkl</a></p></td>
+<td align="left" valign="top"><p class="table">Convert from Voigt elasticity matrix to tensor</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_cijkl2cij.html">MS_cijkl2cij</a></p></td>
+<td align="left" valign="top"><p class="table">Convert from elastic tensor to Voigt elasticity matrix</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_list.html">MS_list</a></p></td>
+<td align="left" valign="top"><p class="table">Print elasticity matrix (in <em>list</em> format)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotM.html">MS_rotM</a></p></td>
+<td align="left" valign="top"><p class="table">Create a cartesian rotation matrix.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_unwind_pm_90.html">MS_unwind_pm_90</a></p></td>
+<td align="left" valign="top"><p class="table">Unwind an angle until it is between 0 and 360 degrees</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_checkC.html">MS_checkC</a></p></td>
+<td align="left" valign="top"><p class="table">Check consistency of a stiffness matrix against various criteria</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><a href="funcs/MS_info.html">MS_info</a></p></td>
+<td align="left" valign="top"><p class="table">Information about an elasticity matrix.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -2086,7 +2335,7 @@ uA =
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-12-30 15:47:42 GMT
+Last updated 2012-04-09 12:12:18 BST
 </div>
 </div>
 </body>

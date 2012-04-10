@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.5" />
-<title></title>
+<title>Matlab Seismic Anisotropy Toolkit – development tips</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -712,69 +712,37 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
+<h1>Matlab Seismic Anisotropy Toolkit – development tips</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_ms_vti2">MS_VTI2</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre><tt>MS_VTI2 - generate elastic constants for a vertically transverse isotropic
-            medium from xi, phi, eta parameters. Symmetry is in the 3-axis.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>[C]=MS_VTI2(vp,vs,rh,xi,phi,eta)</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Inputs:
-    rh  : Density (kg/m2)
-    vp  : km/s (isotropic average)
-    vs  : km/s (isotropic average)
-    xi, phi, eta : Dimensionless anisotropy parameters</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Output:
-     C : Stiffness tensor (6x6 notation, GPa)</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Calculates the elastic tensor for a hexagonal (aka VTI) medium from
-average Vp and Vs, and anisotropic parameters xi, phi and eta.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See, for example, Panning and Romanowicz (2006) for a definition of the
-parameters.</tt></pre>
-</div></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Note: this is wrapper for MS_TI, provided for back-compatibility. **
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>References:
-  Mark Panning and Barbara Romanowicz (2006) A three-dimensional radially
-     anisotropic model of shear velocity in the whole mantle. Geophysical
-     Journal International v167, 361–379.
-     doi: 10.1111/j.1365-246X.2006.03100.x</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See also: MS_TI, MS_VTI, MS_iso, MS_elasticDB</tt></pre>
-</div></div>
-</li>
-</ul></div>
+<div class="paragraph"><p>Beyond an installed and working version of Matlab, the use of MSAT depends on no other software. However, there are a number of useful tools  which developers intending to modify the code are encouraged to utilise. While we are always happy to receive reports of defects or suggestions for future developments, the results of direct modification to the MSAT code base can result in much more rapid integration to the distributed version. Such changes can be communicated by way of modified or additional files attached to an email but the easer it is to read and incorporate changes the quicker the changes can be made. The information below should help make this painless.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_contributing_code">Contributing code</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>We make use of <a href="http://git-scm.com/">git</a>, a fast distributed version control system, to manage the development of MSAT. Using this tool will make it easer for us to review, merge and distribute changes to code. We also make use of hosting provided by <a href="https://github.com/andreww/MSAT">github</a> and, to minimize friction, developers should "fork" the source code on github then use the "pull request" tool to enable new code to be merged.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_documentation">Documentation</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Functions should be documented in a comment block at the start of each Matlab file; see MS_template.m (in the distributed doc_src directory). This documentation block is presented by the Matlab help() built-in function. In order to simplify the generation of html documentation for viewing using the Matlab help browser or on the web the link: <a href="http://www.methods.co.nz/asciidoc/">asciidoc</a> processing system is used. Developers may want to install the asciidoc software in order to re-generate the documentation but this is not essential. Other items of documentation, and the machinery used to re-generation of the html files, are found in the doc_src directory.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_testing">Testing</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>MSAT is distributed with a large number of test cases. These are run using the link: <a href="http://www.mathworks.com/matlabcentral/fileexchange/22846-matlab-xunit-test-framework">xUnit test framework</a>. This must be installed and present in the Matlab path for the tests to be run. Once this is done the tests can be run from within Matlab by navigating to the tests subdirectory and executing the "runtests" command. Tests for new functions (and new tests for existing functions) should be added to this directory.</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-10 14:40:45 BST
+Last updated 2012-04-09 18:18:23 BST
 </div>
 </div>
 </body>

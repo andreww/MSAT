@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.5" />
-<title></title>
+<title>Example 2: Analysis of single crystal elasticity</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -712,69 +712,85 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
+<h1>Example 2: Analysis of single crystal elasticity</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_ms_vti2">MS_VTI2</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="literalblock">
+<div class="paragraph"><p>This example shows how MSAT can be used to perform analysis of single
+crystal elasticity data.
+The source code for this
+example are contained in the file
+diopside_example.m in the examples/diopside
+directory distributed with MSAT. This
+directory also contains the data file needed to run the example.
+In this case the data is taken from calculations
+using density functional theory stored in the file diopside_P.txt - see
+<a href="http://dx.doi.org/10.1016/j.pepi.2011.10.002">Walker 2012</a>. From this data the
+the properties of an aggregate, along with some measures of anisotropy
+are calculated and the anisotropy plotted as a function of wave
+propogation direction.</p></div>
+<div class="paragraph"><p>The first task is to load the input data (1D arrays of pressure, <tt>P</tt>,
+and density, <tt>r</tt>, and a 3D size 6x6xn array of elasticity matrices).
+Note that MS_load_list allows multiple sets of elasticity data
+(in thes case, each representing a different pressure point) to
+be loaded in one go:</p></div>
+<div class="listingblock">
 <div class="content">
-<pre><tt>MS_VTI2 - generate elastic constants for a vertically transverse isotropic
-            medium from xi, phi, eta parameters. Symmetry is in the 3-axis.</tt></pre>
+<pre><tt>[P, C, r] = MS_load_list('diopside_P.txt');</tt></pre>
 </div></div>
-<div class="literalblock">
+<div class="paragraph"><p>The remaining part of the example involves looping over the
+data and performing analysis for each pressure point.</p></div>
+<div class="paragraph"><p>First, <tt>MS_anisotropy</tt> is used to calculate
+various measures of the "strength" of the anisotropy
+exhibited by the elasticity matrix at this pressure.</p></div>
+<div class="listingblock">
 <div class="content">
-<pre><tt>[C]=MS_VTI2(vp,vs,rh,xi,phi,eta)</tt></pre>
+<pre><tt><strong>for</strong> i = 1:length(P)
+
+    % Calculate anisotropy index
+    [ uA, lmA ] = MS_anisotropy( C(:,:,i) );</tt></pre>
 </div></div>
-<div class="literalblock">
+<div class="paragraph"><p>The second step is to build the elasticity matrix
+representing an isotropic rock made up of pure
+diopside at the pressure point and use this to
+calculate the P and S wave velocities:</p></div>
+<div class="listingblock">
 <div class="content">
-<pre><tt>Inputs:
-    rh  : Density (kg/m2)
-    vp  : km/s (isotropic average)
-    vs  : km/s (isotropic average)
-    xi, phi, eta : Dimensionless anisotropy parameters</tt></pre>
+<pre><tt>    % Calculate isotropic elasticity
+    [ K_vrh, G_vrh ] = MS_polyaverage( C(:,:,i) );
+
+    % Get isotropic phase velocities
+    Ciso = MS_build_isotropic('lam', G_vrh, 'K', K_vrh);
+    [ ~, ~, VSiso, ~, VPiso ] = MS_phasevels( Ciso, r(i), 0.0, 0.0 );</tt></pre>
 </div></div>
-<div class="literalblock">
+<div class="paragraph"><p>The third step is to calculate the fast and slow S wave velocities
+and from this the expected delay time (splitting magnitude) for
+a 10 km thick layer of fully aligned diopside:</p></div>
+<div class="listingblock">
 <div class="content">
-<pre><tt>Output:
-     C : Stiffness tensor (6x6 notation, GPa)</tt></pre>
+<pre><tt>    % Calculate splitting <strong>for</strong> [010] direction (10km layer)
+    % This <strong>is</strong> along the y axis.
+    [ ~, aVS, VS1, VS2, ~ ] = MS_phasevels( C(:,:,i), r(i), 0.0, 90.0 );
+    dt = (10/VS2 - 10/VS1);</tt></pre>
 </div></div>
-<div class="literalblock">
+<div class="paragraph"><p>The final step is to produce a set of pole figures showing the
+seismic anisotropy at the pressure represented by this
+loop iteration.</p></div>
+<div class="listingblock">
 <div class="content">
-<pre><tt>Calculates the elastic tensor for a hexagonal (aka VTI) medium from
-average Vp and Vs, and anisotropic parameters xi, phi and eta.</tt></pre>
+<pre><tt>    % Plot polefigs
+    title = sprintf('Diopside seismic anisotropy at %2.1f GPa', P(i));
+    MS_plot(C(:,:,i),r(i), 'wtitle', title, 'fontsize', 10, 'quiet');
+end</tt></pre>
 </div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See, for example, Panning and Romanowicz (2006) for a definition of the
-parameters.</tt></pre>
-</div></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Note: this is wrapper for MS_TI, provided for back-compatibility. **
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>References:
-  Mark Panning and Barbara Romanowicz (2006) A three-dimensional radially
-     anisotropic model of shear velocity in the whole mantle. Geophysical
-     Journal International v167, 361–379.
-     doi: 10.1111/j.1365-246X.2006.03100.x</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See also: MS_TI, MS_VTI, MS_iso, MS_elasticDB</tt></pre>
-</div></div>
-</li>
-</ul></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-10 14:40:45 BST
+Last updated 2012-04-10 13:14:25 BST
 </div>
 </div>
 </body>

@@ -715,16 +715,52 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_vti2">MS_VTI2</h2>
+<h2 id="_ms_ti">MS_TI</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_VTI2 - generate elastic constants for a vertically transverse isotropic
-            medium from xi, phi, eta parameters. Symmetry is in the 3-axis.</tt></pre>
+<pre><tt>MS_TI - generate elastic constants for a vertically transverse isotropic
+            medium from specified parameter sets. Symmetry is in the 3-axis.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[C]=MS_VTI2(vp,vs,rh,xi,phi,eta)</tt></pre>
+<pre><tt>[C]=MS_TI( list_of_parameters , parameter_set_string )</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>where parameter_set_string defines the set which precede it:</tt></pre>
+</div></div>
+<div class="sect2">
+<h3 id="_em_thomsen_em_default"><em>thomsen</em> (default)</h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[C]=MS_TI(vp,vs,rh,eps,gam,del) -or-
+[C]=MS_TI(vp,vs,rh,eps,gam,del,'thomsen')</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Inputs:
+    rh  : Density (kg/m2)
+    vp  : km/s (vertical)
+    vs  : km/s (vertical)
+    eps, gam, del : Dimensionless</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Output:
+     C : Stiffness tensor (6x6 notation, GPa)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Given Thomsen (1986) parameters for a weakly anisotropic VTI medium,
+return the elasticity matrix</tt></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_em_panning_em"><em>panning</em></h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[C]=MS_TI(vp,vs,rh,xi,phi,eta,'panning')</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -741,33 +777,56 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Calculates the elastic tensor for a hexagonal (aka VTI) medium from
-average Vp and Vs, and anisotropic parameters xi, phi and eta.</tt></pre>
+<pre><tt>Calculates the elastic tensor for a VTI medium from average Vp and Vs,
+and anisotropic parameters xi, phi and eta (see, e.g., Panning and
+Romanowicz, 2006)</tt></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_em_love_em"><em>love</em></h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[C]=MS_TI(A,C,L,N,F,'love')</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See, for example, Panning and Romanowicz (2006) for a definition of the
-parameters.</tt></pre>
-</div></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Note: this is wrapper for MS_TI, provided for back-compatibility. **
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>References:
-  Mark Panning and Barbara Romanowicz (2006) A three-dimensional radially
-     anisotropic model of shear velocity in the whole mantle. Geophysical
-     Journal International v167, 361–379.
-     doi: 10.1111/j.1365-246X.2006.03100.x</tt></pre>
+<pre><tt>Inputs:
+     A,C,L,N,F : Love parameters (GPa)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See also: MS_TI, MS_VTI, MS_iso, MS_elasticDB</tt></pre>
+<pre><tt>Output:
+     C : Stiffness tensor (6x6 notation, GPa)</tt></pre>
 </div></div>
-</li>
-</ul></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Calculates the elastic tensor for a VTI medium from Love (1927) parameters.</tt></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_references">References</h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Thomsen, L. (1986) "Weak elastic anisotropy" Geophysics
+    vol.51 pp.1954-1966</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Mark Panning and Barbara Romanowicz (2006) A three-dimensional radially
+   anisotropic model of shear velocity in the whole mantle. Geophysical
+   Journal International v167, 361–379.
+   doi: 10.1111/j.1365-246X.2006.03100.x</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Love, A.E.H., (1927). A Treatise on the Theory of Elasticity,
+   Cambridge Univ. Press, Cambridge.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>See also: MS_iso, MS_elasticDB</tt></pre>
+</div></div>
+</div>
 </div>
 </div>
 </div>
