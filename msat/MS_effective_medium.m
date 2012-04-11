@@ -333,6 +333,8 @@ function [CC,rh]=MS_tandon_and_weng(vp,vs,rho,vpi,vsi,rhoi,del,c)
 
    vp = vp * 1e3 ; % convert to m/s 
    vs = vs * 1e3 ; % convert to m/s
+   vpi = vpi * 1e3 ; % convert to m/s 
+   vsi = vsi * 1e3 ; % convert to m/s
 
    amu = vs*vs*rho ;
    amui = vsi*vsi*rhoi ;
