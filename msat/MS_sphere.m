@@ -13,20 +13,59 @@
 %         Mode can be 'p'(-wave), 's'(-wave), 's1' (fast s-wave) or 's2'
 %         (slow s-wave).
 %
-%     MS_sphere(CC,rh,mode,...)                    
-%          Further arguments are EVALed. Parameters that can be (re)set 
-%          are:
-%            cmap = jet(64) ; % colourmap
-%            icmapflip = 1 ; % reverse the sense of the colourscale     
-%            FSWTickLength=0.08 ; % Fast shear wave vector length
-%            plotlabels = 1 ;
-%            plotaxes = 1 ;
-%            nofig = 0 ; % suppress the figure command, so plot can be sub-plotted
-%            nocbar = 0 ; % suppress the colorbar
-%            cax = NaN ; % colour axis, define to use - default is auto
-%            dirs = [] ;  % directions of interest, this should be a vector of azi, 
-%                           inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4]
-%            dlen = 1.5 ; % length of doi vectors 
+%     MS_sphere(CC,rh,mode,...) 
+%          Further arguments are optional, can be combined in any order and
+%          change the behaviour of the function. Specific options are
+%          listed below.
+%
+%     MS_sphere(..., 'reverse')
+%          Reverse the sense of the colour map.
+%
+%     MS_sphere(..., 'FSWTickLength', length)
+%          Set the length of the Fast shear wave direction markers, default
+%          is 0.08.
+%
+%     MS_sphere(..., 'FSWMarkerSize', length)
+%          Set the size of the Fast shear wave direction markers, default
+%          is 4.
+%
+%     MS_sphere(..., 'cmap', CM)                    
+%          Redefine the colormap. CM can either be a (nx3) matrix containing a 
+%          colormap, or a string describing a function to generate such a 
+%          matrix (such as the built-in MATLAB colormap functions). E.g.:
+%          MS_sphere(C,rh,mode,'cmap','cool(64)') - uses the MATLAB 
+%          function cool to generate a cyan-to-purple colourmap.
+%          The default is 'jet', reversed so blue is fast/high, as is 
+%          conventional for seismic velocity colorscales. 
+%
+%     MS_sphere(..., 'velmesh', levels)
+%          Choose the number of points used to mesh the velocity contours
+%          expressed in terms of the number of times the mesh spacing is 
+%          halved. Default is 3.
+%
+%     MS_sphere(..., 'polmesh', levels)
+%          Choose the number of points used to mesh the fast shear wave 
+%          markers. Expressed in terms of the number of times the mesh spacing is 
+%          halved. Default is 2.
+%
+%     MS_sphere(..., 'dirs', array)
+%          Directions of interest, this should be a vector of azi, 
+%          inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4].
+%
+%     MS_sphere(..., 'dlen', lenght)
+%          Set length of doi vectors. Default is 1.5
+%
+%     MS_sphere(..., 'nolabels')
+%          Supress printing of the text labels.
+%
+%     MS_sphere(..., 'noaxes')
+%          Supress printing of the direction axes.
+%
+%     MS_sphere(..., 'nocbar')
+%          Supress printing of the colour bar.
+%
+%     MS_sphere(..., 'nofig')
+%          Suppress the figure command, so plot can be sub-plotted.
 %
 % See also: MS_SPHERE, MS_PHASEVELS
 
@@ -87,6 +126,56 @@ velmesh = 3;
 polmesh = 2;
 cax = NaN ; % define to use
 
+%  ** process the optional arguments
+      iarg = 1 ;
+      while iarg <= (length(varargin))
+         switch lower(varargin{iarg})
+            case 'reverse'
+               icmapflip = 1 ;
+               iarg = iarg + 1 ;
+            case 'fswticklength'
+               FSWTickLength = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'fswmarkersize'
+               FSWMarkerSize = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'dirs'
+               dirs = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'dlen'
+               dlen = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'velmesh'
+               velmesh = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'polmesh'
+               polmesh = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'nolabels'
+               plotlabels = 0 ;
+               iarg = iarg + 1 ;
+            case 'noaxes'
+               plotaxes = 0 ;
+               iarg = iarg + 1 ;
+            case 'nofig'
+               nofig = 0 ;
+               iarg = iarg + 1 ;
+            case 'nocbar'
+               nocbar = 0 ;
+               iarg = iarg + 1 ;
+            case 'cmap'
+               cmarg = varargin{iarg+1} ;
+               if isstr(cmarg)
+                  eval(['cmap = ' cmarg ';']) ;
+               else
+                  cmap = cmarg ;
+               end
+               iarg = iarg + 2 ;
+            otherwise 
+               error(['Unknown option: ' varargin{iarg}]) ;   
+         end   
+      end 
+
 % check the inputs: CC
 assert(MS_checkC(CC)==1, 'MS:SPHERE:badC', 'MS_checkC error MS_sphere') ;
 
@@ -107,12 +196,7 @@ if ischar(mode)
 else
    error('MS:SPHERE:badmode', ...
        'Mode must be ''S''(-wave) or ''P''(-wave) ')
-end     
-
-% process the optional arguments, these are EVAL'ed in turn
-for i=1:length(varargin) 
-   eval(varargin{i}) ; 
-end    
+end      
 
 % check input pars
 if mod(length(dirs),2)~=0
