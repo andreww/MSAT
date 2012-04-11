@@ -3,7 +3,7 @@
 <!-- First tocitem specifies top level in Help browser Contents pane -->
 <!-- This can be a roadmap page, as shown below, or a content page -->
 
-    <tocitem target="text.html">MyToolbox Toolbox
+    <tocitem target="text.html">Matlab Seismic Anisotropy Toolkit
         <!-- Nest tocitems to create hierarchical entries in  Contents-->
         <!-- To include icons, use the following syntax for tocitems: -->
         <!-- <tocitem target="foo.html" image="HelpIcon.NAME"> -->
@@ -15,9 +15,22 @@
         <!-- matlabroot/toolbox/matlab/icons -->
         <!-- A Getting Started Guide usually comes first -->
         <tocitem target="MSATstart.html" image="$toolbox/matlab/icons/greenarrowicon.gif">Getting Started</tocitem>
-        <tocitem target="MSATguide.html" image="$toolbox/matlab/icons/greenarrowicon.gif">User Guide</tocitem>
+        <tocitem target="MSATguide.html" image="$toolbox/matlab/icons/bookicon.gif">User Guide
+            <tocitem target="MSATfunctions.html" image="$toolbox/matlab/icons/bookicon.gif">Functions and theory</tocitem>
+            <tocitem target="MSATdevelop.html" image="$toolbox/matlab/icons/bookicon.gif">Development tips</tocitem>
+            <tocitem target="MSATreadme.html" image="$toolbox/matlab/icons/bookicon.gif">Installation and licensing</tocitem>
+        </tocitem>
+        <tocitem target="./examples/index.html" image="$toolbox/matlab/icons/demoicon.gif">examples
+            <tocitem target="./examples/loading_examples.html" image="$toolbox/matlab/icons/demoicon.gif">Example 1: Loading data</tocitem>
+            <tocitem target="./examples/diopside_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 2: Analysis of single crystal elasticity</tocitem>
+            <tocitem target="./examples/texture_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 3: Texture analysis and MTEX</tocitem>
+            <tocitem target="./examples/lmm_anisotropy_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 4: Lowermost mantle anisotropy</tocitem>
+            <tocitem target="./examples/split_model_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 5: modelling shear-wave splitting variation with backazimuth</tocitem>
+        </tocitem>
+        <tocitem target="MSATrelease_notes.html" image="$toolbox/matlab/icons/notesicon.gif">Release notes</tocitem>
 	<tocitem target="./funcs/index.html" image="$toolbox/matlab/icons/help_fx.png">Functions 
 
+        <tocitem target="./funcs/MS_TI.html" image="$toolbox/matlab/icons/help_fx.png">MS_TI</tocitem>
         <tocitem target="./funcs/MS_VRH.html" image="$toolbox/matlab/icons/help_fx.png">MS_VRH</tocitem>
         <tocitem target="./funcs/MS_VTI.html" image="$toolbox/matlab/icons/help_fx.png">MS_VTI</tocitem>
         <tocitem target="./funcs/MS_VTI2.html" image="$toolbox/matlab/icons/help_fx.png">MS_VTI2</tocitem>

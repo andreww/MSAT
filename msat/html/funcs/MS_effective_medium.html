@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.5" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -179,7 +179,7 @@ div.quoteblock, div.verseblock {
   margin-left: 1.0em;
   margin-right: 10%;
   border-left: 5px solid #f0f0f0;
-  color: #888;
+  color: #777777;
 }
 
 div.quoteblock > div.attribution {
@@ -514,29 +514,6 @@ th.tableblock.valign-middle, td.tableblock.valign-middle {
 th.tableblock.valign-bottom, td.tableblock.valign-bottom {
   vertical-align: bottom;
 }
-
-
-/*
- * manpage specific
- *
- * */
-
-body.manpage h1 {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  border-top: 2px solid silver;
-  border-bottom: 2px solid silver;
-}
-body.manpage h2 {
-  border-style: none;
-}
-body.manpage div.sectionbody {
-  margin-left: 3em;
-}
-
-@media print {
-  body.manpage div#toc { display: none; }
-}
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -610,7 +587,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName == 'DIV'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +633,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'DIV' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -755,13 +732,13 @@ arguments depend on the theory invoked.</tt></pre>
 <div class="content">
 <pre><tt>Currently available theories:</tt></pre>
 </div></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Tandon and Weng, 84 (<em>tandon</em> or <em>t&amp;w</em>)
-     (Isotropic host matrix with unidirectionally aligned isotropic spheroid
-      inclusions)
-</p>
+<div class="sect2">
+<h3 id="_tandon_and_weng_84_em_tandon_em_or_em_t_amp_w_em_spheroids">Tandon and Weng, 84 (<em>tandon</em> or <em>t&amp;w</em>) Spheroids</h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>(Isotropic host matrix with unidirectionally aligned isotropic spheroid
+ inclusions)</tt></pre>
+</div></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>[Ceff,rh]=MS_effective_medium('t&amp;w',vpm,vsm,rhm,vpi,vsi,rhi,del,f) or
@@ -792,26 +769,104 @@ Tandon and Weng, 84 (<em>tandon</em> or <em>t&amp;w</em>)
    Ceff : Elastic constants (GPa) (symmetry in X1 direction)
    rh : aggregate density (kg/m3)</tt></pre>
 </div></div>
+</div>
+<div class="sect2">
+<h3 id="_hudson_1980_1981_em_hudson_em_or_em_crack_em_cracks">Hudson, 1980, 1981 (<em>hudson</em> or <em>crack</em>) Cracks</h3>
 <div class="literalblock">
 <div class="content">
-<pre><tt> References:
-- Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the
-  Elastic Properties of Unidirectionally Aligned Composites. Polymer
-  Composites, 5, pp 327-333, 1984.</tt></pre>
+<pre><tt>[Ceff,rh]=MS_effective_medium('hudson',vpm,vsm,rhm,vpc,vsc,rhc,ar,cd) or
+   Input parameters:
+      vpm,vsm,rhm : isotropic parameters of the matrix (km/s, kg/m3)
+               ar : aspect ratio of cracks
+               cd : crack density
+   vpc, vsc, rhc : isotropic parameters of the fill material</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[Ceff,rh]=MS_effective_medium('hudson',Cm,rhm,Ci,rhi,ar,cd) or
+   Input parameters:
+        Cm,rh : elasticity and density of the matrix (GPa, kg/m3)
+               ar : aspect ratio of cracks
+               cd : crack density
+    Cc, rhc : isotropic parameters of the fill material</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Output parameters:
+   Ceff : Elastic constants (GPa) (symmetry in X1 direction)
+   rh : aggregate density (kg/m3)</tt></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_backus_1962_em_backus_em_stack_of_thin_horizontal_layers">Backus, 1962 (<em>backus</em>) stack of thin horizontal layers</h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[Ceff,rh]=MS_effective_medium('backus',thickness,vp,vs,rh) or
+   Input parameters:
+        thickness : layer thicknesses (vector)
+         vp,vs,rh : isotropic parameters of the layers (km/s, kg/m3) (vector)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Output parameters:
+   Ceff : Elastic constants (GPa) (symmetry in X1 direction)
+   rh : aggregate density (kg/m3)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[Ceff,rh]=MS_effective_medium('backus',thickness,C,rh) or
+   Input parameters:
+        thickness : layer thicknesses (vector)
+                C : elasticity of the layers (GPa) (6x6xn tensor)
+               rh : density of the layers (GPa, kg/m3) (vector)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Output parameters:
+   Ceff : Elastic constants (GPa) (symmetry in X3 direction)
+   rh : aggregate density (kg/m3)</tt></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_references">References</h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Tandon, GP and Weng, GJ. The Effect of Aspect Ratio of Inclusions on the
+     Elastic Properties of Unidirectionally Aligned Composites. Polymer
+     Composites, 5, pp 327-333, 1984.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Hudson, J. A., Overall properties of a cracked solid, Math. Proc. Camb.
+     Phil. Soc., 88, pp 371-384. 1980</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Hudson, J. A., Wave speeds and attenuation of elastic waves in material
+     containing cracks, Geophys. J. R. Astr. Soc., 64, pp 133-150. 1981</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Crampin, S. Effective anisotropic elastic constants for wave propagation
+     through cracked solids. Geophys. J. R. Astr. Soc., 76, pp 135-145, 1984</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Backus, G. E., Long-Wave Elastic Anisotropy Produced by Horizontal Layering.
+     J. Geophys. Res., pp 4427-4440</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>See also: MS_elasticDB</tt></pre>
 </div></div>
-</li>
-</ul></div>
+</div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-22 14:43:59 GMT
+Last updated 2012-04-10 14:40:45 BST
 </div>
 </div>
 </body>

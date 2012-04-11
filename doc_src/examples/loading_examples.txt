@@ -1,0 +1,88 @@
+Example 1: Loading data
+=======================
+
+This example shows how MSAT can read 
+elasticity matrices from various 
+file formats and from the built-in
+database. This is often the first
+task that must be performed by any
+application built using MSAT.
+The source code for this 
+example are contained in the file
+loading_examples.m in the examples/loading
+directory distributed with MSAT. This
+directory also contains the data files
+needed to run the example. Significant 
+parts of the code are reproduced below with
+explanation.
+
+The "default" data format is a row based 
+text file with two integers and a real 
+number in each row. Column one and two 
+contain the indices (in Voigt notation)
+of the elastic constant contained in 
+column three (in GPa). Only the constants that 
+are non-zero by symmetry must be provided
+(and only those in the upper-half of the
+elasticity matrix). The indices "7 7" 
+stand for density (in kg/m^3). This data
+format can be read as follows (with or 
+without the density, as needed):
+[code,python]
+----
+% Load a file in default format assuming file units are GPa
+fprintf('Elasticity matrix from "Olivine.txt" - default format:')
+C = MS_load('Olivine.txt') 
+% Load a file in default format assuming file units are GPa and
+% density in kg.m^-3
+fprintf('Elasticity matrix and density from "Olivine.txt":')
+[C,rh] = MS_load('Olivine.txt')
+----
+
+It is also possible to read data from a similar file
+where the elastic constants are density normalised
+(and the units of the un-normalised constants 
+must be changed):
+[code,python]
+----
+% Read density normalised elasticities, where the pre-normalised 
+% elasticities are in Pa and the density is in kg.m^-3 (i.e. units 
+% of the elasticity values in the file are m^2.s^-2). Note that 
+% unit conversion (from Pa to GPa) is performed after
+% denormalisation.
+fprintf('Elasticity matrix and density from "Olivine.Aij"')
+fprintf(' (file data is density normalised):')
+[C,rh] = MS_load('Olivine.Aij','Aij','eunit','Pa')
+----
+
+Data stored in the format used by David Mainprice's EMATRIX 
+program can also be read:
+[code,python]
+----
+% Load a file in 'ematrix' format    
+fprintf('Elasticity matrix from "Olivine.Ematrix",')
+fprintf(' file format of the ematrix program:')
+[C] = MS_load('Olivine.Ematrix','format','ematrix')
+----
+
+MS_load can "expand" the elasticity matrix if the 
+symmetry is provided (Olivine.iso has only two 
+constants, C33 and C66 - the rest of the isotropic matrix 
+is filled in by MSAT).
+[code,python]
+----
+% File with isotropic data - note symmetry handling. 
+fprintf('Elasticity matrix and density from "Olivine.iso",')
+fprintf(' this is an isotropic aggregate of olivine crystals:')
+[C,rh] = MS_load('Olivine.iso','symmetry','iso') 
+----
+
+It is often useful to read data from the built-in database
+of elastic constants:      
+[code,python]
+----
+% Use the built in database. 
+fprintf('Elasticity matrix and density from the built in database:')
+[C,rh] = MS_elasticDB('Olivine') 
+----
+
