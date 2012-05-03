@@ -1,6 +1,45 @@
 MSAT Release Notes
 ==================
 
+Version 1.0 - 11 April 2011
+---------------------------
+
+This version of MSAT completes the intended initial feature 
+set and contains more detailed documentation. There are 
+also a few bug fixes, an API change (to MS_sphere's optional 
+arguments) and a couple of new features. All users are 
+encouraged to report outstanding bugs and request missing 
+features. Major changes from version 0.9 include:
+
+* The way MS_sphere handles optional 
+arguments has been made consistent with
+the rest of the code.
+
+* The MSAT reference guide has been written
+along with documentation on the various examples.
+These release notes now form part of the documentation
+available within the Matlab environment.
+
+* A new function, MS_TI, has been written to bring together 
+the various ways of creating a elasticity matrix with
+transverse isotropy from the various representations. MS_VTI 
+and MS_VTI2 now act as aliases to this function. Love’s 
+parameterisation has been added.
+
+* Added new effective medium theories (for aligned cracks and 
+thin layering) to MS_effective medium. Fixed a bug in the 
+ellipsoidal inclusions case where the material parameters were 
+provided as velocities rather than elasticity matrices.
+
+* MS_phasevels has been made ~50% faster when called with 
+a very large number of directions. The function also rejects 
+invalid elasticity matrices (which, for example, can yield 
+imaginary velocities).
+
+Thanks to Alan Baird (Bristol) and Alex 
+Cote (UCL) for reporting bugs in and 
+suggesting improvements to version 0.9. 
+
 Version 0.9 - 24 November 2011
 ------------------------------
 

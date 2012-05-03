@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.5" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -179,7 +179,7 @@ div.quoteblock, div.verseblock {
   margin-left: 1.0em;
   margin-right: 10%;
   border-left: 5px solid #f0f0f0;
-  color: #777777;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -514,6 +514,29 @@ th.tableblock.valign-middle, td.tableblock.valign-middle {
 th.tableblock.valign-bottom, td.tableblock.valign-bottom {
   vertical-align: bottom;
 }
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -587,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'DIV'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -633,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'DIV' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -741,19 +764,82 @@ asciidoc.install();
 <div class="literalblock">
 <div class="content">
 <pre><tt>MS_sphere(CC,rh,mode,...)
-     Further arguments are EVALed. Parameters that can be (re)set
-     are:
-       cmap = jet(64) ; colourmap
-       icmapflip = 1 ; reverse the sense of the colourscale
-       FSWTickLength=0.08 ; Fast shear wave vector length
-       plotlabels = 1 ;
-       plotaxes = 1 ;
-       nofig = 0 ; suppress the figure command, so plot can be sub-plotted
-       nocbar = 0 ; suppress the colorbar
-       cax = NaN ; colour axis, define to use - default is auto
-       dirs = [] ; directions of interest, this should be a vector of azi,
-                      inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4]
-       dlen = 1.5 ; length of doi vectors</tt></pre>
+     Further arguments are optional, can be combined in any order and
+     change the behaviour of the function. Specific options are
+     listed below.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'reverse')
+     Reverse the sense of the colour map.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'FSWTickLength', length)
+     Set the length of the Fast shear wave direction markers, default
+     is 0.08.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'FSWMarkerSize', length)
+     Set the size of the Fast shear wave direction markers, default
+     is 4.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'cmap', CM)
+     Redefine the colormap. CM can either be a (nx3) matrix containing a
+     colormap, or a string describing a function to generate such a
+     matrix (such as the built-in MATLAB colormap functions). E.g.:
+     MS_sphere(C,rh,mode,'cmap','cool(64)') - uses the MATLAB
+     function cool to generate a cyan-to-purple colourmap.
+     The default is 'jet', reversed so blue is fast/high, as is
+     conventional for seismic velocity colorscales.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'velmesh', levels)
+     Choose the number of points used to mesh the velocity contours
+     expressed in terms of the number of times the mesh spacing is
+     halved. Default is 3.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'polmesh', levels)
+     Choose the number of points used to mesh the fast shear wave
+     markers. Expressed in terms of the number of times the mesh spacing is
+     halved. Default is 2.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'dirs', array)
+     Directions of interest, this should be a vector of azi,
+     inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4].</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'dlen', lenght)
+     Set length of doi vectors. Default is 1.5</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'nolabels')
+     Supress printing of the text labels.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'noaxes')
+     Supress printing of the direction axes.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'nocbar')
+     Supress printing of the colour bar.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'nofig')
+     Suppress the figure command, so plot can be sub-plotted.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -765,7 +851,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-10 14:40:45 BST
+Last updated 2012-04-11 13:32:00 BST
 </div>
 </div>
 </body>
