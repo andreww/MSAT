@@ -126,6 +126,14 @@ velmesh = 3;
 polmesh = 2;
 cax = NaN ; % define to use
 
+% Changing defaults for case of slowness surfaces before the optional arguments are processed
+if ischar(mode)
+   if sum(strcmpi({'slows1'},mode))==1
+	   cmap=copper ;
+	   icmapflip = 1 ; % reverse the sense of the colourscale
+   end
+end  
+
 %  ** process the optional arguments
       iarg = 1 ;
       while iarg <= (length(varargin))
@@ -189,7 +197,7 @@ else
 end
 
 if ischar(mode)
-   if sum(strcmpi({'p','s', 's1', 's2'},mode))~=1
+   if sum(strcmpi({'p','s', 's1', 's2', 'slows1'},mode))~=1
       error('MS:SPHERE:badmode', ...
           'Mode must be ''S''(-wave), ''S1'', ''S2'', or ''P''(-wave) ')
    end
@@ -229,6 +237,13 @@ elseif strcmpi(mode,'s1')
    trisurf(faces,x,y,z,vs1) ;
 elseif strcmpi(mode,'s2')
    trisurf(faces,x,y,z,vs2) ;
+elseif strcmpi(mode, 'slows1')
+    slowness = 1./vs1;
+    nslow = slowness./max(slowness);
+    xslow = x .* nslow;
+    yslow = y .* nslow;
+    zslow = z .* nslow;
+    trisurf(faces, xslow, yslow, zslow, slowness);
 else
    trisurf(faces,x,y,z,avs) ;
 end
@@ -242,7 +257,7 @@ hold on
 if ~isnan(cax), caxis(cax), end
 
 % plot the shear-wave polarisation
-if sum(strcmpi({'s','s1','s2'},mode))==1 
+if sum(strcmpi({'s','s1','s2','slows1'},mode))==1 
    [x, y, z, ~, az, inc] =  get_mesh(polmesh);
 
 %  find the closest points to each specified direction   
@@ -259,10 +274,10 @@ if sum(strcmpi({'s','s1','s2'},mode))==1
       inc(ind) = din(idir)*180/pi ;
    end
    
-   [~,~,~,~,~, SF, SS] = MS_phasevels(CC,rh,inc,az) ;
+   [~,avs,vs1,vs2,vp, SF, SS] = MS_phasevels(CC,rh,inc,az) ;
    % calculate PM vectors
    nv = length(x) ;
-   if sum(strcmpi(mode,{'s','s1'}))==1 
+   if sum(strcmpi(mode,{'s','s1','slows1'}))==1 
       for iv=1:nv
           XI=1.01.*[x(iv) y(iv) z(iv)] ;
           X1 = XI-FSWTickLength.*SF(iv,:);
