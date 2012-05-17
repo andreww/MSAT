@@ -80,9 +80,9 @@ function texture_example()
     
     tic; fprintf('Extracting Euler angles ...');
     % NaCl Euler angles
-    [Nphi1s, Nthetas, Nphi2s] = Euler(get(ebsd(1),'orientations'), 'Bundge');
+    [Nphi1s, Nthetas, Nphi2s] = Euler(get(ebsd(1),'orientations'), 'Bunge');
     % KCl Euler angles
-    [Kphi1s, Kthetas, Kphi2s] = Euler(get(ebsd(2),'orientations'), 'Bundge');
+    [Kphi1s, Kthetas, Kphi2s] = Euler(get(ebsd(2),'orientations'), 'Bunge');
     telap = toc; fprintf(' done (%4.2f secs)\n',telap);
   
     % rads to deg...
@@ -101,7 +101,7 @@ function texture_example()
     NaCl_rhos = ones(num_xtals,1)*rho1;
     telap = toc; fprintf(' done (%4.2f secs)\n',telap);
     
-    tic; fprintf('Creating list of rotated NaCl elasticity matrices ...');
+    tic; fprintf('Creating list of rotated KCl elasticity matrices ...');
     KCl_Cs = MS_rotEuler(C2, Kphi1s, Kthetas, Kphi2s);
     KCl_rhos = ones(num_xtals,1)*rho2;
     telap = toc; fprintf(' done (%4.2f secs)\n',telap);
