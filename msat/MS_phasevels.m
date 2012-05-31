@@ -37,14 +37,18 @@
 %     eps^1/2) pol is set to NaN. Optional outputs SF and SS are arrays of
 %     size (length(inc),3), with each row corresponding to a polarisation
 %     vector. This implementation is based on EMATRIX6 by D. Mainprice. 
-%     Re-coded in MATLAB by James Wookey.
+%     Re-coded in MATLAB by James Wookey but now avoids transforming
+%     from the 6x6 elasticity matrix into the 3x3x3x3 tensor form using the
+%     method outlined in Winterstein (1990).
 % 
 % Reference: Mainprice D. (1990). An efficient
 %            FORTRAN program to calculate seismic anisotropy from
 %            the lattice preferred orientation of minerals.
 %            Computers & Gesosciences, vol16, pp385-393.
+%            Winterstein D. F. (1990). Velocity anisotropy terminology 
+%            for geophysicists. Geophysics, vol 55, pp1070-1088. 
 
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011-2012, James Wookey and Andrew Walker
 % Copyright (c) 2007-2011, James Wookey
 % All rights reserved.
 % 
@@ -276,32 +280,19 @@ return
 %     EIGVEC(3,3) - eigenvectors stored by columns
 %
 % Translated to MATLAB by James Wookey         
-		ijkl = [1,6,5; ...
-		        6,2,4; ...
-		        5,4,3] ;
-            
-        % Form symmetric matrix Tik=Cijkl*Xj*Xl (summation convention)
-        % note that this mostly-unrolled approach is ~5x faster than the
-        % direct (four-looping) construction and allows us to use the 
-        % symmetry of T to reduce the cost. I suspect there is a better
-        % way, involving kron(X,X') and a single line for the summation, 
-        % but I cannot see it.
-        T = zeros(3,3);
-        for j=1:3
-            T(1,1)=T(1,1) + sum(C(ijkl(1,j),ijkl(1,1:3)).*X(j).*X(1:3)) ;
-            T(1,2)=T(1,2) + sum(C(ijkl(1,j),ijkl(2,1:3)).*X(j).*X(1:3)) ;
-            T(1,3)=T(1,3) + sum(C(ijkl(1,j),ijkl(3,1:3)).*X(j).*X(1:3)) ;
-            T(2,2)=T(2,2) + sum(C(ijkl(2,j),ijkl(2,1:3)).*X(j).*X(1:3)) ;
-            T(2,3)=T(2,3) + sum(C(ijkl(2,j),ijkl(3,1:3)).*X(j).*X(1:3)) ;
-            T(3,3)=T(3,3) + sum(C(ijkl(3,j),ijkl(3,1:3)).*X(j).*X(1:3)) ;
-        end
-        % Impose the symmetry (build the lower-left corner).
-        T(2,1) = T(1,2);
-        T(3,1) = T(1,3);
-        T(3,2) = T(2,3);
-        
+% Revised, Andrew Walker 2012. 
+
+% Form the 3x3 Christoffel tensor without converting the elasticity 
+% from 6x6 to 3x3x3x3 form using the formula from page 1076 of 
+% Winterstein 1990. This is > twice as fast as the quickest way I
+% have found going via the full tensor form.
+        gamma = [X(1) 0.0  0.0  0.0  X(3) X(2) ; ...
+                 0.0  X(2) 0.0  X(3) 0.0  X(1) ; ...
+                 0.0  0.0  X(3) X(2) X(1) 0.0 ];
+        T = gamma * C * gamma';
+         
 % determine the eigenvalues of symmetric tij
-      [EIVEC EIVAL] = eig(T) ;
+        [EIVEC EIVAL] = eig(T) ;
 
 % calculate velocities and sort
 		V_RAW = (sqrt([EIVAL(1,1) EIVAL(2,2) EIVAL(3,3)]./rh))*10. ;
