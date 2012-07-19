@@ -6,7 +6,7 @@ facilitate the analysis and modelling of observations of seismic
 and elastic anisotropy. This user guide provides information on
 the range of link:MSATfunctions.html[functions] provided by the 
 toolkit along with some brief comments on the background theory 
-implemented within them. There are also link:examples/index.html[exmples] 
+implemented within them. There are also link:examples/index.html[examples] 
 of how MSAT can be used. 
 
 For the impatient there is a shorter document describing 
