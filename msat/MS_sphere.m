@@ -19,7 +19,9 @@
 %          listed below.
 %
 %     MS_sphere(..., 'reverse')
-%          Reverse the sense of the colour map.
+%          Unreverse the sense of the colour map. Default (no argument) is 
+%          for blue to be fast/high as is conventional for seismic velocity 
+%          colorscales. Setting this option results in red being fast/high.
 %
 %     MS_sphere(..., 'FSWTickLength', length)
 %          Set the length of the Fast shear wave direction markers, default
@@ -71,7 +73,7 @@
 
 
 % Copyright (c) 2007 - 2011, James Wookey
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011, 2012 James Wookey and Andrew Walker
 % Portions of this function are:
 % Copyright (c) 1989 - 2002, Darren Weber, Jon Leech and Jim Buddenhagen.
 % All rights reserved.
@@ -131,7 +133,7 @@ cax = NaN ; % define to use
       while iarg <= (length(varargin))
          switch lower(varargin{iarg})
             case 'reverse'
-               icmapflip = 1 ;
+               icmapflip = 0 ;
                iarg = iarg + 1 ;
             case 'fswticklength'
                FSWTickLength = varargin{iarg+1} ;

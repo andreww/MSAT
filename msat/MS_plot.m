@@ -30,14 +30,16 @@
 %          conventional for seismic velocity colorscales. 
 %
 %     MS_plot(..., 'reverse')
-%          Reverse the sense of the colour map. 
+%          Unreverse the sense of the colour map. Default (no argument) is 
+%          for blue to be fast/high as is conventional for seismic velocity 
+%          colorscales. Setting this option results in red being fast/high.
 %
 %     MS_plot(..., 'quiet')
 %          Don't write isotropic velocities to the terminal. 
 %
 % See also: MS_SPHERE, MS_PHASEVELS
 
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011, 2012 James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
@@ -98,7 +100,7 @@ function MS_plot(C,rh,varargin)
       while iarg <= (length(varargin))
          switch lower(varargin{iarg})
             case 'reverse'
-               icmapflip = 1 ;
+               icmapflip = 0 ;
                iarg = iarg + 1 ;
             case 'quiet'
                silentterm = 1;
