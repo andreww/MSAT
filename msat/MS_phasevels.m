@@ -295,6 +295,14 @@ return
         [EIVEC EIVAL] = eig(T) ;
 
 % calculate velocities and sort
+% note that we could get a significant speedup if
+% we could avoid the sort - LAPACK usually does sort
+% in order of incresing eigenvectors but I've found 
+% cases where this does not happen (and we swap P and 
+% S wave velocities). Note that MATLAB does not "guarantee
+% that the eignevalues are not returned in sorted order"
+% http://www.mathworks.com/matlabcentral/newsreader/view_original/394371 
+% so we have to sort here...
 		V_RAW = (sqrt([EIVAL(1,1) EIVAL(2,2) EIVAL(3,3)]./rh))*10. ;
 		[V IND] = sort(V_RAW,2,'descend') ;
 		EIGVEC = EIVEC ; % for dimensioning
