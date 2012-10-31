@@ -2,7 +2,7 @@
 %                 backazimuth. 
 %
 % This script demonstrates simple shear-wave splitting modelling using the MSAT
-% toolset. It predicts the SKS splitting variation with backazimuth associated 
+% toolset. It predicts the SKS splitting variation with azimuth associated 
 % with two dipping, partially-aligned olivine layers. The splitting in each layer
 % is calculated using the Christoffel equation (MS_phasvels), and combined using
 % N-layer effective splitting equations (MS_effective_splitting_N; Silver and 
@@ -47,12 +47,15 @@ function split_model()
                    L2_depth, L2_thick, L2_dip, L2_aaz, L2_faln) ; 
 
 %  ** imaging parameters
-      baz = [0:1:360] ; % 0 is down dip direction (perp. to strike)
-      inc = -ones(size(baz)).*90 + aoi ;
+      azi = [0:1:360] ; % 0 is down dip direction (perp. to strike), note that
+                        % this is the seismic backazimuth + 180 degrees
+                        % Wave is assumed to be polarised in this direction. 
+                        
+      inc = ones(size(azi)).*90 - aoi ; % 90 is vertical
 
 %  ** calculate distances
-      [dist1]=distance_in_dipping_layer(L1_dip,aoi,L1_thick,baz) ;
-      [dist2]=distance_in_dipping_layer(L2_dip,aoi,L2_thick,baz) ;
+      [dist1]=distance_in_dipping_layer(L1_dip,aoi,L1_thick,azi) ;
+      [dist2]=distance_in_dipping_layer(L2_dip,aoi,L2_thick,azi) ;
       
 %  ** load anisotropy, and generate an isotropic version of it. 
       [Cani,rh] = MS_elasticDB('olivine') ;
@@ -69,20 +72,20 @@ function split_model()
          MS_rot3(Cani,0,-L2_dip,L2_aaz,'order',[3 2 1]),rh, Ciso, rh) ;
 
 %  ** interrogate elasticities to generate splitting parameters for each layer.
-      [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( L1_C, rh, inc, baz ) ;   
-      fast1 = MS_unwind_pm_90((baz - pol')) ; % geog. reference frame
+      [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( L1_C, rh, inc, azi ) ;   
+      fast1 = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
       tlag1 = dist1./vs2' - dist1./vs1' ;
             
-      [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( L2_C, rh, inc, baz ) ;   
-      fast2 = MS_unwind_pm_90((baz - pol')) ; % geog. reference frame
+      [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( L2_C, rh, inc, azi ) ;   
+      fast2 = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
       tlag2 = dist2./vs2' - dist2./vs1' ;
 
 %  ** calculate the effective splitting between 2 layers    
-      fast_eff = zeros(size(baz)) ;
+      fast_eff = zeros(size(azi)) ;
       tlag_eff = fast_eff ;
-      for i = 1:length(baz)
+      for i = 1:length(azi)
          [fast_eff(i),tlag_eff(i)] = ...
-            MS_effective_splitting_N(0.125,baz(i), ...
+            MS_effective_splitting_N(0.125,azi(i), ...
             [fast2(i) fast1(i)],[tlag2(i) tlag1(i)]) ;
       end
 
@@ -92,9 +95,9 @@ function split_model()
 
 %  ** lag times
       subplot(2,1,1)
-      plot(baz,tlag1,'r--') ; hold on
-      plot(baz,tlag2,'g--') ;
-      plot(baz,tlag_eff,'k-','LineWidth',1.5)
+      plot(azi,tlag1,'r--') ; hold on
+      plot(azi,tlag2,'g--') ;
+      plot(azi,tlag_eff,'k-','LineWidth',1.5)
       axis([0 360 0 4])
       xlabel('Polarisation (relative to downdip direction)')
       ylabel('Lag times (s)')
@@ -102,9 +105,9 @@ function split_model()
 
 %  ** fast directions
       subplot(2,1,2)
-      plot(baz,fast1,'r--') ; hold on
-      plot(baz,fast2,'g--') ;
-      plot(baz,fast_eff,'k-','LineWidth',1.5)
+      plot(azi,fast1,'r--') ; hold on
+      plot(azi,fast2,'g--') ;
+      plot(azi,fast_eff,'k-','LineWidth',1.5)
       axis([0 360 -90 90])
       xlabel('Polarisation (relative to downdip direction)')
       ylabel('Fast shear-wave orientation (degree)')      
@@ -112,15 +115,16 @@ function split_model()
       
 return
 
-function [dist]=distance_in_dipping_layer(dip,aoi,thick,baz)
+function [dist]=distance_in_dipping_layer(dip,aoi,thick,azi)
 
 %  ** calculate apparent dip
-      alp = atand(tand(dip) .* sind(baz+90)) ;
-
+      alp = atand(tand(dip) .* sind(azi-90)) ;
+      
 %  ** calculate distances
       gam = 90 - alp - aoi ;
       bet = 90 + alp ;
       dist = thick .* sind(bet) ./ sind(gam) ;
+
 return
 
 function report_model(L1_depth, L1_thick, L1_dip, L1_aaz, L1_faln, ...
