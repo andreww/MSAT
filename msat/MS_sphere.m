@@ -4,14 +4,15 @@
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 % Given an elasticity matrix and density, produce spherical figures showing 
-%     the P- or S-wave anisotrpy. 
+%     the P- or S-wave anisotropy or the slowness surface. 
 %
 %  % MS_sphere(CC,rh,mode,...)
 %
 % Usage: 
 %     MS_sphere(CC,rh,mode)                    
 %         Mode can be 'p'(-wave), 's'(-wave), 's1' (fast s-wave) or 's2'
-%         (slow s-wave).
+%         (slow s-wave) for velocity plots or 'slowP','slowS1' or 'slowS2'
+%         for slowness plots (slowness is the inverse of velocity).
 %
 %     MS_sphere(CC,rh,mode,...) 
 %          Further arguments are optional, can be combined in any order and
@@ -131,9 +132,7 @@ cax = NaN ; % define to use
 % Changing defaults for case of slowness surfaces before the optional arguments are processed
 if ischar(mode)
    if sum(strcmpi({'slowp','slows1','slows2'},mode))==1
-	   cmap=copper ;
-	   icmapflip = 1 ; % reverse the sense of the colourscale
-	   velmesh = 5 ; % increase this to make it better
+	   cmap=copper(64) ; % So we can tell the difference between V and slowness
    end
 end  
 
@@ -369,13 +368,10 @@ elseif strcmpi(mode,'s2')
     title(cbax,'Slow S-wave velocity (km/s)');
 elseif strcmpi(mode,'slowp')
     title(cbax,'P-wave slowness (s/km)');
-	light('Position',[-0.58674 -0.05336 0.80801],'Style','infinite');
 elseif strcmpi(mode,'slows1')
     title(cbax,'Fast S-wave slowness (s/km)');
-	light('Position',[-0.58674 -0.05336 0.80801],'Style','infinite');
 elseif strcmpi(mode,'slows2')
     title(cbax,'Slow S-wave slowness (s/km)');
-	light('Position',[-0.58674 -0.05336 0.80801],'Style','infinite');
 
 
 end
