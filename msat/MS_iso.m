@@ -10,7 +10,7 @@
 %   Output:
 %        C : Stiffness tensor (6x6 notation, GPa)
 
-function [C]=MS_thom(vp,vs,rh)
+function [C]=MS_iso(vp,vs,rh)
 
    vp=vp*1e3;
    vs=vs*1e3;

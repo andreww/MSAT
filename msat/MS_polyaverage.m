@@ -15,6 +15,7 @@
 %     [ K_vrh, G_vrh, K_v, G_v, K_r, G_r ] = MS_polyaverage( C )
 %         Also return Voigt and Reuss bounds on the bulk and shear moduli.
 %
+%
 % Notes:
 %     For the case of an isotropic solid formed from a random distribution
 %     of elements, the bulk and shear moduli can be found directly without
