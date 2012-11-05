@@ -45,7 +45,7 @@
 %   Love, A.E.H., (1927). A Treatise on the Theory of Elasticity, 
 %      Cambridge Univ. Press, Cambridge.
 %
-% See also: MS_TI, MS_polyavarage
+% See also: MS_TI, MS_polyaverage
  
 % Copyright (c) 2011-2012, James Wookey, Andrew Walker and Alan Baird
 % All rights reserved.
@@ -130,7 +130,7 @@ function [vpa, vsa, xi, phi, eta, vpv, vsv]=MS_panning_params(C, rho)
 end
 
 function [eps, gam, del] = MS_thomsen_params(C)
-    % From a VTI (uneq X3) elasticity matrix, return 
+    % From a VTI (unique X3) elasticity matrix, return 
     % the three Thomsen parameters eps, gam and del
 
     % FIXME - do we need to do the 'vs too high' test here?
@@ -153,7 +153,7 @@ function [A, C, L, N, F] = MS_love_params(CC)
 end
 
 function [check] = is_Ti(C)
-    % Check if input elasticity matrix is VTI with uneque X3 axis
+    % Check if input elasticity matrix is VTI with unique X3 axis
     % return 1 if it is and 0 if not.
     
     thresh = 1e-6 ;
