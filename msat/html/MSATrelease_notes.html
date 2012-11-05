@@ -739,7 +739,63 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_version_1_0_11_april_2011">Version 1.0 - 11 April 2011</h2>
+<h2 id="_version_1_0_1_5_november_2012">Version 1.0.1 - 5 November 2012</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This version of MSAT collects together several minor improvements
+and minor bug fixes. Changes from version 1.0 are:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Fix the <em>reverse</em> argument of MS_sphere and MS_plot. This optional
+argument was inoperative.
+</p>
+</li>
+<li>
+<p>
+Clarify the behaviour of MS_rotEuler such that the default action is
+to rotate the crystal and not the frame of reference. Add optional arguments
+<em>sense</em>, <em>passive</em> to allow previous behaviour (rotation of the frame of
+reference)
+</p>
+</li>
+<li>
+<p>
+Add a new function MS_TI_parameters which calculates a range of
+values for VTI parameterisations given an elasticity matrix.
+</p>
+</li>
+<li>
+<p>
+Extend MS_sphere to plot slowness surfaces using <em>slowP</em>, <em>slowS1</em>
+or <em>slowS2</em> values for the mode argument.
+</p>
+</li>
+<li>
+<p>
+Speed up MS_phasevels by a factor of two.
+</p>
+</li>
+<li>
+<p>
+Expand the range of materials in MS_elasticDB
+</p>
+</li>
+<li>
+<p>
+Include reference to the MSAT paper ("MSAT - A new toolkit for the
+analysis of elastic and seismic anisotropy" Computers and Geosciences,
+49, pp.81-90. doi:10.1016/j.cageo.2012.05.031) in the documentation.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>We thank Michele Zucali (University of Milan), Alan Baird (Bristol),
+Jenny Di Leo (Bristol), Nagaya Takayoshi (University of Nagoya) and
+an anonymous reviewer of the manuscript for contributing sugestions,
+bug reports, and code.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_version_1_0_11_april_2012">Version 1.0 - 11 April 2012</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>This version of MSAT completes the intended initial feature
 set and contains more detailed documentation. There are
@@ -889,7 +945,7 @@ Many of the functions are derived from
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-11 13:31:47 BST
+Last updated 2012-11-05 12:07:43 GMT
 </div>
 </div>
 </body>

@@ -748,7 +748,7 @@ asciidoc.install();
 <div class="literalblock">
 <div class="content">
 <pre><tt>Given an elasticity matrix and density, produce spherical figures showing
-    the P- or S-wave anisotrpy.</tt></pre>
+    the P- or S-wave anisotropy or the slowness surface.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -759,7 +759,8 @@ asciidoc.install();
 <pre><tt>Usage:
     MS_sphere(CC,rh,mode)
         Mode can be 'p'(-wave), 's'(-wave), 's1' (fast s-wave) or 's2'
-        (slow s-wave).</tt></pre>
+        (slow s-wave) for velocity plots or 'slowP','slowS1' or 'slowS2'
+        for slowness plots (slowness is the inverse of velocity).</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -771,7 +772,9 @@ asciidoc.install();
 <div class="literalblock">
 <div class="content">
 <pre><tt>MS_sphere(..., 'reverse')
-     Reverse the sense of the colour map.</tt></pre>
+     Unreverse the sense of the colour map. Default (no argument) is
+     for blue to be fast/high as is conventional for seismic velocity
+     colorscales. Setting this option results in red being fast/high.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -851,7 +854,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-11 13:32:00 BST
+Last updated 2012-11-05 12:07:45 GMT
 </div>
 </div>
 </body>

@@ -746,20 +746,34 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Rotate one or more elasticity matrices usign Bunge's Euler angles</tt></pre>
+<pre><tt>Rotate one or more elasticity matrices using Bunge's Euler angles</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[ CC ] = MS_rotEuler( C, phi1, theta, phi2 )</tt></pre>
+<pre><tt>Usage:</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Usage:
-    For three angles in degrees (phi1, theta, phi2) representing a
-    rotation in Bunge convention rotate the elasticity matrix C. All
-    variables can be arrays or scalars but (1) the angles must all be the
-    same length and (2) either C or all the angles must be scalars unless
-    they are the same length.</tt></pre>
+<pre><tt>[ CC ] = MS_rotEuler( C, phi1, Phi, phi2 )</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>For three angles in degrees (phi1, theta, phi2) representing a
+rotation in Bunge convention rotate the elasticity matrix C. All
+variables can be arrays or scalars but (1) the angles must all be the
+same length and (2) either C or all the angles must be scalars unless
+they are the same length.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[ CC ] = MS_rotEuler( C, phi1, Phi, phi2, 'sense', 'active' )
+[ CC ] = MS_rotEuler( C, phi1, Phi, phi2, 'sense', 'passive' )</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>As above, but allow user choice between 'active' (the default) or
+'passive' rotations (the usual description for texture analysis).
+See notes, below, for details.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -767,19 +781,36 @@ asciidoc.install();
    In the context of this function the term 'Euler angle' is used in
    the sense common in texture analysis not computer graphics etc. where
    the three angles are rotations around a fixes axis system (see
-   MS_rot3 for this case). In the (Bunge) convention used here the object
-   (crystal) reference frame is first assumed to be alligned with the
-   sample reference frame. The object is then rotated around the common
-   z axis by an angle phi1. The second rotation (theta) is about
-   the object's x axis (which is no longer parallel to the external
-   x axis). The third rotation, phi2, is about the samples z axis
-   (which, by this point, is not paralell with the external z axis). See
-   Figure 5 of Bunge 1985 for a graphical example.</tt></pre>
+   MS_rot3 for this case). In the (Bunge) convention used here the
+   relationship between the orientation of a set of "crystal" axes is
+   considered with respect to an external "sample" axis system. This
+   is described by considering a moving reference frame which starts out
+   parallel to the sample axes. This moving reference frame is first
+   rotated anticlockwise about its z axis by phi1 degrees. A second
+   anticlockwise rotation of Phi degrees is made about the frame's x axis
+   (which, at this point, is no longer parallel to the sample x axis).
+   Finally, a second anticlockwise rotation of phi2 degrees about the
+   frame's z axis is made to bring the moving reference into line with
+   the crystal axes. See Figure 5 of Bunge 1985 for a graphical example.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>As described, the Euler angles are passive rotations showing how the
+reference frame must be rotated. However, for most applications one
+knows the elasticity matrix of the crystal on the crystal axis system
+and wants to calculate the elasticity matrix represented on the global
+"sample" reference frame. In this case the corresponding active
+rotation must be applied to the crystal's elasticity matrix. By
+default, the MS_rotEuler function applies the active rotation.
+The optional arguments 'sense' and 'passive' can be used to reverse
+the sense of rotation. This can be used if, for example, the
+elasticity has been measured on an experimental frame which is offset
+from the crystal frame more usually used.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>References:
-   Bunge, H. J. (1985) "Representaton of Preferred Orientations" in H.-R.
+   Bunge, H. J. (1985) "Representation of Preferred Orientations" in H.-R.
    Wenk (ed.) "Preferred Orientation in Deformed Metals and Rocks:
     An Introduction to Modern Texture Analysis" Academic Press inc.
     Orlando.</tt></pre>
@@ -794,7 +825,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-11 13:32:00 BST
+Last updated 2012-11-05 12:07:45 GMT
 </div>
 </div>
 </body>

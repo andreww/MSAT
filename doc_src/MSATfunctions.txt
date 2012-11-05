@@ -240,6 +240,7 @@ spherical representation, respectively.
 | link:funcs/MS_norms.html[MS_norms]                                 | Browaeys and Chevrot analysis of the elasticity matrix.
 | link:funcs/MS_sphere.html[MS_sphere]                               | Plot a spherical plot of phasevels/anisotropy from a set of elastic constants.
 | link:funcs/MS_effective_spltting_N.html[MS_effective_splitting_N]  | N-layer effective splitting operator calculation
+| link:funcs/MS_TI_parameters.html[MS_TI_parameters]                 | Calculate Thomsen and other parameters for a vertically transverse isotropic medium given the elasticity matrix. Symmetry is in the 3-axis. 
 |======================                                                
 
 Other functions 

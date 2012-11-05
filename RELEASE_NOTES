@@ -1,6 +1,39 @@
 MSAT Release Notes
 ==================
 
+Version 1.0.1 - 5 November 2012
+-------------------------------
+
+This version of MSAT collects together several minor improvements 
+and minor bug fixes. Changes from version 1.0 are:
+
+* Fix the 'reverse' argument of MS_sphere and MS_plot. This optional 
+argument was inoperative.
+
+* Clarify the behaviour of MS_rotEuler such that the default action is
+to rotate the crystal and not the frame of reference. Add optional arguments
+'sense', 'passive' to allow previous behaviour (rotation of the frame of 
+reference)
+
+* Add a new function MS_TI_parameters which calculates a range of 
+values for VTI parameterisations given an elasticity matrix.
+
+* Extend MS_sphere to plot slowness surfaces using 'slowP', 'slowS1' 
+or 'slowS2' values for the mode argument.
+
+* Speed up MS_phasevels by a factor of two.
+
+* Expand the range of materials in MS_elasticDB
+
+* Include reference to the MSAT paper ("MSAT - A new toolkit for the 
+analysis of elastic and seismic anisotropy" Computers and Geosciences, 
+49, pp.81-90. doi:10.1016/j.cageo.2012.05.031) in the documentation.
+
+We thank Michele Zucali (University of Milan), Alan Baird (Bristol), 
+Jenny Di Leo (Bristol), Nagaya Takayoshi (University of Nagoya) and 
+an anonymous reviewer of the manuscript for contributing sugestions,
+bug reports, and code.
+
 Version 1.0 - 11 April 2012
 ---------------------------
 

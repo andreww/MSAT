@@ -738,73 +738,72 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_ms_phasevels">MS_phasevels</h2>
+<h2 id="_ms_ti_parameters">MS_TI_parameters</h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_PHASEVELS - Wave velocities in anisotropic media.</tt></pre>
+<pre><tt>MS_TI_parameters - TI parameters from C.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Calculate the phase velocity details for an elsticity matrix.</tt></pre>
+<pre><tt>Returns various parameters describing TI anisotropy given an elasticity
+matrix (C) and density (rho) in GPa and kg/m^3.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[ pol, avs, vs1, vs2, vp, ...] = MS_phasevels( C, rh, inc, azi )</tt></pre>
+<pre><tt>[loveA, loveC, loveL, loveN, loveF, vpv, vsv, eps, gam, del ...
+           vpa, vsa, xi, phi, eta] = MS_TI_parameters(C, rho)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Usage:
-    [ pol, avs, vs1, vs2, vp ] = MS_phasevels( C, rh, inc, azi )
-        Calculate phase velocities from elasticity matrix C (in GPa) and
-        density rh (in kg/m^3) for a propogation direction defined by
-        an inclination and azimuth (both in degrees, see below). Output
-        details are given below.</tt></pre>
+<pre><tt>  Output:
+       vpa                               : isotropic average P-wave
+                                           velocity, km/s
+       vsa                               : isotropic average S-wave
+                                           velocity, km/s
+       vpv                               : vertical P-wave velocity, km/s
+       vsv                               : vertical S-wave velocity, km/s
+       eps, gam, del                     : dimensionless Thomsen (1986)
+                                           parameters
+       xi, phi, eta                      : dimensionless anisotropy
+                                           parameters (e.g. Panning
+                                           and Romanowicz, 2006)
+       loveA, loveC, loveL, loveN, loveF : Love's (1927) anisotropy
+                                           parameters, GPa
+Notes</tt></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>   Input units should be GPa for the elasticity matrix and kg/m^3 for the
+   density - this gives output parameters in units of km/s for velocity and
+   GPa for elasticity. Choosing a different unit for the elasticity will
+   change the units for the Love parameters and velocities but not the
+   dimensionless parameters. Choosing an arbitrary value for the density
+   will not alter the dimensionless parameters or Love parameters, but the
+   velocities will be meaningless.
+
+References</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[ pol, avs, vs1, vs2, vp, SF, SS ] = MS_phasevels( C, rh, inc, azi )
-    Additionally output fast and slow S-wave polarisation in vector
-    form.</tt></pre>
+<pre><tt>Thomsen, L. (1986) "Weak elastic anisotropy" Geophysics
+   vol.51 pp.1954-1966</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Notes:
-    Azi is defined as the angle in degrees from the +ve 1-axis in x1-x2
-    plane with +ve being clockwise when looking at origin from the
-    3-axis. Inc is defined as the angle in degrees from the x1-x2 plane
-    towards x3 with zero being in the x1-x2 plane. Inc and azi may be
-    scalars, or vectors of the same size. Outputs are:</tt></pre>
+<pre><tt>Mark Panning and Barbara Romanowicz (2006) A three-dimensional radially
+   anisotropic model of shear velocity in the whole mantle. Geophysical
+   Journal International v167, 361–379.
+   doi: 10.1111/j.1365-246X.2006.03100.x</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>'pol' = angle in plane normal to raypath of FSW
-       (deg, zero is x3 direction, +ve c'wise looking along
-       raypath at origin)
-'avs' = shear-wave anisotropy
-'vs1' = fast shear-wave velocity (m/s)
-'vs2' = slow shear-wave velocity (m/s)
-'vp'  = P-wave velocity (m/s)</tt></pre>
+<pre><tt>Love, A.E.H., (1927). A Treatise on the Theory of Elasticity,
+   Cambridge Univ. Press, Cambridge.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>and all are vectors of length equal to the input inc and azi vectors.
-In the case of no S-wave splitting (vs1 and vs2 are equal to within
-eps^1/2) pol is set to NaN. Optional outputs SF and SS are arrays of
-size (length(inc),3), with each row corresponding to a polarisation
-vector. This implementation is based on EMATRIX6 by D. Mainprice.
-Re-coded in MATLAB by James Wookey but now avoids transforming
-from the 6x6 elasticity matrix into the 3x3x3x3 tensor form using the
-method outlined in Winterstein (1990).</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Reference: Mainprice D. (1990). An efficient
-           FORTRAN program to calculate seismic anisotropy from
-           the lattice preferred orientation of minerals.
-           Computers &amp; Gesosciences, vol16, pp385-393.
-           Winterstein D. F. (1990). Velocity anisotropy terminology
-           for geophysicists. Geophysics, vol 55, pp1070-1088.</tt></pre>
+<pre><tt>See also: MS_TI, MS_polyavarage</tt></pre>
 </div></div>
 </div>
 </div>

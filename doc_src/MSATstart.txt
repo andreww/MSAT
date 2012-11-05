@@ -132,6 +132,6 @@ More help
 ~~~~~~~~~
 
 A more in-depth guide to MSAT is provided by the  link:MSATguide.html[user guide]. Further information 
-(upgrades, reporting bugs, how to install) can be found at the MSAT website (link:http://www1.gly.bris.ac.uk/msat[http://www1.gly.bris.ac.uk/msat]).
+(upgrades, reporting bugs, how to install) can be found at the MSAT website (link:http://www1.gly.bris.ac.uk/msat[http://www1.gly.bris.ac.uk/msat]). There is also a paper published in Computers and Geosciences (volume 49, pages 81 - 90) describing MSAT. This is available online as a link:http://www1.gly.bris.ac.uk/~walker/pubs/msat.pdf[preprint] or from link:http://dx.doi.org/10.1016/j.cageo.2012.05.031[Elsevier].
 
 

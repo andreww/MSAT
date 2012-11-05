@@ -31,6 +31,7 @@
 	<tocitem target="./funcs/index.html" image="$toolbox/matlab/icons/help_fx.png">Functions 
 
         <tocitem target="./funcs/MS_TI.html" image="$toolbox/matlab/icons/help_fx.png">MS_TI</tocitem>
+        <tocitem target="./funcs/MS_TI_parameters.html" image="$toolbox/matlab/icons/help_fx.png">MS_TI_parameters</tocitem>
         <tocitem target="./funcs/MS_VRH.html" image="$toolbox/matlab/icons/help_fx.png">MS_VRH</tocitem>
         <tocitem target="./funcs/MS_VTI.html" image="$toolbox/matlab/icons/help_fx.png">MS_VTI</tocitem>
         <tocitem target="./funcs/MS_VTI2.html" image="$toolbox/matlab/icons/help_fx.png">MS_VTI2</tocitem>
