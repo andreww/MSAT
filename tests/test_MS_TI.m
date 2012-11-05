@@ -45,9 +45,11 @@ function test_MS_TI_parameters_1
    
    C = MS_TI(vpv_in, vsv_in, rh_in, eps_in, gam_in, del_in,'thomsen'); 
  
-   [loveA, loveC, loveL, loveN, loveF, eps, gam, del ...
-             vp, vs, xi, phi, eta] = MS_TI_parameters(C, 4000);
-         
+   [loveA, loveC, loveL, loveN, loveF, vpv, vsv, eps, gam, del ...
+             vpa, vsa, xi, phi, eta] = MS_TI_parameters(C, 4000);
+          
+   assertElementsAlmostEqual(vpv_in, vpv);
+   assertElementsAlmostEqual(vsv_in, vsv);
    assertElementsAlmostEqual(eps_in, eps);
    assertElementsAlmostEqual(gam_in, gam);
    assertElementsAlmostEqual(del_in, del);
@@ -55,7 +57,77 @@ function test_MS_TI_parameters_1
    C2 = MS_TI(loveA, loveC, loveL, loveN, loveF,'love') ;
    assertElementsAlmostEqual(C, C2);
    
-   C3 = MS_TI(vp, vs, rh_in, xi, phi, eta,'panning') ;
+   C3 = MS_TI(vpa, vsa, rh_in, xi, phi, eta,'panning') ;
    assertElementsAlmostEqual(C, C3);
 
+end
+
+function test_MS_TI_parameters_errors
+
+    [C, rh] = MS_elasticDB('stishovite');
+    
+    f = @()MS_TI_parameters(C, rh);
+        assertExceptionThrown(f, 'MS:BadTIelasticity');
+    
+    
+    [C, rh] = MS_elasticDB('apatite');
+    
+    f = @()MS_TI_parameters(MS_rot3(C, 0.0, 90.0, 0.0), rh);
+        assertExceptionThrown(f, 'MS:BadTIelasticity');
+end
+
+
+function test_MS_TI_apatite
+
+    [C, rh] = MS_elasticDB('apatite');
+    
+    [loveA, loveC, loveL, loveN, loveF, vpv, vsv, eps, gam, del ...
+        vpa, vsa, xi, phi, eta] = MS_TI_parameters(C, rh);
+    
+    C1 = MS_TI(vpv, vsv, rh, eps, gam, del,'thomsen');
+    C2 = MS_TI(loveA, loveC, loveL, loveN, loveF,'love') ;
+    C3 = MS_TI(vpa, vsa, rh, xi, phi, eta,'panning') ;
+    
+    assertElementsAlmostEqual(C, C1);
+    assertElementsAlmostEqual(C, C2);
+    assertElementsAlmostEqual(C, C3);
+    
+end
+
+function test_MS_TI_apatite_units
+
+    [C, rh] = MS_elasticDB('apatite');
+    
+    [~, ~, ~, ~, ~, ~, ~, eps, gam, del ...
+        ~, ~, xi, phi, eta] = MS_TI_parameters(C, rh);
+    
+    [~, ~, ~, ~, ~, ~, ~, eps1, gam1, del1 ...
+        ~, ~, xi1, phi1, eta1] = MS_TI_parameters(C/10, rh);
+    
+    assertElementsAlmostEqual(xi,  xi1);
+    assertElementsAlmostEqual(phi, phi1);
+    assertElementsAlmostEqual(eta, eta1);
+    assertElementsAlmostEqual(eps, eps1);
+    assertElementsAlmostEqual(gam, gam1);
+    assertElementsAlmostEqual(del, del1);
+    
+    [~, ~, ~, ~, ~, ~, ~, eps1, gam1, del1 ...
+        ~, ~, xi1, phi1, eta1] = MS_TI_parameters(C*10, rh);
+    
+    assertElementsAlmostEqual(xi,  xi1);
+    assertElementsAlmostEqual(phi, phi1);
+    assertElementsAlmostEqual(eta, eta1);
+    assertElementsAlmostEqual(eps, eps1);
+    assertElementsAlmostEqual(gam, gam1);
+    assertElementsAlmostEqual(del, del1);
+    
+    [~, ~, ~, ~, ~, ~, ~, eps1, gam1, del1 ...
+        ~, ~, xi1, phi1, eta1] = MS_TI_parameters(C, 3000);
+    
+    assertElementsAlmostEqual(xi,  xi1);
+    assertElementsAlmostEqual(phi, phi1);
+    assertElementsAlmostEqual(eta, eta1);
+    assertElementsAlmostEqual(eps, eps1);
+    assertElementsAlmostEqual(gam, gam1);
+    assertElementsAlmostEqual(del, del1);
 end

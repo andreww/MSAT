@@ -5,14 +5,16 @@
 % Returns various parameters describing TI anisotropy given an elasticity
 % matrix (C) and density (rho) in GPa and kg/m^3. 
 %
-%  [loveA, loveC, loveL, loveN, loveF, eps, gam, del ...
-%             vp, vs, xi, phi, eta] = MS_TI_parameters(C, rho)
+%  [loveA, loveC, loveL, loveN, loveF, vpv, vsv, eps, gam, del ...
+%             vpa, vsa, xi, phi, eta] = MS_TI_parameters(C, rho)
 %
 %  Output:
-%       vp                                : isotropic average P-wave 
+%       vpa                               : isotropic average P-wave 
 %                                           velocity, km/s 
-%       vs                                : isotropic average S-wave 
+%       vsa                               : isotropic average S-wave 
 %                                           velocity, km/s
+%       vpv                               : vertical P-wave velocity, km/s
+%       vsv                               : vertical S-wave velocity, km/s
 %       eps, gam, del                     : dimensionless Thomsen (1986) 
 %                                           parameters
 %       xi, phi, eta                      : dimensionless anisotropy 
@@ -20,6 +22,15 @@
 %                                           and Romanowicz, 2006)
 %       loveA, loveC, loveL, loveN, loveF : Love's (1927) anisotropy 
 %                                           parameters, GPa
+%Notes
+%~~~~~
+%   Input units should be GPa for the elasticity matrix and kg/m^3 for the
+%   density - this gives output parameters in units of km/s for velocity and 
+%   GPa for elasticity. Choosing a different unit for the elasticity will 
+%   change the units for the Love parameters and velocities but not the 
+%   dimensionless parameters. Choosing an arbitrary value for the density
+%   will not alter the dimensionless parameters or Love parameters, but the 
+%   velocities will be meaningless. 
 %
 %References
 %~~~~~~~~~~
@@ -70,8 +81,8 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function [loveA, loveC, loveL, loveN, loveF, eps, gam, del ...
-             vp, vs, xi, phi, eta] = MS_TI_parameters(C, rho)
+function [loveA, loveC, loveL, loveN, loveF, vpv, vsv, eps, gam, del ...
+             vpa, vsa, xi, phi, eta] = MS_TI_parameters(C, rho)
 
     % Check we have valid input...
     MS_checkC(C);
@@ -83,11 +94,11 @@ function [loveA, loveC, loveL, loveN, loveF, eps, gam, del ...
     % Pass off the calculations to subroutines.
     [eps, gam, del] = MS_thomsen_params(C);
     [loveA, loveC, loveL, loveN, loveF] = MS_love_params(C);
-    [vp, vs, xi, phi, eta] = MS_panning_params(C, rho);
+    [vpa, vsa, xi, phi, eta, vpv, vsv] = MS_panning_params(C, rho);
 
 end
 
-function [vp, vs, xi, phi, eta]=MS_panning_params(C, rho)
+function [vpa, vsa, xi, phi, eta, vpv, vsv]=MS_panning_params(C, rho)
 
    % Convert to Pa
    C = C.*1e9 ;
@@ -96,8 +107,8 @@ function [vp, vs, xi, phi, eta]=MS_panning_params(C, rho)
    % velocites in m/s
    [A, C, L, N, F] = MS_love_params(C);
    vph = sqrt(A/rho);
-   vpv = sqrt(C/rho);
-   vsv = sqrt(L/rho);
+   vpv = sqrt(C/rho); % Thom VP
+   vsv = sqrt(L/rho); % Thom VS
    vsh = sqrt(N/rho);
    
    %  note: xi and phi are defined oppositely; i.e.: 
@@ -105,14 +116,16 @@ function [vp, vs, xi, phi, eta]=MS_panning_params(C, rho)
    xi = vsh^2 / vsv^2;
    phi = vpv^2 / vph^2;
    
-   vp = sqrt((vpv^2 + 4.0*vph.^2)/5.0) ;
-   vs = sqrt((2.0*vsv.^2 + vsh.^2)/3.0) ;
+   vpa = sqrt((vpv^2 + 4.0*vph.^2)/5.0) ;
+   vsa = sqrt((2.0*vsv.^2 + vsh.^2)/3.0) ;
    
    eta = F/(A-2.0*L);
    
    %  convert to km/s
-   vp=vp/1e3;
-   vs=vs/1e3;
+   vpa = vpa/1e3;
+   vsa = vsa/1e3;
+   vpv = vpv/1e3;
+   vsv = vsv/1e3;
 
 end
 
