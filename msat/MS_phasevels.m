@@ -28,9 +28,9 @@
 %              (deg, zero is x3 direction, +ve c'wise looking along             
 %              raypath at origin)  
 %       'avs' = shear-wave anisotropy
-%       'vs1' = fast shear-wave velocity (m/s)
-%       'vs2' = slow shear-wave velocity (m/s)
-%       'vp'  = P-wave velocity (m/s)
+%       'vs1' = fast shear-wave velocity (km/s)
+%       'vs2' = slow shear-wave velocity (km/s)
+%       'vp'  = P-wave velocity (km/s)
 %
 %     and all are vectors of length equal to the input inc and azi vectors.
 %     In the case of no S-wave splitting (vs1 and vs2 are equal to within
@@ -111,7 +111,7 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 		pol = zeros(size(azi)) ;
 		S1 = zeros(length(azi),3) ;
 		S1P = zeros(length(azi),3) ;
-        S2P = zeros(length(azi),3) ;
+      S2P = zeros(length(azi),3) ;
         
 %   ** Handle isotropic case quickly
      if isIsotropic(C, isotol)
@@ -164,11 +164,11 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 %     (use functions optimised for the two needed 
 %      rotations, see below).
       [S1PR] = V_rot_gam(S1P(ipair,:),cazi) ;
-	  [S1PRR] = V_rot_bet(S1PR,cinc) ;
+	   [S1PRR] = V_rot_bet(S1PR,cinc) ;
 
 
       
-	  ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
+	   ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
 
 %  ** transform angle to between -90 and 90
       if (ph < -90.), ph = ph + 180.;end
@@ -186,14 +186,14 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       pol(ipair) = ph ;
 	end % ipair = 1:length(inc_in)
 
-    % If any directions have zero avs (within machine accuracy)
-    % set pol to NaN - array wise:
-    isiso = real(avs > sqrt(eps)) ; % list of 1.0 and 0.0.
-    pol = pol .* (isiso./isiso) ; % times by 1.0 or NaN. 
+   % If any directions have zero avs (within machine accuracy)
+   % set pol to NaN - array wise:
+   isiso = real(avs > sqrt(eps)) ; % list of 1.0 and 0.0.
+   pol = pol .* (isiso./isiso) ; % times by 1.0 or NaN. 
 
-    S1P(:,1) = S1P(:,1) .* (isiso./isiso);
-    S1P(:,2) = S1P(:,2) .* (isiso./isiso);
-    S1P(:,3) = S1P(:,3) .* (isiso./isiso);
+   S1P(:,1) = S1P(:,1) .* (isiso./isiso);
+   S1P(:,2) = S1P(:,2) .* (isiso./isiso);
+   S1P(:,3) = S1P(:,3) .* (isiso./isiso);
     
 return
 %=======================================================================================  
