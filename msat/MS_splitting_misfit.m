@@ -57,5 +57,172 @@ function [misfit] = MS_splitting_misfit(fast1,tlag1,...
                                         fast2,tlag2,spol,dfreq,varargin) ;
 %===============================================================================
 
+   % default mode
+   modeStr = 'lam2' ;
+   
+   % process the optional arguments
+   iarg = 1 ;
+   while iarg <= (length(varargin))
+      switch lower(varargin{iarg})
+      case 'mode'  % parameter definition (value required)
+         modeStr = varargin{iarg+1} ;
+         iarg = iarg + 2 ;
+      otherwise 
+         error('MS:SPLITTING_MISFIT:UnknownOption',...
+            ['Unknown option: ' varargin{iarg}]) ;   
+      end
+   end
 
+   % call the appropriate mode function
+   switch lower(modeStr)
+   case 'lam2'
+      misfit=MS_splitting_misfit_lam2(fast1,tlag1,fast2,tlag2,spol,dfreq) ;
+   otherwise
+      error('MS:SPLITTING_MISFIT:UnknownMode',...
+         ['Unknown mode: ' varargin{iarg}]) ;      
+   end
+   
 end
+%===============================================================================
+
+%===============================================================================
+function [misfit] = MS_splitting_misfit_lam2(fast1,tlag1,fast2,tlag2,spol,dfreq)
+%===============================================================================
+
+   % generate a test wavelet.
+   
+   
+   [time,T00,T90] = FDGaussian_wavelet(spol,dfreq) ;
+
+
+   % apply splitting operator 1 
+   
+   [T00sp,T90sp] = split(time,T00,T90,fast1,tlag1) ;
+
+   if 0 % debug
+   
+      figure
+      subplot(2,1,1)
+      plot(time,T00,'r-') ; 
+      hold on
+      plot(time,T90,'b-') ;
+      
+   
+      
+      subplot(2,1,2)
+      plot(time,T00sp,'r-') ; 
+      hold on
+      plot(time,T90sp,'b-') ;
+   
+      % save em
+      
+      msac_write('/tmp/T.BHN',...
+         msac_new( ...
+             T00sp,time(2)-time(1),'b',time(1), 'e',time(end), ...
+             'cmpaz',00,'cmpinc',90, ...
+             'a',-10, ...
+             'f',10, ...
+             'user0',-10, ...
+             'user2',10) ...
+         ) ;
+      
+      msac_write('/tmp/T.BHE',...
+         msac_new( ...
+             T90sp,time(2)-time(1),'b',time(1), 'e',time(end), ...
+             'cmpaz',90,'cmpinc',90, ...
+             'a',-10, ...
+             'f',10, ...
+             'user0',-10, ...
+             'user2',10) ...
+         ) ;
+   
+   end % end of debug
+   
+   % apply splitting operator -2
+   [T00sp2,T90sp2] = split(time,T00sp,T90sp,fast2,-tlag2) ;   
+   
+   %% measure second eignvalue of the resulting wavelet
+   % calculate the covariance matrix
+   COVM = cov(T90sp2,T00sp2) ;
+
+   % take the eigenvalues   
+   [V,D] = eig(COVM) ;
+      
+   % calculate normalised misfit.   
+   misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;   
+   
+end
+%===============================================================================
+
+%===============================================================================
+function [T00sp,T90sp] = split(time,T00,T90,fast,tlag)
+%===============================================================================
+% Apply a splitting operator to a pair of orthogonal traces. 
+   
+   % rotate to fast reference frame
+   [ F, S ] = RF_rotate(T00,T90,fast) ;
+   
+   % shift both components tlag/2 in opposite directions
+   F = tshift(time,F,+tlag/2) ;
+   S = tshift(time,S,-tlag/2) ;
+   
+   % rotate back to original reference frame
+   [ T00sp, T90sp ] = RF_rotate(F,S,-fast) ;
+   
+end
+%===============================================================================
+
+%===============================================================================
+function [As] = tshift(time,A,tshift)
+%===============================================================================
+% Apply an interpolated time shift to a trace
+   
+   As = pchip(time,A,time+tshift) ;
+   
+end
+%===============================================================================
+
+%===============================================================================
+function [T00R,T90R] = RF_rotate(T00,T90,theta)
+%===============================================================================
+% Apply a rotation to a pair of orthogonal traces (this is a reference frame
+% rotation)
+
+   % form 2 row matrix 
+   D = [T90 ; T00] ;
+   
+   % rotation matrix 
+   R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)] ;
+   
+   DR = R*D ;
+   
+   T00R = DR(2,:) ;
+   T90R = DR(1,:) ;
+   
+end
+%===============================================================================
+
+%===============================================================================
+function [time,amp0,amp90] = FDGaussian_wavelet(spol,dfreq)
+%===============================================================================
+% generate a (first-derivative) Gaussian wavelet centred on 0, time base is 
+% -2*T:T/100:2*T.
+
+   % calculate time base 
+   T = 1/dfreq ;
+   dt = T/100 ;
+   time = -2*T:dt:2*T ;
+
+   % calculate wavelet
+   sig = T/6 ;
+   amp = -(time./(sig.^3*sqrt(2.*pi))).*exp(-time.^2./(2.*sig.^2)) ;
+   
+   %  normalise and project amplitude
+   amp = amp./max(amp) ;  
+   amp0 = amp.*cosd(spol) ;
+   amp90 = amp.*sind(spol) ;
+   
+   % done
+end
+%===============================================================================
+
