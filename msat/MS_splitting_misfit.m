@@ -92,54 +92,18 @@ function [misfit] = MS_splitting_misfit_lam2(fast1,tlag1,fast2,tlag2,spol,dfreq)
    % generate a test wavelet.
    
    
-   [time,T00,T90] = FDGaussian_wavelet(spol,dfreq) ;
-
+   [time,T00,T90] = FDGaussian_wavelet(spol,dfreq,max([tlag1 tlag2])) ;
 
    % apply splitting operator 1 
-   
    [T00sp,T90sp] = split(time,T00,T90,fast1,tlag1) ;
-
-   if 0 % debug
    
-      figure
-      subplot(2,1,1)
-      plot(time,T00,'r-') ; 
-      hold on
-      plot(time,T90,'b-') ;
-      
+   %plot_wavelet(time,T00sp,T90sp)
    
-      
-      subplot(2,1,2)
-      plot(time,T00sp,'r-') ; 
-      hold on
-      plot(time,T90sp,'b-') ;
-   
-      % save em
-      
-      msac_write('/tmp/T.BHN',...
-         msac_new( ...
-             T00sp,time(2)-time(1),'b',time(1), 'e',time(end), ...
-             'cmpaz',00,'cmpinc',90, ...
-             'a',-10, ...
-             'f',10, ...
-             'user0',-10, ...
-             'user2',10) ...
-         ) ;
-      
-      msac_write('/tmp/T.BHE',...
-         msac_new( ...
-             T90sp,time(2)-time(1),'b',time(1), 'e',time(end), ...
-             'cmpaz',90,'cmpinc',90, ...
-             'a',-10, ...
-             'f',10, ...
-             'user0',-10, ...
-             'user2',10) ...
-         ) ;
-   
-   end % end of debug
-   
-   % apply splitting operator -2
+   % apply inverse of splitting operator 2
    [T00sp2,T90sp2] = split(time,T00sp,T90sp,fast2,-tlag2) ;   
+
+   %plot_wavelet(time,T00sp2,T90sp2)
+   
    
    %% measure second eignvalue of the resulting wavelet
    % calculate the covariance matrix
@@ -203,15 +167,16 @@ end
 %===============================================================================
 
 %===============================================================================
-function [time,amp0,amp90] = FDGaussian_wavelet(spol,dfreq)
+function [time,amp0,amp90] = FDGaussian_wavelet(spol,dfreq,max_tlag)
 %===============================================================================
 % generate a (first-derivative) Gaussian wavelet centred on 0, time base is 
-% -2*T:T/100:2*T.
+% set so the maximum tlag can be accomodated. This is defined as
+% -(max_tlag+2*T):T/100:(max_tlag+2*T) ;
 
    % calculate time base 
    T = 1/dfreq ;
    dt = T/100 ;
-   time = -2*T:dt:2*T ;
+   time = -(max_tlag+2*T):dt:(max_tlag+2*T) ;
 
    % calculate wavelet
    sig = T/6 ;
@@ -226,3 +191,19 @@ function [time,amp0,amp90] = FDGaussian_wavelet(spol,dfreq)
 end
 %===============================================================================
 
+%===============================================================================
+function [] = plot_wavelet(time,T00,T90)
+%===============================================================================
+% generate a (first-derivative) Gaussian wavelet centred on 0, time base is 
+% set so the maximum tlag can be accomodated. This is defined as
+% -(max_tlag+2*T):T/100:(max_tlag+2*T) ;
+
+figure
+
+plot(time,T00,'b-')
+hold on
+plot(time,T90,'r-')
+
+
+end
+%===============================================================================
