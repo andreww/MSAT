@@ -66,65 +66,138 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
           'Input fast and tlag vectors must be of the same length')            
    end
 
+%  check for just one layer
+   if length(fast)==1
+      fast_eff = fast ;
+      tlag_eff = tlag ;
+      return
+   end
+
+%  aggregate layers which differ by 0 or 90 (+/- 1 degree)
+   [ fast , tlag ] = aggregate( fast , tlag, 'threshold' , 1.0 ) ;
+
+%  check (again) for just one layer
+   if length(fast)==1
+      fast_eff = fast ;
+      tlag_eff = tlag ;
+      return
+   end
+
 %  remove any layers with 0 tlag time; these break the calculation
    ind = find(tlag~=0.0) ;
    fast2 = fast(ind) ;
    tlag2 = tlag(ind) ;
    fast = fast2 ;
    tlag = tlag2 ;
-   
-%  check for just one layer
-   if length(fast)==1
-      fast_eff = fast ;
-      tlag_eff = tlag ;
-      return
-   end                  
 
-%**first unwind the fast directions
+%  unwind the fast directions
    fast = MS_unwind_pm_90(fast) ;
    
-%**deal with the situation where all fast directions are the same
-   if length(find(fast==fast(1))) == length(fast)
-      fast_eff = fast(1) ;
-      tlag_eff = sum(tlag) ;
-   else   
-
 %**process   
-      w = 2.0 .* pi .* f ;
-      th = w .* tlag ./ 2. ;
-      al = 2.*(fast-spol) .* pi/180.0 ;
-            
-      S = prod(cos(th)) ;
-      Cc = S.*sum((tan(th).*cos(al))) ;
-      Cs = S.*sum((tan(th).*sin(al))) ;
-      
-      n=length(fast) ;
-      
-      ap = 0;
-      app = 0;
-      
-      for i=1:n-1
-         for j=i+1:n
-            ap = ap + (tan(th(i)).*tan(th(j)).*cos(al(i)-al(j))) ;
-            app = app + (tan(th(i)).*tan(th(j)).*sin(al(i)-al(j))) ;
-         end
-      end
-      
-      ap = S.*(1-ap) ;
-      app = S.*app ;
-      ala = atan ( (app.^2.+Cs.^2.) ./ (app.*ap + Cs.*Cc) ) ;
-      tha = atan ( (app) ./ (Cs.*cos(ala)-Cc.*sin(ala)) ) ;
+   w = 2.0 .* pi .* f ;
+   th = w .* tlag ./ 2. ;
+   al = 2.*(fast-spol) .* pi/180.0 ;
+         
+   S = prod(cos(th)) ;
+   Cc = S.*sum((tan(th).*cos(al))) ;
+   Cs = S.*sum((tan(th).*sin(al))) ;
    
-      fast_eff = spol + (ala.*180./pi) ./ 2. ;
-      tlag_eff = 2.*tha./w ;                                     
-      
-      fast_eff = MS_unwind_pm_90(fast_eff) ;
+   n=length(fast) ;
+   
+   ap = 0;
+   app = 0;
+   
+   for i=1:n-1
+      for j=i+1:n
+         ap = ap + (tan(th(i)).*tan(th(j)).*cos(al(i)-al(j))) ;
+         app = app + (tan(th(i)).*tan(th(j)).*sin(al(i)-al(j))) ;
+      end
    end
+   
+   ap = S.*(1-ap) ;
+   app = S.*app ;
+   ala = atan ( (app.^2.+Cs.^2.) ./ (app.*ap + Cs.*Cc) ) ;
+   tha = atan ( (app) ./ (Cs.*cos(ala)-Cc.*sin(ala)) ) ;
+   
+   fast_eff = spol + (ala.*180./pi) ./ 2. ;
+   tlag_eff = 2.*tha./w ;                                     
+   
+   fast_eff = MS_unwind_pm_90(fast_eff) ;
+
 %**handle zero tlags      
    if (tlag_eff < 0)
       fast_eff = MS_unwind_pm_90(fast_eff+90) ;
       tlag_eff = abs(tlag_eff) ;
    end   
 
-return
+end
 %===============================================================================
+
+%===============================================================================
+function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
+%  Agglomerate splitting operators which are (near) parallel or
+%  perpendicular. 
+%
+   
+   threshold = 1 ;
+   
+%  process the optional arguments
+   iarg = 1 ;
+   while iarg <= (length(varargin))
+      switch lower(varargin{iarg})
+                case 'threshold'  % parameter definition (value required)
+                  threshold = varargin{iarg+1} ;
+                  iarg = iarg + 2 ;
+                otherwise 
+                  error('MS:EFFECTIVE_SPLITTING_N:UnknownOption',...
+                     ['Unknown option: ' varargin{iarg}]) ;   
+      end
+   end   
+
+   % new arrays
+   fast_agg = zeros(size(fast))+NaN ;
+   tlag_agg = zeros(size(fast))+NaN ;
+   
+   N = length(fast) ;
+   
+   iRef = 1 ;
+   iAgg = 1 ;
+   iComp = 2 ;
+   
+   fast_agg(1) = fast(1) ;
+   tlag_agg(1) = tlag(1) ;
+   
+   % process the fast directions. If the reference direction and the 
+   % comparison  direction are (nearly) identical, sum the tlags. If they 
+   % differ by (nearly) 90 degrees, take the difference. 
+   while iComp<=N
+      if abs(fast(iRef)-fast(iComp))<threshold
+         % add the tlag
+         tlag_agg(iAgg) = tlag_agg(iAgg) + tlag(iComp) ;
+         iComp = iComp + 1 ;
+      elseif abs((abs(fast(iRef)-fast(iComp))-90))<threshold
+         % subtract the tlag
+         tlag_agg(iAgg) = tlag_agg(iAgg) - tlag(iComp) ;
+         iComp = iComp + 1 ;
+      else
+         % move onto the next element
+         iRef = iComp ;
+         iComp = iComp + 1 ;
+         iAgg = iAgg + 1;
+         fast_agg(iAgg) = fast(iRef) ;
+         tlag_agg(iAgg) = tlag(iRef) ;
+      end
+   end
+   
+   % remove the NaNs.
+   ind = find(~isnan(fast_agg)) ;
+   fastA = fast_agg(ind) ;
+   tlagA = tlag_agg(ind) ;
+   
+   % finally, see if we have ended up with any negative numbers. 
+   % if so, flip the sign and add 90. 
+   ind = find(tlagA<0) ;
+   tlagA(ind) = abs(tlagA(ind)) ;
+   fastA(ind) = fastA(ind)+90 ; 
+   
+end

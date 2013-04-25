@@ -62,6 +62,36 @@ assertElementsAlmostEqual(expec, res, 'relative', 0.1)
 
 end 
 
+function test_MS_effective_splitting_N_aggregation
+
+% check that pre-aggregation of parameters works as expected.
+
+% with an extra, cancelling pair of layers
+expec = [-25 0.8];
+[fe, tle] = MS_effective_splitting_N(1/5, 10, [90 20 110 140], [1.0, 3.0, 3.0, 1.0]);
+res = [fe tle];
+assertElementsAlmostEqual(expec, res, 'relative', 0.1)
+
+% last layer which stacks
+expec = [-25 0.8];
+[fe, tle] = MS_effective_splitting_N(1/5, 10, [90 140 140], [1.0, 0.5, 0.5]);
+res = [fe tle];
+assertElementsAlmostEqual(expec, res, 'relative', 0.1)
+
+% last layer which partially cancels.
+expec = [-25 0.8];
+[fe, tle] = MS_effective_splitting_N(1/5, 10, [90 140 50], [1.0, 1.5, 0.5]);
+res = [fe tle];
+assertElementsAlmostEqual(expec, res, 'relative', 0.1)
+
+% entirely cancelling stack
+expec = [0 1.0];
+[fe, tle] = MS_effective_splitting_N(1/5, 10, [0 0 0 90 90 0 0], [1 1 1 2 2 1 1]);
+res = [fe tle];
+assertElementsAlmostEqual(expec, res, 'relative', 0.1)
+
+end
+
 function test_MS_effective_splitting_N_errors
 
 f = @()MS_effective_splitting_N(1/20, 10, [90], [1.0, 1.0]);
