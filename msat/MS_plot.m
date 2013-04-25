@@ -34,6 +34,30 @@
 %          for blue to be fast/high as is conventional for seismic velocity 
 %          colorscales. Setting this option results in red being fast/high.
 %
+%     MS_plot(..., 'pcontours', pcvect)
+%     MS_plot(..., 'scontours', scvect)
+%          Set the contour levels for the P-wave velocity and S-wave
+%          anisotropy plots. The values of pcvect and scvect can be scalars
+%          indicating the number of contour lines to use or vectors, where
+%          each value represents a different contour line. Thus, the
+%          minimum, maximum values and spacing of contours can easily be
+%          set using the syntax [minval:spacing:maxval] for pcvect and
+%          scvect.
+%
+%     MS_plot(..., 'limitsonpol')
+%          Include markers for the maximum and minimum values of S-wave
+%          anisotropy on the plot of fast S-wave polarisation direction.
+%          Not shown by default.
+%
+%     MS_plot(..., 'polsize' s1, s2, w1, w2)
+%          Set the size of the markers used to indicate the fast S-wave
+%          polarisation direction. There are two markers used a larger
+%          white "background" marker with a length set by s1 (defaults to
+%          0.18) and width set by w1 (defaults to 3.0) and an inner black
+%          marker with width set by w2 (defaults to 2.0) and length set by
+%          s2 (defaults to 0.18). A useful "neet" alternitive to the
+%          default is s1 = 0.18, s2 = 0.16, w1 = 2.0 and w2 = 1.0.
+%
 %     MS_plot(..., 'quiet')
 %          Don't write isotropic velocities to the terminal. 
 %
@@ -81,7 +105,18 @@ function MS_plot(C,rh,varargin)
 %  ** Set defaults, these can be overriden in the function call
 %  ** configure contouring options
       cvect = 10 ;     % number of contours
-
+      VPcvect = cvect ;
+      AVScvect = cvect ;
+      
+%  ** Put markers on SWS pol plot. 
+      limitsonpol = 0;
+   
+%  ** Scaling for SWS plo plot.
+      qwhite_scale = 0.18;
+      qblack_scale = 0.18;
+      qwhite_width = 3.0;
+      qblack_width = 2.0;
+      
 %  ** configure font options
       fntsz = 12;
 
@@ -106,8 +141,28 @@ function MS_plot(C,rh,varargin)
                silentterm = 1;
                iarg = iarg + 1 ;
             case 'contours'
+               % We keep this for backwards compat.
+               % but note that it is not (and has never been)
+               % documented.
                cvect = varargin{iarg+1} ;
                iarg = iarg + 2 ;
+               VPcvect = cvect ;
+               AVScvect = cvect ;
+            case 'pcontours'
+               VPcvect = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'scontours'
+               AVScvect = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'limitsonpol'
+               limitsonpol = 1;
+               iarg = iarg + 1;
+            case 'polsize'
+               qwhite_scale = varargin{iarg+1};
+               qblack_scale = varargin{iarg+2};
+               qwhite_width = varargin{iarg+3};
+               qblack_width = varargin{iarg+4};
+               iarg = iarg + 5 ;
             case 'fontsize'
                fntsz = varargin{iarg+1} ;
                iarg = iarg + 2 ;
@@ -127,8 +182,6 @@ function MS_plot(C,rh,varargin)
          end   
       end 
 
-      VPcvect = cvect ;
-      AVScvect = cvect ;
       
       % check the inputs: C
       assert(MS_checkC(C)==1, 'MS:PLOT:badC', 'MS_checkC error MS_plot') ;
@@ -212,7 +265,11 @@ function MS_plot(C,rh,varargin)
                set(h2(j),'LineStyle','none')
             end
          else
-            contourf(X,Y,VP,VPcvect,'LineStyle','none') ; 
+            contourf(X,Y,VP,VPcvect,'LineStyle','none') ;
+            if (~isscalar(VPcvect))
+                % Limit the contours to the input vector.
+                caxis([min(VPcvect) max(VPcvect)]);
+            end
          end
       else
          surf(X,Y,zeros(size(VP)),VP) ;
@@ -263,7 +320,11 @@ function MS_plot(C,rh,varargin)
                set(h2(j),'LineStyle','none')
             end
          else
-            contourf(X,Y,AVS,AVScvect,'LineStyle','none') ;
+             contourf(X,Y,AVS,AVScvect,'LineStyle','none') ;
+             if (~isscalar(AVScvect))
+                 % Limit the contours to the input vector.
+                 caxis([min(AVScvect) max(AVScvect)]);
+             end
          end
       else
          surf(X,Y,zeros(size(AVS)),AVS) ;
@@ -303,6 +364,10 @@ function MS_plot(C,rh,varargin)
          end
       else
          contourf(X,Y,AVS,AVScvect,'LineStyle','none') ;
+         if (~isscalar(AVScvect))
+             % Limit the contours to the input vector.
+             caxis([min(AVScvect) max(AVScvect)]);
+         end
       end
       
       colormap(cmap) ;
@@ -381,19 +446,28 @@ function MS_plot(C,rh,varargin)
       end
 
 
+      if (limitsonpol)
+          %  ** mark the max. min. values here too... 
+          h=plot(AVSmax_x,AVSmax_y,'ws') ;
+          set(h,'MarkerFaceColor','black');
+          h=plot(AVSmin_x,AVSmin_y,'wo') ;
+          set(h,'MarkerFaceColor','black');
+      end
+      
+      
 %  ** plot the vectors (changed to 2D to allow plotting with contourf surface)     
-%      h=quiver3(X2,Y2,Z2,U2,V2,W2,0.18,'k.') ;
-      h=quiver(X2,Y2,U2,V2,0.18,'w.') ;
-      set(h,'LineWidth',3.0) ;
+%      h=quiver3(X2,Y2,Z2,U2,V2,W2,0.18,'k.') ;      
+      h=quiver(X2,Y2,U2,V2,qwhite_scale,'w.') ;
+      set(h,'LineWidth',qwhite_width) ;
 
-      h=quiver(X2,Y2,-U2,-V2,0.18,'w.') ;
-      set(h,'LineWidth',3.0) ;
+      h=quiver(X2,Y2,-U2,-V2,qwhite_scale,'w.') ;
+      set(h,'LineWidth',qwhite_width) ;
 
-      h=quiver(X2,Y2,U2,V2,0.18,'k.') ;
-      set(h,'LineWidth',2.0) ;
+      h=quiver(X2,Y2,U2,V2,qblack_scale,'k.') ;
+      set(h,'LineWidth',qblack_width) ;
 
-      h=quiver(X2,Y2,-U2,-V2,0.18,'k.') ;
-      set(h,'LineWidth',2.0) ;
+      h=quiver(X2,Y2,-U2,-V2,qblack_scale,'k.') ;
+      set(h,'LineWidth',qblack_width) ;
 
 
       view(view_angle);

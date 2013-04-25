@@ -43,6 +43,24 @@
 %   and anisotropic parameters xi, phi and eta (see, e.g., Panning and 
 %   Romanowicz, 2006)
 %
+%'global'
+%~~~~~~~~~
+%
+%   [C]=MS_TI(vp,vs,rh,xi,phi,eta,'global')
+%
+%   Inputs: 
+%       rh  : Density (kg/m2) 
+%       vp  : km/s (Voigt isotropic average)
+%       vs  : km/s (Voigt isotropic average)
+%       xi, phi, eta : Dimensionless anisotropy parameters
+%
+%   Output:
+%        C : Stiffness tensor (6x6 notation, GPa)
+%
+%   Calculates the elastic tensor for a VTI medium from the Voigt average
+%   Vp and Vs and anisotropic parameters xi, phi and eta (see, e.g., Babuska
+%   and Cara, 1991)
+%
 %'love'
 %~~~~~~
 %
@@ -65,6 +83,9 @@
 %        anisotropic model of shear velocity in the whole mantle. Geophysical  
 %        Journal International v167, 361–379. 
 %        doi: 10.1111/j.1365-246X.2006.03100.x
+%
+%     Babuska, V. and Cara, M. (1991). Seismic Anisotropy in the Earth. Kluwer 
+%        Academic, Boston.
 %
 %     Love, A.E.H., (1927). A Treatise on the Theory of Elasticity, 
 %        Cambridge Univ. Press, Cambridge.
@@ -146,6 +167,15 @@ switch lower(pset)
       xi = varargin{4} ; phi = varargin{5} ; eta = varargin{6} ;
       [C]=MS_panning(vp,vs,rh,xi,phi,eta) ;
 %-------------------------------------------------------------------------------
+   case {'global'}
+      if length(varargin)~=7 % need to check
+         error('MS:TI:GlobalWrongArgs', ...
+         'global requires 6 input parameters.') ;
+      end
+      vp = varargin{1} ; vs = varargin{2} ; rh = varargin{3} ; 
+      xi = varargin{4} ; phi = varargin{5} ; eta = varargin{6} ;
+      [C]=MS_global(vp,vs,rh,xi,phi,eta) ;
+%-------------------------------------------------------------------------------
    case {'love'}
       if length(varargin)~=6 % need to check 
          error('MS:TI:LoveWrongArgs', ...
@@ -209,6 +239,46 @@ function [C]=MS_panning(vp,vs,rh,xi,phi,eta)
          0   0   0   0   0  C66 ] ;
    
    C = C./1e9 ; % convert to GPa
+
+end
+
+function [Cglobal]=MS_global(vp,vs,rho,xi,phi,eta)
+%  Output the elastic tensor given a set of radial anisotropy parameters
+%  as used typically in global seismology.  Average velocities are given by:
+%        15*rho*<Vp>^2 = 3*C + (8 + 4*eta)*A + 8*(1 - eta)*L
+%        15*rho*<Vs>^2 =   C + (1 - 2*eta)*A + (6 + 4*eta)*L + 5*N
+%     vp:   Voigt average P wave velocity
+%     vs:   Voigt average shear wave velocity
+%     rho:  Density
+%     xi:   (Vsh^2/Vsv^2) of horizontal waves
+%     phi:  (Vpv^2/Vph^2)
+%     eta:  C13/(C11 - 2*C44)
+
+% convert to m/s
+   vp=vp*1e3;
+   vs=vs*1e3;
+
+   Cglobal = zeros(6,6) ;
+
+   L = 15.*rho.*((3.*phi + 8. + 4.*eta).*vs.^2 - (phi + 1. - 2.*eta).*vp.^2) ...
+         ./ ((6. + 4.*eta + 5.*xi).*(3.*phi + 8. + 4.*eta) ...
+            - 8.*(phi + 1. - 2.*eta).*(1. - eta)) ;
+
+   A = (15.*rho.*vp.^2 - 8.*(1. - eta).*L) ./ (3.*phi + 8. + 4.*eta) ;
+
+   F = eta.*(A - 2.*L) ;
+   C = phi.*A ;
+   N = xi.*L ;
+   C12 = A - 2.*N ;
+
+   Cglobal = [ A  C12 F 0 0 0; ...
+			  C12  A  F 0 0 0; ...
+			   F   F  C 0 0 0; ...
+			   0   0  0 L 0 0; ...
+			   0   0  0 0 L 0; ...
+			   0   0  0 0 0 N] ;
+
+   Cglobal = Cglobal./1e9 ; % convert to GPa
 
 end
 

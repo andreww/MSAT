@@ -10,12 +10,14 @@
 % Usage: 
 %     Fill out elastic tensor C based on symmetry, defined by mode. This 
 %     can take the following values:
-%        'auto' - assume symmetry based on number of Cijs specified 
-%        'iso' - isotropic (nec=2) ; C33 and C66 must be specified.
-%        'hex' - hexagonal (nec=5) ; C33, C44, C11, C66 and C13 must be
-%                specified, x3 is symmetry axis
-%        'vti' - synonym for hexagonal
+%        'auto'  - assume symmetry based on number of Cijs specified 
+%        'iso'   - isotropic (nec=2) ; C33 and C66 must be specified.
+%        'hex'   - hexagonal (nec=5) ; C33, C44, C11, C66 and C13 must be
+%                  specified, x3 is symmetry axis
+%        'vti'   - synonym for hexagonal
 %        'cubic' - cubic (nec=3) ; C33, C66 and C12 must be specified
+%        'ortho' - orthorhombic (nec=9); All six diagonal (C11-C66), C12,
+%                  C13 and C23 must be specified
 %
 %     Cijs *not* specified in the appropriate symmetry should be zero in 
 %     the input matrix. 
@@ -78,6 +80,8 @@ case 'auto'
       mode = 'cubic' ;
    case 5
       mode = 'hex' ;
+   case 9
+      mode = 'ortho' ;
    otherwise
       error('MS:EXPANDnoautosym',['No automatic symmetry set for ' ...
          sprintf('%i',nec) ' elastic constants.']) ;
@@ -111,7 +115,7 @@ case 'cubic'
 %  check that C(1,1) and C(6,6) are set
    if Cin(3,3)==0 | Cin(6,6)==0 | Cin(1,2) == 0
       error('MS:EXPANDbadcubic',...
-         'Isotropic expansion requires C33, C66 and C12 to be set.') ;
+         'Cubic expansion requires C33, C66 and C12 to be set.') ;
    end
    
    C = Cin ;
@@ -125,7 +129,7 @@ case {'hex', 'vti'}
 %  check that C(1,1) and C(6,6) are set
    if Cin(1,1)==0 | Cin(3,3)==0 | Cin(1,3) == 0 | Cin(4,4)==0 | Cin(6,6) == 0 
       error('MS:EXPANDbadhex',...
-         'Isotropic expansion requires C11, C33, C44, C66 and C13 to be set.') ;
+         'Hexagonal expansion requires C11, C33, C44, C66 and C13 to be set.') ;
    end
    
    C = Cin ;
@@ -133,7 +137,28 @@ case {'hex', 'vti'}
    C(1,2) = (C(1,1)-2.*C(6,6)) ;
    C(2,2) = C(1,1) ; C(2,3) = C(1,3) ;
    C(5,5) = C(4,4) ;
-         
+     
+case {'ortho', 'orthorhombic'}
+   if nec~=9
+      error('MS:EXPANDbadortho',...
+          ['Orthorhombic expansion requires C11, C22, C33, C44,' ...
+           'C55, C66, C12, C13 and C23 to be set.']) ;
+   end
+%  check that C(1,1) and C(6,6) are set
+   if Cin(1,1) == 0 | Cin(2,2) == 0 | Cin(3,3) == 0 | Cin(1,2) == 0 | ...
+      Cin(1,3) == 0 | Cin(2,3) == 0 | Cin(4,4) == 0 | Cin(5,5) == 0 | ...
+      Cin(6,6) == 0
+       error('MS:EXPANDbadortho',...
+          ['Orthorhombic expansion requires C11, C22, C33, C44,' ...
+           'C55, C66, C12, C13 and C23 to be set.']) ;
+   end
+   
+   C = Cin ;
+   
+   C(2,1) = C(1,2) ;
+   C(3,1) = C(1,3) ;
+   C(3,2) = C(2,3) ;
+   
 otherwise
    error('MS:EXPANDunsupportsymmetry','Unsupported symmetry.') ;
 end

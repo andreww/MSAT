@@ -129,7 +129,7 @@
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 %===============================================================================
-   function [varargout] = MS_load(fname,varargin) ;
+   function [varargout] = MS_load(fname,varargin)
 %===============================================================================
       eunit = 'default' ;
       dunit = 'default' ;
