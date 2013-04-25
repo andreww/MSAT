@@ -1,6 +1,27 @@
 MSAT Release Notes
 ==================
 
+Version 1.0.2 - unreleased / in progress
+----------------------------------------
+
+This version of MSAT includes several minor improvments, 
+pieces of new functionality and bug fixes. Changes from 
+1.0.1 are:
+
+* Allow MS_expand to handle 9-element orthorhombic 
+case.
+
+* Add MS_save to write files in the formats supported 
+by MS_load.
+
+* Add a new TI paramaterisation 'global', which is like
+'panning' but without the approximation of eta=1.
+
+* Add options to produce nicer looking plots in MS_plot.
+
+* Include proper treatment of exactly parallel or perpendicula
+layers in the stack of operators in MS_effective_splitting_N.
+
 Version 1.0.1 - 5 November 2012
 -------------------------------
 
