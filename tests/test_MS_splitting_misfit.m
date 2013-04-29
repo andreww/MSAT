@@ -18,6 +18,22 @@ function test_MS_splitting_misfit_Zero_cases
 
 end 
 
+function test_MS_splitting_misfit_lam2S
+   % Check that the symmetrical mode works properly. 
+   
+   fast1 = 30  ;
+   tlag1 = 1.5 ;
+   
+   fast2 = 75  ;
+   tlag2 = 0.8 ;
+   
+   misfit1 = MS_splitting_misfit(fast1,tlag1,fast2,tlag2,0.0,0.1,'mode','lam2S') ;
+   misfit2 = MS_splitting_misfit(fast2,tlag2,fast1,tlag1,0.0,0.1,'mode','lam2S') ;
+
+   assertElementsAlmostEqual(misfit1, misfit2, 'absolute',0.001) ;
+
+end 
+
 %function test_MS_splitting_misfit_Zero_cases2
 %    % check two zero splits are equal
 %    misfit = MS_splitting_misfit(30,0.0,60,0,45,0.1.) ;

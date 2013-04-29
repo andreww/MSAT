@@ -77,9 +77,11 @@ function [misfit] = MS_splitting_misfit(fast1,tlag1,...
    switch lower(modeStr)
    case 'lam2'
       misfit=MS_splitting_misfit_lam2(fast1,tlag1,fast2,tlag2,spol,dfreq) ;
+   case 'lam2s'
+      misfit=MS_splitting_misfit_lam2S(fast1,tlag1,fast2,tlag2,spol,dfreq) ;
    otherwise
       error('MS:SPLITTING_MISFIT:UnknownMode',...
-         ['Unknown mode: ' varargin{iarg}]) ;      
+         ['Unknown mode: ' modeStr]) ;      
    end
    
 end
@@ -114,6 +116,58 @@ function [misfit] = MS_splitting_misfit_lam2(fast1,tlag1,fast2,tlag2,spol,dfreq)
       
    % calculate normalised misfit.   
    misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;   
+   
+end
+%===============================================================================
+
+%===============================================================================
+function [misfit] = MS_splitting_misfit_lam2S(fast1,tlag1,fast2,tlag2,spol,dfreq)
+%===============================================================================
+
+% foward 
+
+   % generate a test wavelet.
+   [time,T00,T90] = FDGaussian_wavelet(spol,dfreq,max([tlag1 tlag2])) ;
+
+   % apply splitting operator 1 
+   [T00sp,T90sp] = split(time,T00,T90,fast1,tlag1) ;
+      
+   % apply inverse of splitting operator 2
+   [T00sp2,T90sp2] = split(time,T00sp,T90sp,fast2,-tlag2) ;   
+   
+   %% measure second eignvalue of the resulting wavelet
+   % calculate the covariance matrix
+   COVM = cov(T90sp2,T00sp2) ;
+
+   % take the eigenvalues   
+   [V,D] = eig(COVM) ;
+      
+   % calculate normalised misfit.   
+   misfit1 = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;   
+
+   %% reverse
+   
+   [time,T00,T90] = FDGaussian_wavelet(spol,dfreq,max([tlag1 tlag2])) ;
+
+   % apply splitting operator 2 
+   [T00sp,T90sp] = split(time,T00,T90,fast2,tlag2) ;
+      
+   % apply inverse of splitting operator 1
+   [T00sp2,T90sp2] = split(time,T00sp,T90sp,fast1,-tlag1) ;   
+   
+   %% measure second eignvalue of the resulting wavelet
+   % calculate the covariance matrix
+   COVM = cov(T90sp2,T00sp2) ;
+
+   % take the eigenvalues   
+   [V,D] = eig(COVM) ;
+      
+   % calculate normalised misfit.   
+   misfit2 = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;     
+   
+%  result is the average of the two
+   misfit = (misfit1+misfit2)/2 ;
+
    
 end
 %===============================================================================
