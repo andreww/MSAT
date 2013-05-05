@@ -5,10 +5,12 @@
 % [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
 %  
 %  Inputs:
-%     f (scalar) : Dominant frequency of wave 
-%     spol (scalar) : initial source polarisation
-%     fast (scalar/vector) : fast direction(s) of layer(s) to be included
+%     f (scalar) : Dominant frequency of wave (Hz)
+%     spol (scalar) : initial source polarisation (degrees)
+%     fast (scalar/vector) : fast direction(s) of layer(s) to be 
+%                            included (s)
 %     tlag (scalar/vector) : lag time(s) of layer(s) to be included
+%                            (degrees)
 %
 %  Fast and tlag can be scalars or vectors but must all be the same length.  
 %
