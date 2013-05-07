@@ -204,6 +204,12 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
     [fast_eff, tlag_eff] = measure_splitting_function(time, T00, T90, ...
         15, 0.5.*min(tlag), sum(tlag));
  
+    fast_eff = MS_unwind_pm_90(fast_eff) ;
+    if (tlag_eff < 0)
+       fast_eff = MS_unwind_pm_90(fast_eff+90) ;
+       tlag_eff = abs(tlag_eff) ;
+    end   
+    
     if plotwave
         plot_splitting(time, T00, T90, fast_eff, tlag_eff);
     end
