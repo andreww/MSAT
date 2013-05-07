@@ -2,9 +2,9 @@
 % 
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-% [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
-%  
-%  Inputs:
+% [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...)
+%
+%  Common Inputs:
 %     f (scalar) : Dominant frequency of wave (Hz)
 %     spol (scalar) : initial source polarisation (degrees)
 %     fast (scalar/vector) : fast direction(s) of layer(s) to be 
@@ -12,11 +12,34 @@
 %     tlag (scalar/vector) : lag time(s) of layer(s) to be included
 %                            (degrees)
 %
-%  Fast and tlag can be scalars or vectors but must all be the same length.  
+%  Fast and tlag can be scalars or vectors but must all be the same length.
+% 
+%  Usage:
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag)
+%     or 
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+%   'mode', 'S&S')
 %
-%  CAUTION! The method gives unstable results when
-%  the source polarisation is near the effective fast direction. This would,
-%  however probably be seen as a null result anyway.
+%     Calculate effective splitting parameters using the method of Silver
+%     and Savage (1994). CAUTION! This is quick but is known to fail if the delay
+%     time becomes large compared to the dominant frequence of the wave. It
+%     also gives unstable results when the source polarisation is near the 
+%     effective fast direction. This would, however probably be seen as a 
+%     null result anyway.
+% 
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+%   'mode', 'GaussianWavelet')
+%
+%     Calculate effective splitting parameters by first applying the 
+%     splitting operators in sequence to an unsplit Gaussian wavelet then
+%     searching for the effective splitting operator that minimises the
+%     second eigenvalue of the covariance matrix of the result. This is the 
+%     ray theory approach described by Bonnin et al. (2012). 
+%
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+%   'mode', 'GaussianWavelet', 'PlotWavelet')
+%
+%     Plot the resulting wavelet when in GaussianWavelet mode.
 %
 %  Reference: 
 %      Silver, P. G. and Savage, M. K. 1994 "The interpretation of shear-wave
@@ -60,14 +83,42 @@
 
 
 %===============================================================================
-function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
+function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag, varargin)
 %===============================================================================
 %  check inputs are the same size   
    if ~isequal(length(fast),length(tlag))
       error('MS:ListsMustMatch', ...
           'Input fast and tlag vectors must be of the same length')            
    end
+   
+   mode = 's&s';
+   plotwave = 0;
+   
+   iarg = 1 ;
+   while iarg <= (length(varargin))
+       switch lower(varargin{iarg})
+           case 'mode'
+              mode = varargin{iarg+1} ; 
+              iarg = iarg + 2;
+           case 'plotwavelet'
+               plotwave = 1;
+               iarg = iarg + 1;
+       end
+   end
+   
+   if strcmp(mode, 's&s') 
+       [fast_eff,tlag_eff]=MS_effective_splitting_N_SS(f,spol,fast,tlag);
+   elseif strcmp(mode, 'gaussianwavelet')
+       [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f,spol,...
+           fast,tlag,plotwave);
+   else
+       error('MS:effectiveUnkownMode', ...
+           ['unknown mode in MS_effective_splitting_N: ', mode])
+   end
+end
 
+function [fast_eff,tlag_eff]=MS_effective_splitting_N_SS(f,spol,fast,tlag)
+   
 %  check for just one layer
    if length(fast)==1
       fast_eff = fast ;
@@ -134,6 +185,29 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
 
 end
 %===============================================================================
+
+function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
+    tlag, plotwave)
+
+    [time,T00,T90] = FDGaussian_wavelet(spol,f, sum(tlag)) ;
+
+    if length(fast)==1
+        % So we can test - should get [fast_eff,tlag_eff] == [fast, tlag]
+        [T00,T90] = split(time,T00,T90,fast,tlag);
+    else
+        for i =1:length(fast)
+            % Split by each op in turn...
+            [T00,T90] = split(time,T00,T90,fast(i),tlag(i));
+        end
+    end
+    
+    [fast_eff, tlag_eff] = measure_splitting_function(time, T00, T90, ...
+        15, 0.5.*min(tlag), sum(tlag));
+ 
+    if plotwave
+        plot_splitting(time, T00, T90, fast_eff, tlag_eff);
+    end
+end
 
 %===============================================================================
 function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
@@ -203,3 +277,139 @@ function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
    fastA(ind) = fastA(ind)+90 ; 
    
 end
+
+
+function [fast, tlag] = measure_splitting_function(time, T00, T90, ...
+    d_fast, d_tlag, max_tlag)
+    % Given a two traces (T00 and T90) on a common time axis (time) find
+    % the splitting operator (fast and tlag) that minimises the second
+    % eigenvalue of the covariance matrix. This is done in two steps. First
+    % using an approximate grid search (spacing and time limits set by 
+    % d_fast, d_tlag and max_tlag) then by using the Matlab built
+    % in simplex optimiser from the best grid point.
+
+    % Do the grid search
+    best_misfit = 100;
+    for fast = 0.0:d_fast:180.0
+        for tlag = 0.0:d_tlag:max_tlag
+            split_op = [fast, tlag];
+            misfit = splitting_function(split_op, time, T00, T90);
+            if (misfit < best_misfit)
+                best_split_op = split_op;
+                best_misfit = misfit;
+            end
+        end
+    end
+    
+    % Simplex minimisation
+    [new_split_op, misfit] = fminsearch(...
+                @(split_op) splitting_function(split_op, time, ...
+                T00, T90), best_split_op, optimset('Display','notify'));
+    if (misfit < best_misfit)
+        best_split_op = new_split_op;
+    end
+            
+    % Unpack results
+    fast = best_split_op(1);
+    tlag = best_split_op(2);        
+end
+
+function misfit = splitting_function(split_op, time, T00, T90)
+    % Apply a spliting operator to two traces and calculate the misfit in a
+    % way that can be used by measure_splitting_function
+    
+    % Unpack args
+    fast = split_op(1);
+    tlag = split_op(2);
+    % Calculate the traces with the revered split
+    [T00sp,T90sp] = split(time,T00,T90,fast,-tlag) ;
+    % measure second eignvalue of the resulting wavelet
+    % calculate the covariance matrix
+    COVM = cov(T90sp,T00sp) ;
+    % take the eigenvalues
+    [~,D] = eig(COVM) ;
+    % calculate normalised misfit.
+    misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;     
+end
+
+function [T00sp,T90sp] = split(time,T00,T90,fast,tlag)
+    % Apply a splitting operator to a pair of orthogonal traces.
+   
+    % rotate to fast reference frame
+    [ F, S ] = RF_rotate(T00,T90,fast) ;
+   
+    % shift both components tlag/2 in opposite directions
+    F = tshift(time,F,+tlag/2) ;
+    S = tshift(time,S,-tlag/2) ;
+   
+    % rotate back to original reference frame
+    [ T00sp, T90sp ] = RF_rotate(F,S,-fast) ;
+end
+
+function [As] = tshift(time,A,tshift)
+    % Apply an interpolated time shift to a trace
+    As = pchip(time,A,time+tshift) ;
+end
+
+function [T00R,T90R] = RF_rotate(T00,T90,theta)
+    % Apply a rotation to a pair of orthogonal traces (this is a reference frame
+    % rotation)
+
+    % form 2 row matrix
+    D = [T90 ; T00] ;
+   
+    % rotation matrix
+    R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)] ;
+   
+    DR = R*D ;
+   
+    T00R = DR(2,:) ;
+    T90R = DR(1,:) ; 
+end
+
+
+function [time,amp0,amp90] = FDGaussian_wavelet(spol,dfreq,max_tlag)
+    % generate a (first-derivative) Gaussian wavelet centred on 0, time base is
+    % set so the maximum tlag can be accomodated. This is defined as
+    % -(max_tlag+2*T):T/100:(max_tlag+2*T) ;
+
+    % calculate time base
+    T = 1/dfreq ;
+    dt = T/100 ;
+    time = -(max_tlag+2*T):dt:(max_tlag+2*T) ;
+
+    % calculate wavelet
+    sig = T/6 ;
+    amp = -(time./(sig.^3*sqrt(2.*pi))).*exp(-time.^2./(2.*sig.^2)) ;
+   
+    % normalise and project amplitude
+    amp = amp./max(amp) ;
+    amp0 = amp.*cosd(spol) ;
+    amp90 = amp.*sind(spol) ;
+end
+
+
+function [] = plot_splitting(time, T00, T90, fast, tlag)
+    % Plot some possibly useful diagnostics;
+
+    [T00sp,T90sp] = split(time,T00,T90,fast,-tlag) ;
+
+    figure
+    subplot(221);
+    plot(time,T00,'b-')
+    hold on
+    plot(time,T90,'r-')
+    title('Split wavelet')
+    subplot(222);
+    plot(time,T00sp,'b-')
+    hold on
+    plot(time,T90sp,'r-')
+    title('After effective splitting removed')
+    subplot(223);
+    plot(T00, T90,'b-');
+    subplot(224);
+    plot(T00sp, T90sp,'b-');
+  
+end
+
+ 
