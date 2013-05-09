@@ -128,6 +128,8 @@ nocbar = 0 ;
 velmesh = 3;
 polmesh = 2;
 cax = NaN ; % define to use
+minval = Inf ; % define to use
+maxval = Inf ; 
 
 % Changing defaults for case of slowness surfaces before the optional arguments are processed
 if ischar(mode)
@@ -181,6 +183,10 @@ end
                   cmap = cmarg ;
                end
                iarg = iarg + 2 ;
+            case 'contourbounds'
+               minval = varargin{iarg + 1};
+               maxval = varargin{iarg + 2};
+               iarg = iarg + 3;
             otherwise 
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
@@ -267,6 +273,9 @@ end
 shading interp
 axis([-1.2 1.2 -1.2 1.2 -1.2 1.2]) ;
 colormap(cmap)
+if (minval ~= Inf) && (maxval ~= Inf)
+    caxis([minval maxval])
+end
 daspect([1 1 1]) ;
 hold on
 

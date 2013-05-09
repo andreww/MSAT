@@ -17,7 +17,8 @@ by MS_load.
 * Add a new TI paramaterisation 'global', which is like
 'panning' but without the approximation of eta=1.
 
-* Add options to produce nicer looking plots in MS_plot.
+* Add options to produce nicer looking plots in MS_plot and 
+allow contour limits to be set in MS_sphere.
 
 * Include proper treatment of exactly parallel or perpendicula
 layers in the stack of operators in MS_effective_splitting_N.
