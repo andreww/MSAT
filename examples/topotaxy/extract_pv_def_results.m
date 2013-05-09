@@ -1,11 +1,29 @@
 % EXTRACT_PV_DEF_RESULTS.M - cut down version for PV def after transform
 % 
 % This script is for the analysis of deformed perovskite after
-% topotaxy_model has been run on deformed post_perovskite.
+% topotaxy_model has been run on deformed post_perovskite and the 
+% VPSC code used to deform the resulting textured perovskite. It is
+% included here for completeness.
 %  
 % See also: MS_rotEuler, MS_rotR, MS_VRH
 
-% (C) Andrew Walker, 2012
+% (C) Andrew Walker, 2012, 2013
+% 
+% Redistribution and use in source and binary forms, 
+% with or without modification, are permitted provided 
+% that the following conditions are met:
+% 
+%    * Redistributions of source code must retain the 
+%      above copyright notice, this list of conditions 
+%      and the following disclaimer.
+%    * Redistributions in binary form must reproduce 
+%      the above copyright notice, this list of conditions 
+%      and the following disclaimer in the documentation 
+%      and/or other materials provided with the distribution.
+%    * Neither the name of the University of Bristol nor the names 
+%      of its contributors may be used to endorse or promote 
+%      products derived from this software without specific 
+%      prior written permission.
 % 
 % THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS 
 % AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
@@ -197,7 +215,7 @@ end
 % ============================
 %
 % Note that I have copies of these
-% in a seperate repo to ease reuse.
+% in a separate repo to ease reuse.
 
 function plot_pole_figure(eulers, CS, SS, title, scale)
     % Use MTEX to plot a pole figure of a set of Euler 
@@ -228,7 +246,6 @@ function plot_pole_figure(eulers, CS, SS, title, scale)
     set(h, 'Name', title);
     
 end
-
 
 
 function [eulers, nxtl] = read_VPSC_file(filename)

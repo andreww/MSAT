@@ -13,21 +13,49 @@
 % this is used to generate a model of the elasticity of the perovskite
 % following the phase transition. Finally, a set of Euler angles 
 % representing the transformed perovskite is generated and these 
-% can be used to begin a further VPSC calculation of deformation 
-% of perovskite.
+% can be used to begin a further VPSC calculation of the deformation 
+% of pre-textured perovskite. 
 % 
 % The script is packaged as a function taking a number of optional
 % arguments to give the source of the VPSC output and restart files
 % but these are not needed. The script can most simply be run as 
-% topotaxy_model() on the command line. The MTEX toolkit can be used 
-% to produce pole figures of the textures but this is not required.
-% The first optional argument in the file name of a non-default 
-% input file to read the post-perovskite texture from, the second
-% is a file to write the transformed perovskite texture to.
-%  
+% topotaxy_model() on the command line. The MTEX toolkit (Bachmann 
+% et al. 2010) can be used to produce pole figures of the textures 
+% but this is not required. The function can take one, two, or four 
+% optional arguments:
+%   * The first optional argument in the file name of a non-default 
+%     input file to read the post-perovskite texture from. This 
+%     defaults  to 'TEX_PH1.OUT' in the local directory. 
+%   * The second is a file to be used to write the transformed 
+%     perovskite texture in a format that can be read by the VPSC code.
+%     If no argument is provided no file is produced. 
+%   * The third and fourth arguments allow the post-perovskite
+%     and perovskite elasticity to be written in a file for later reuse.
+% 
+% References:
+%     F. Bachmann, R. Hielscher and H. Schaeben (2010) "Texture analysis 
+%        with MTEX -- free and open source software toolbox". Solid State
+%        Phenomena 160:63-68. 10.4028/www.scientific.net/SSP.160.63
+%
 % See also: MS_rotEuler, MS_rotR, MS_VRH
 
-% (C) Andrew Walker, 2012
+% (C) Andrew Walker, 2012, 2013
+%
+% Redistribution and use in source and binary forms, 
+% with or without modification, are permitted provided 
+% that the following conditions are met:
+% 
+%    * Redistributions of source code must retain the 
+%      above copyright notice, this list of conditions 
+%      and the following disclaimer.
+%    * Redistributions in binary form must reproduce 
+%      the above copyright notice, this list of conditions 
+%      and the following disclaimer in the documentation 
+%      and/or other materials provided with the distribution.
+%    * Neither the name of the University of Bristol nor the names 
+%      of its contributors may be used to endorse or promote 
+%      products derived from this software without specific 
+%      prior written permission.
 % 
 % THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS 
 % AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
@@ -178,7 +206,7 @@ function topotaxy_model(varargin)
     report_elasticity(C_pv_av, rh_pv_av, ...
         'perovskite after transformation');
     if write_elastic
-        % Save Cij in format for reflectivity calc.
+        % Save Cij in format that can be used for reflectivity calculation.
         MS_save(pv_elastic_name, C_pv_av, rh_pv_av, 'Aij', 'eunit', ...
             'Pa');    
     end
@@ -203,7 +231,7 @@ function topotaxy_model(varargin)
             transformed_eulers(3,x) = phi2;
         end
         
-        % A test that this is correct is to see if these euler angles give
+        % A test that this is correct is to see if these Euler angles give
         % C_pv_av...
         Cs = zeros(6,6,nxtls);
         for x = 1:nxtls
@@ -225,7 +253,7 @@ function topotaxy_model(varargin)
                 'MATLAB:UndefinedFunction')
                 %XUnit not installed...
                 fprintf(['\n Warning: XUnit is not installed. \n ', ...
-                     'Proceeding with out checking for valididty of ', ...
+                     'Proceeding with out checking for validity of ', ...
                      'rotated Euler angles\n']);
             else
                 % Anything else is a problem.
@@ -241,7 +269,7 @@ function topotaxy_model(varargin)
     % =================================
     if (write_vpsc_out)
         write_VPSC_file(vpsc_out_fname, transformed_eulers, ...
-            'Euler angles for perovskite transfomed from post-perovskite');
+            'Euler angles for perovskite transformed from post-perovskite');
         fprintf('\n%i sets of transformed Euler angles written to %s\n',...
         [nxtls, vpsc_out_fname]);
     end
@@ -331,7 +359,7 @@ end
 
 
 function [transA, transB] = getTopotaxyRotations(ppv_a, ppv_b, ppv_c)
-    % Return two rotation metricies to give the two possible orientations
+    % Return two rotation matrices to give the two possible orientations
     % of perovskite given a post-perovskite orientation.
 
     % We need the post-perovskite lattice vectors 
@@ -405,7 +433,7 @@ end
 % ============================
 %
 % Note that I have copies of these
-% in a seperate repo to ease reuse.
+% in a separate repo to ease reuse.
 
 function [ g ] = rot_from_Euler(phi1, theta, phi2)
     % Given three Euler angles phi1, Phi, phi2 (Bunge notation, 
