@@ -4,7 +4,7 @@ MSAT Release Notes
 Version 1.0.2 - unreleased / in progress
 ----------------------------------------
 
-This version of MSAT includes several minor improvments, 
+This version of MSAT includes several minor improvements, 
 pieces of new functionality and bug fixes. Changes from 
 1.0.1 are:
 
@@ -14,13 +14,16 @@ case.
 * Add MS_save to write files in the formats supported 
 by MS_load.
 
-* Add a new TI paramaterisation 'global', which is like
+* Add a new TI parameterization 'global', which is like
 'panning' but without the approximation of eta=1.
 
 * Add options to produce nicer looking plots in MS_plot.
 
-* Include proper treatment of exactly parallel or perpendicula
+* Include proper treatment of exactly parallel or perpendicular
 layers in the stack of operators in MS_effective_splitting_N.
+
+* Add new example showing the simulation of texture inheritance 
+in the lowermost mantle.
 
 Version 1.0.1 - 5 November 2012
 -------------------------------
@@ -77,7 +80,7 @@ available within the Matlab environment.
 * A new function, MS_TI, has been written to bring together 
 the various ways of creating a elasticity matrix with
 transverse isotropy from the various representations. MS_VTI 
-and MS_VTI2 now act as aliases to this function. Love’s 
+and MS_VTI2 now act as aliases to this function. Love's 
 parameterisation has been added.
 
 * Added new effective medium theories (for aligned cracks and 
