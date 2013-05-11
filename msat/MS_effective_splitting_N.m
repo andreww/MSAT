@@ -22,7 +22,7 @@
 %
 %     Calculate effective splitting parameters using the method of Silver
 %     and Savage (1994). CAUTION! This is quick but is known to fail if the delay
-%     time becomes large compared to the dominant frequence of the wave. It
+%     time becomes large compared to the dominant frequency of the wave. It
 %     also gives unstable results when the source polarisation is near the 
 %     effective fast direction. This would, however probably be seen as a 
 %     null result anyway.
@@ -31,22 +31,28 @@
 %   'mode', 'GaussianWavelet')
 %
 %     Calculate effective splitting parameters by first applying the 
-%     splitting operators in sequence to an unsplit Gaussian wavelet then
-%     searching for the effective splitting operator that minimises the
-%     second eigenvalue of the covariance matrix of the result. This is the 
-%     ray theory approach described by Bonnin et al. (2012). 
+%     splitting operators in sequence to an unsplit first-derivative 
+%     Gaussian wavelet then searching for the effective splitting operator 
+%     that minimises the second eigenvalue of the covariance matrix 
+%     of the result. This is the ray theory approach described by 
+%     Bonnin et al. (2012). 
 %
 %   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
 %   'mode', 'GaussianWavelet', 'PlotWavelet')
 %
 %     Plot the resulting wavelet when in GaussianWavelet mode.
 %
-%  Reference: 
+%  References: 
+%      M. Bonnin, A. Tommasi, R. Hassani, S. Chevrot, J. Wookey, G. Barruol
+%        (2012) "Numerical modelling of the upper-mantle anisotropy beneath
+%        a migrating strike-slip plate boundary: the San Andreas Fault 
+%        system" Geophysical Journal International, v191 pp 436-458.
+%        http://dx.doi.org/10.1111/j.1365-246X.2012.05650.x
 %      Silver, P. G. and Savage, M. K. 1994 "The interpretation of shear-wave
-%      splitting parameters in the presence of two anisotropic layers" 
-%      Geophysical Journal International, v119 pp 949-963.  
+%        splitting parameters in the presence of two anisotropic layers" 
+%        Geophysical Journal International, v119 pp 949-963. 
 
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011-2013 James Wookey and Andrew Walker
 % Copyright (c) 2005-2011, James Wookey
 % All rights reserved.
 % 
@@ -98,7 +104,7 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag, varargin
    while iarg <= (length(varargin))
        switch lower(varargin{iarg})
            case 'mode'
-              mode = varargin{iarg+1} ; 
+              mode = lower(varargin{iarg+1}) ; 
               iarg = iarg + 2;
            case 'plotwavelet'
                plotwave = 1;
@@ -189,15 +195,15 @@ end
 function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
     tlag, plotwave)
 
-    [time,T00,T90] = FDGaussian_wavelet(spol,f, sum(tlag)) ;
+    [time,T00,T90] = MS_make_trace(spol,f, sum(tlag)) ;
 
     if length(fast)==1
         % So we can test - should get [fast_eff,tlag_eff] == [fast, tlag]
-        [T00,T90] = split(time,T00,T90,fast,tlag);
+        [T00,T90] = MS_split_trace(time,T00,T90,fast,tlag);
     else
         for i =1:length(fast)
             % Split by each op in turn...
-            [T00,T90] = split(time,T00,T90,fast(i),tlag(i));
+            [T00,T90] = MS_split_trace(time,T00,T90,fast(i),tlag(i));
         end
     end
     
@@ -328,7 +334,7 @@ function misfit = splitting_function(split_op, time, T00, T90)
     fast = split_op(1);
     tlag = split_op(2);
     % Calculate the traces with the revered split
-    [T00sp,T90sp] = split(time,T00,T90,fast,-tlag) ;
+    [T00sp,T90sp] = MS_split_trace(time,T00,T90,fast,-tlag) ;
     % measure second eignvalue of the resulting wavelet
     % calculate the covariance matrix
     COVM = cov(T90sp,T00sp) ;
@@ -338,67 +344,11 @@ function misfit = splitting_function(split_op, time, T00, T90)
     misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;     
 end
 
-function [T00sp,T90sp] = split(time,T00,T90,fast,tlag)
-    % Apply a splitting operator to a pair of orthogonal traces.
-   
-    % rotate to fast reference frame
-    [ F, S ] = RF_rotate(T00,T90,fast) ;
-   
-    % shift both components tlag/2 in opposite directions
-    F = tshift(time,F,+tlag/2) ;
-    S = tshift(time,S,-tlag/2) ;
-   
-    % rotate back to original reference frame
-    [ T00sp, T90sp ] = RF_rotate(F,S,-fast) ;
-end
-
-function [As] = tshift(time,A,tshift)
-    % Apply an interpolated time shift to a trace
-    As = pchip(time,A,time+tshift) ;
-end
-
-function [T00R,T90R] = RF_rotate(T00,T90,theta)
-    % Apply a rotation to a pair of orthogonal traces (this is a reference frame
-    % rotation)
-
-    % form 2 row matrix
-    D = [T90 ; T00] ;
-   
-    % rotation matrix
-    R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)] ;
-   
-    DR = R*D ;
-   
-    T00R = DR(2,:) ;
-    T90R = DR(1,:) ; 
-end
-
-
-function [time,amp0,amp90] = FDGaussian_wavelet(spol,dfreq,max_tlag)
-    % generate a (first-derivative) Gaussian wavelet centred on 0, time base is
-    % set so the maximum tlag can be accomodated. This is defined as
-    % -(max_tlag+2*T):T/100:(max_tlag+2*T) ;
-
-    % calculate time base
-    T = 1/dfreq ;
-    dt = T/100 ;
-    time = -(max_tlag+2*T):dt:(max_tlag+2*T) ;
-
-    % calculate wavelet
-    sig = T/6 ;
-    amp = -(time./(sig.^3*sqrt(2.*pi))).*exp(-time.^2./(2.*sig.^2)) ;
-   
-    % normalise and project amplitude
-    amp = amp./max(amp) ;
-    amp0 = amp.*cosd(spol) ;
-    amp90 = amp.*sind(spol) ;
-end
-
 
 function [] = plot_splitting(time, T00, T90, fast, tlag)
     % Plot some possibly useful diagnostics;
 
-    [T00sp,T90sp] = split(time,T00,T90,fast,-tlag) ;
+    [T00sp,T90sp] = MS_split_trace(time,T00,T90,fast,-tlag) ;
 
     figure
     subplot(221);
