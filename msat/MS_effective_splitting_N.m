@@ -190,7 +190,7 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N_SS(f,spol,fast,tlag)
    end   
 
 end
-%===============================================================================
+
 
 function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
     tlag, plotwave)
@@ -207,7 +207,7 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
         end
     end
     
-    [fast_eff, tlag_eff] = measure_splitting_function(time, T00, T90, ...
+    [fast_eff, tlag_eff] = MS_measure_trace_splitting(time, T00, T90, ...
         15, 0.5.*min(tlag), sum(tlag));
  
     fast_eff = MS_unwind_pm_90(fast_eff) ;
@@ -221,7 +221,7 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
     end
 end
 
-%===============================================================================
+
 function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
 %  Agglomerate splitting operators which are (near) parallel or
 %  perpendicular. 
@@ -291,58 +291,6 @@ function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
 end
 
 
-function [fast, tlag] = measure_splitting_function(time, T00, T90, ...
-    d_fast, d_tlag, max_tlag)
-    % Given a two traces (T00 and T90) on a common time axis (time) find
-    % the splitting operator (fast and tlag) that minimises the second
-    % eigenvalue of the covariance matrix. This is done in two steps. First
-    % using an approximate grid search (spacing and time limits set by 
-    % d_fast, d_tlag and max_tlag) then by using the Matlab built
-    % in simplex optimiser from the best grid point.
-
-    % Do the grid search
-    best_misfit = 100;
-    for fast = 0.0:d_fast:180.0
-        for tlag = 0.0:d_tlag:max_tlag
-            split_op = [fast, tlag];
-            misfit = splitting_function(split_op, time, T00, T90);
-            if (misfit < best_misfit)
-                best_split_op = split_op;
-                best_misfit = misfit;
-            end
-        end
-    end
-    
-    % Simplex minimisation
-    [new_split_op, misfit] = fminsearch(...
-                @(split_op) splitting_function(split_op, time, ...
-                T00, T90), best_split_op, optimset('Display','notify'));
-    if (misfit < best_misfit)
-        best_split_op = new_split_op;
-    end
-            
-    % Unpack results
-    fast = best_split_op(1);
-    tlag = best_split_op(2);        
-end
-
-function misfit = splitting_function(split_op, time, T00, T90)
-    % Apply a spliting operator to two traces and calculate the misfit in a
-    % way that can be used by measure_splitting_function
-    
-    % Unpack args
-    fast = split_op(1);
-    tlag = split_op(2);
-    % Calculate the traces with the revered split
-    [T00sp,T90sp] = MS_split_trace(time,T00,T90,fast,-tlag) ;
-    % measure second eignvalue of the resulting wavelet
-    % calculate the covariance matrix
-    COVM = cov(T90sp,T00sp) ;
-    % take the eigenvalues
-    [~,D] = eig(COVM) ;
-    % calculate normalised misfit.
-    misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;     
-end
 
 
 function [] = plot_splitting(time, T00, T90, fast, tlag)
