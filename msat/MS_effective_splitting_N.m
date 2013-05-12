@@ -217,7 +217,11 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
     end   
     
     if plotwave
-        plot_splitting(time, T00, T90, fast_eff, tlag_eff);
+        [~, T00or, T90or] = MS_make_trace(spol,f, sum(tlag));
+        [T00us, T90us] = MS_split_trace(time,T00,T90,fast_eff,-tlag_eff);
+        MS_plot_trace(time, [T00or; T00; T00us], [T90or; T90; T90us],...
+            'headings', {'Probe trace'; 'Split trace'; ...
+            'Recovered trace'}, 'plots', 'wd');
     end
 end
 
@@ -288,32 +292,6 @@ function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
    tlagA(ind) = abs(tlagA(ind)) ;
    fastA(ind) = fastA(ind)+90 ; 
    
-end
-
-
-
-
-function [] = plot_splitting(time, T00, T90, fast, tlag)
-    % Plot some possibly useful diagnostics;
-
-    [T00sp,T90sp] = MS_split_trace(time,T00,T90,fast,-tlag) ;
-
-    figure
-    subplot(221);
-    plot(time,T00,'b-')
-    hold on
-    plot(time,T90,'r-')
-    title('Split wavelet')
-    subplot(222);
-    plot(time,T00sp,'b-')
-    hold on
-    plot(time,T90sp,'r-')
-    title('After effective splitting removed')
-    subplot(223);
-    plot(T00, T90,'b-');
-    subplot(224);
-    plot(T00sp, T90sp,'b-');
-  
 end
 
  

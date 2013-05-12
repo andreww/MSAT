@@ -170,21 +170,3 @@ function [misfit] = MS_splitting_misfit_lam2S(fast1,tlag1,fast2,tlag2,spol,dfreq
 
    
 end
-%===============================================================================
-
-%===============================================================================
-function [] = plot_wavelet(time,T00,T90)
-%===============================================================================
-% generate a (first-derivative) Gaussian wavelet centred on 0, time base is 
-% set so the maximum tlag can be accomodated. This is defined as
-% -(max_tlag+2*T):T/100:(max_tlag+2*T) ;
-
-figure
-
-plot(time,T00,'b-')
-hold on
-plot(time,T90,'r-')
-
-
-end
-%===============================================================================
