@@ -1,12 +1,31 @@
-% SPLIT_MODEL.M - Example script modelling shear-wave splitting variation with
-%                 backazimuth. 
+% SPLIT_MODEL.M - Example script modelling shear-wave splitting variation 
+%                 with backazimuth. 
 %
-% This script demonstrates simple shear-wave splitting modelling using the MSAT
-% toolset. It predicts the SKS splitting variation with azimuth associated 
-% with two dipping, partially-aligned olivine layers. The splitting in each layer
-% is calculated using the Christoffel equation (MS_phasvels), and combined using
-% N-layer effective splitting equations (MS_effective_splitting_N; Silver and 
-% Savage, GJI, 1994). Straight raypaths through the upper mantle are assumed. 
+% This script demonstrates simple shear-wave splitting modelling using 
+% the MSAT toolset. It predicts the SKS splitting variation with azimuth 
+% associated with two dipping, partially-aligned olivine layers. The 
+% splitting in each layer is calculated using the Christoffel equation 
+% (MS_phasvels), and, by default, combined using N-layer effective 
+% splitting equations (MS_effective_splitting_N; Silver and Savage, GJI, 
+% 1994). Straight raypaths through the upper mantle are assumed.
+%
+% The example can also calculate the effective splitting parameters 
+% numerically and can limit the calculation to a subset of azimuths
+% (e.g. using the 'GaussianWavelet' mode in MS_effective_splitting_N).
+% These features are supported by pairs of optional arguments to the 
+% example script. These are any combination of:
+%
+%     * split_model("mode", eff_split_mode) where eff_split_mode is a 
+%       string passed into the mode argument of MS_effective_splitting_N.
+%       Note that setting this to 'GaussianWavelet' results in a much 
+%       longer execution time for the example and the remaining options 
+%       can be used to limit this.
+%     * split_model("min_azi", min_azi) the minimum azimuth considered for
+%       the calculation (default 0 degrees).
+%     * split_model("max_azi", max_azi) the maximum azimuth considered for
+%       the calculation (default 360 degrees).
+%     * split_model("del_azi", del_azi) the azimuthal spacing used for the
+%       calculation (default 1 degree).
 %
 % See also: MS_EFFECTIVE_SPLITTING_N, MS_PHASEVELS
 
@@ -27,7 +46,30 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function split_model()
+function split_model(varargin)
+
+%  ** Handle optional arguments and defaults
+   e_split_mode = 's&s'; % Default mode for effective splitting calc.
+   min_azi = 0.0;
+   max_azi = 360.0;
+   del_azi = 1.0;
+   iarg = 1 ;
+   while iarg <= (length(varargin))
+       switch lower(varargin{iarg})
+           case 'mode'
+              e_split_mode = lower(varargin{iarg+1}) ; 
+              iarg = iarg + 2;
+           case 'min_azi'
+               min_azi = varargin{iarg+1};
+               iarg = iarg + 2;
+           case 'max_azi'
+               max_azi = varargin{iarg+1};
+               iarg = iarg + 2;
+           case 'del_azi'
+               del_azi = varargin{iarg+1};
+               iarg = iarg + 2;
+       end
+   end
 
 %  ** Setup model parameters
       S_slow = 4.814 ; % (SKS at 100 degrees from iasp91) ->
@@ -47,10 +89,10 @@ function split_model()
                    L2_depth, L2_thick, L2_dip, L2_aaz, L2_faln) ; 
 
 %  ** imaging parameters
-      azi = [0:1:360] ; % 0 is down dip direction (perp. to strike), note that
-                        % this is the seismic backazimuth + 180 degrees
-                        % Wave is assumed to be polarised in this direction. 
-                        
+      azi = [min_azi:del_azi:max_azi] ; % 0 is down dip direction (perp. to
+                        % strike), note that this is the seismic 
+                        % backazimuth + 180 degrees. Wave is assumed to be 
+                        % polarised in this direction.                 
       inc = ones(size(azi)).*90 - aoi ; % 90 is vertical
 
 %  ** calculate distances
@@ -86,7 +128,7 @@ function split_model()
       for i = 1:length(azi)
          [fast_eff(i),tlag_eff(i)] = ...
             MS_effective_splitting_N(0.125,azi(i), ...
-            [fast2(i) fast1(i)],[tlag2(i) tlag1(i)]) ;
+            [fast2(i) fast1(i)],[tlag2(i) tlag1(i)], 'mode', e_split_mode);
       end
 
 %  ** make a figure of the results
@@ -98,7 +140,7 @@ function split_model()
       plot(azi,tlag1,'r--') ; hold on
       plot(azi,tlag2,'g--') ;
       plot(azi,tlag_eff,'k-','LineWidth',1.5)
-      axis([0 360 0 4])
+      axis([min(azi) max(azi) 0 4])
       xlabel('Polarisation (relative to downdip direction)')
       ylabel('Lag times (s)')
       legend('Upper layer','Lower layer','Total') ;
@@ -108,7 +150,7 @@ function split_model()
       plot(azi,fast1,'r--') ; hold on
       plot(azi,fast2,'g--') ;
       plot(azi,fast_eff,'k-','LineWidth',1.5)
-      axis([0 360 -90 90])
+      axis([min(azi) max(azi) -90 90])
       xlabel('Polarisation (relative to downdip direction)')
       ylabel('Fast shear-wave orientation (degree)')      
       legend('Upper layer','Lower layer','Total') ;
