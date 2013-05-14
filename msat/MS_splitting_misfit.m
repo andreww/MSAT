@@ -9,25 +9,28 @@
 %        and [fast2,tlag2], using the default mode (see below). SPOL is
 %        the initial source polarisation, dfreq is the dominant frequency.
 %
-%     [misfit, weight] = MS_splitting_misfit(...)   
-%        As above, except an appropriate weight is also estimated for 
-%        the measurement. This does not apply to all modes; where it is
-%        not applicable it will be given the value 1.0. 
-%
-%        The weight ...
 %
 % Modes of operation:
-%     [...] = MS_splitting_misfit(...,'mode','lam2')
+%     [misfit] = MS_splitting_misfit(...,'mode','lam2')
 %        Calculate misfit based on the residual second eigenvalue of applying
 %        [f1,t1] to a test wavelet, then removing [f2,t2]. [DEFAULT].
 %
-%     [...] = MS_splitting_misfit(...,'mode','lam2S')
+%     [misfit] = MS_splitting_misfit(...,'mode','lam2S')
 %        Calculate misfit based on the residual second eigenvalue of applying
 %        [f1,t1] to a test wavelet, then removing [f2,t2]. This is then 
 %        reversed, and the final misfit is the average of the two. 
 %
-%     [...] = MS_splitting_misfit(...,'mode','simple')
+%     [misfit] = MS_splitting_misfit(...,'mode','intensity')
+%        Calculates the misfit as the difference between the splitting intensity
+%        (see, e.g., Long and Silver, 2009) for the two operators. 
+%
+%     [misfit] = MS_splitting_misfit(...,'mode','simple')
 %        A simple (normalised) arithmetic misfit. 
+%
+%  References: 
+%      Long, M. D., & Silver, P. G. (2009). "Shear Wave Splitting and Mantle 
+%        Anisotropy: Measurements, Interpretations, and New Directions". Surveys 
+%        in Geophysics, 30(4-5), 407–461. doi:10.1007/s10712-009-9075-1
 %
 % See also: MS_EFFECTIVE_SPLITTING_N
 
@@ -95,7 +98,7 @@ function [varargout] = MS_splitting_misfit(fast1,tlag1,...
    end
    
    % check outputs
-   if nargout>2
+   if nargout>1
       error('MS:SPLITTING_MISFIT:TooManyOutputs','Too many outputs specified')
    end
    
@@ -103,12 +106,14 @@ function [varargout] = MS_splitting_misfit(fast1,tlag1,...
    % call the appropriate mode function
    switch lower(modeStr)
    case 'simple'
-      [misfit, weight]=MS_splitting_misfit_simple(fast1,tlag1,fast2,tlag2,spol,dfreq) ;      
+      [misfit]=MS_splitting_misfit_simple(fast1,tlag1,fast2,tlag2,spol,dfreq) ;      
+   case 'intensity'
+      [misfit]=MS_splitting_misfit_intensity(fast1,tlag1,fast2,tlag2,spol,dfreq) ;      
    case 'lam2'
-      [misfit, weight]=MS_splitting_misfit_lam2( ...
+      [misfit]=MS_splitting_misfit_lam2( ...
          fast1,tlag1,fast2,tlag2,spol,dfreq,max_tlag,idebug) ;
    case 'lam2s'
-      [misfit, weight]=MS_splitting_misfit_lam2S( ...
+      [misfit]=MS_splitting_misfit_lam2S( ...
          fast1,tlag1,fast2,tlag2,spol,dfreq,max_tlag,idebug) ;
    otherwise
       error('MS:SPLITTING_MISFIT:UnknownMode',...
@@ -119,8 +124,6 @@ function [varargout] = MS_splitting_misfit(fast1,tlag1,...
    switch nargout
       case 1
          varargout = {misfit} ;
-      case 2
-         varargout = {misfit, weight} ;
    end
       
    
@@ -128,7 +131,7 @@ end
 %===============================================================================
 
 %===============================================================================
-function [misfit,weight] = ...
+function [misfit] = ...
    MS_splitting_misfit_simple(fast1,tlag1,fast2,tlag2,spol,dfreq)
 %===============================================================================
 % Simple numerical misfit. Average of normalised fast angular difference and 
@@ -144,14 +147,30 @@ function [misfit,weight] = ...
 % sum of two functions? 
    
    misfit = mean([fast_misfit tlag_misfit]) ;
-   
-   weight = 1.0 ;
-   
+      
 end
 %===============================================================================
 
 %===============================================================================
-function [misfit,weight] = ...
+function [misfit] = ...
+   MS_splitting_misfit_intensity(fast1,tlag1,fast2,tlag2,spol,dfreq)
+%===============================================================================
+% Calculate the misfit between the splitting intensities predicted by the 
+% two [fast,tlag] operators combined with the initial source polarisations. 
+
+   beta1 = abs(MS_unwind_pm_90(fast1-spol)) ;
+   S1 = tlag1 * sind(2*beta1) ;
+   
+   beta2 = abs(MS_unwind_pm_90(fast2-spol)) ;
+   S2 = tlag2 * sind(2*beta2) ;
+ 
+   misfit = abs(S1-S2) ; 
+      
+end
+%===============================================================================
+
+%===============================================================================
+function [misfit] = ...
    MS_splitting_misfit_lam2(fast1,tlag1,fast2,tlag2,spol,dfreq,max_tlag,idebug)
 %===============================================================================
 
@@ -183,13 +202,12 @@ function [misfit,weight] = ...
       
    % calculate normalised misfit.   
    misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;   
-   weight = 1.0 ;
    
 end
 %===============================================================================
 
 %===============================================================================
-function [misfit,weight] = ...
+function [misfit] = ...
    MS_splitting_misfit_lam2S(fast1,tlag1,fast2,tlag2,spol,dfreq,max_tlag,idebug)
 %===============================================================================
 
@@ -238,7 +256,6 @@ function [misfit,weight] = ...
    
 %  result is the average of the two
    misfit = (misfit1+misfit2)/2 ;
-   weight = 1.0 ;
    
 end
 %===============================================================================
