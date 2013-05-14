@@ -34,12 +34,36 @@ function test_MS_splitting_misfit_lam2S
 
 end 
 
-%function test_MS_splitting_misfit_Zero_cases2
-%    % check two zero splits are equal
-%    misfit = MS_splitting_misfit(30,0.0,60,0,45,0.1.) ;
-%    assertElementsAlmostEqual(misfit, 0, 'absolute',0.001) ;
-%
-%end 
+function test_MS_splitting_misfit_intensity
+   % Check that the intensity mode works properly. This has a 
+   % different periodicity to the other misfit measures.
+   
+   fast1 = 90  ;
+   tlag1 = 1.5 ;
+   
+   fast2 = 0  ;
+   tlag2 = 1.5 ;
+   
+   misfit = MS_splitting_misfit(fast1,tlag1,fast2,tlag2,0.0,0.1,'mode','intensity') ;
+
+   assertElementsAlmostEqual(misfit,0,'absolute',0.001) ;
+
+end 
+
+function test_MS_splitting_misfit_simple
+   % Check that the simple mode works properly. 
+   
+   fast1 = 90  ;
+   tlag1 = 1.5 ;
+   
+   fast2 = 90  ;
+   tlag2 = 1.5 ;
+   
+   misfit = MS_splitting_misfit(fast1,tlag1,fast2,tlag2,0.0,0.1,'mode','simple') ;
+
+   assertElementsAlmostEqual(misfit,0,'absolute',0.001) ;
+
+end 
 
 function test_MS_splitting_misfit_Worst_case
    % check misfit between two identical splitting operators is unity for
