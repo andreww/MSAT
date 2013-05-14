@@ -135,16 +135,11 @@ function [misfit] = ...
    MS_splitting_misfit_simple(fast1,tlag1,fast2,tlag2,spol,dfreq)
 %===============================================================================
 % Simple numerical misfit. Average of normalised fast angular difference and 
-% time lag. TLAG misfit is normalised by half the dominant period. Also,
+% time lag. TLAG misfit is normalised by 1/4 of the dominant period. Also,
 % apply a weighting factor for the polarisation.
-
-   
 
    fast_misfit = abs(MS_unwind_pm_90(fast1-fast2))./90 ;
    tlag_misfit = abs(tlag1-tlag2)./(0.25/dfreq) ;
-   
-% polarisation weighting factor. Function which is maximal at 45 degrees.
-% sum of two functions? 
    
    misfit = mean([fast_misfit tlag_misfit]) ;
       
