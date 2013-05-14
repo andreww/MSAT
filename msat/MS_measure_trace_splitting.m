@@ -97,6 +97,9 @@ function [fast, tlag] = MS_measure_trace_splitting(time, T00, T90, ...
             case 'optimoptions'
                 optimoptions = varargin{iarg+1};
                 iarg = iarg + 2;
+            otherwise 
+                error('MS:measure_trace_splitting', ...
+                   ['Unknown option: ' varargin{iarg}]) ; 
         end
     end
     

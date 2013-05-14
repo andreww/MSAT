@@ -109,6 +109,9 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag, varargin
            case 'plotwavelet'
                plotwave = 1;
                iarg = iarg + 1;
+           otherwise
+               error('MS:effective_splitting_N', ...
+                   ['Unknown option: ' varargin{iarg}]) ;
        end
    end
    
