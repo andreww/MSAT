@@ -3,7 +3,7 @@
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 % [fast, tlag] = MS_measure_trace_splitting(time, T00, T90, d_fast, ...
-%     d_tlag, max_tlag)
+%     d_tlag, max_tlag ...)
 %
 %  Inputs:
 %     time (vector) : Series of time points where amplitudes are known (s)
@@ -17,7 +17,7 @@
 %
 %  Outputs:
 %     fast (vector)  : Optimum fast direction (degrees).
-%     tlag (vector)  : Optimum lag tim.
+%     tlag (vector)  : Optimum lag tim
 %
 % Given a two traces (T00 and T90) on a common time axis (time) find
 % the splitting operator (fast and tlag) that minimises the second
@@ -25,6 +25,19 @@
 % using an approximate grid search (spacing and time limits set by 
 % d_fast, d_tlag and max_tlag) then by using the Matlab built
 % in simplex optimiser from the best grid point. 
+% 
+%  Options:
+%  
+% * MS_measure_trace_splitting( ... 'errorsurf')
+%     Draw a contour plot of the error surface generated during the grid
+%     search for the best splitting parameters.
+% *  MS_measure_trace_splitting( ... 'optimoptions', options)
+%      Provide a structure of optimisation options to pass into the simplex
+%      optimiser. Use optimist to generate this. e.g. for looser tolerances 
+%      use MS_measure_trace_splitting( ... 'optimoptions', ...
+%      optimset('TolFun', 1.0e-3, 'TolX', 1.0e-3)). 
+%      Default options are: optimset('Display','none','TolFun',1.0e-5, ...
+%     'TolX', 1.0e-5).
 
 % Copyright (c) 2013, James Wookey and Andrew Walker
 % All rights reserved.
@@ -63,7 +76,7 @@
 
 
 function [fast, tlag] = MS_measure_trace_splitting(time, T00, T90, ...
-        d_fast, d_tlag, max_tlag)
+        d_fast, d_tlag, max_tlag, varargin)
     % Given a two traces (T00 and T90) on a common time axis (time) find
     % the splitting operator (fast and tlag) that minimises the second
     % eigenvalue of the covariance matrix. This is done in two steps. First
@@ -71,27 +84,63 @@ function [fast, tlag] = MS_measure_trace_splitting(time, T00, T90, ...
     % d_fast, d_tlag and max_tlag) then by using the Matlab built
     % in simplex optimiser from the best grid point.
 
+    iarg = 1 ;
+    errorsurf = 0; % Plot an error surface?
+    optimoptions=optimset('Display','none', ...
+        'TolFun', 1.0e-5, 'TolX', 1.0e-5);
+    
+    while iarg <= (length(varargin))
+        switch lower(varargin{iarg})
+            case 'errorsurf'
+                errorsurf = 1 ; 
+                iarg = iarg + 1;
+            case 'optimoptions'
+                optimoptions = varargin{iarg+1};
+                iarg = iarg + 2;
+        end
+    end
+    
+    if errorsurf
+        misfits = zeros(ceil(180.0./d_fast), ceil(max_tlag./d_tlag)); 
+        tlags = 0.0:d_tlag:max_tlag;
+        fasts = 0.0:d_fast:180.0;
+    end
+    i = 0;
+    j = 0;
+    
     % Do the grid search
     best_misfit = 100;
     for fast = 0.0:d_fast:180.0
+        i = i + 1;
         for tlag = 0.0:d_tlag:max_tlag
+            j = j + 1;
             split_op = [fast, tlag];
             misfit = splitting_function(split_op, time, T00, T90);
+            if errorsurf
+                misfits(i,j) = misfit;
+            end
             if (misfit < best_misfit)
                 best_split_op = split_op;
                 best_misfit = misfit;
             end
         end
+        j = 0;
     end
     
     % Simplex minimisation
     [new_split_op, misfit] = fminsearch(...
                 @(split_op) splitting_function(split_op, time, ...
-                T00, T90), best_split_op, optimset('Display','notify'));
+                T00, T90), best_split_op, optimoptions);
     if (misfit < best_misfit)
         best_split_op = new_split_op;
     end
-            
+    
+    if errorsurf
+        figure;
+        contour(tlags, fasts, misfits);
+        colorbar;
+    end
+    
     % Unpack results
     fast = best_split_op(1);
     tlag = best_split_op(2);        
