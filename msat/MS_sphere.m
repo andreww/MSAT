@@ -24,10 +24,10 @@
 %          for blue to be fast/high as is conventional for seismic velocity 
 %          colorscales. Setting this option results in red being fast/high.
 %
-%     MS_sphere(..., 'sdata',azi,inc,phi,magn)
+%     MS_sphere(..., 'sdata',azi,inc,pol,magn)
 %          Overlay a S-wave (splitting) dataset onto the sphere at the points. 
-%          indicated by the azi, inc arrays. The data are in 2 vectors: fast 
-%          (SW orientation), magn (% anisotropy). They are plotted as coloured 
+%          indicated by the azi, inc arrays. The data are in 2 vectors: pol 
+%          (SW orientation) and mag (% anisotropy). They are plotted as coloured 
 %          spots with vector ticks. 
 %
 %     MS_sphere(..., 'pdata',azi,inc,vel)
@@ -176,6 +176,13 @@ end
                pd_inc = varargin{iarg+2} ;
                pd_vel = varargin{iarg+3} ;
                iarg = iarg + 4 ;               
+            case 'sdata'
+               iplot_sdata = 1 ;
+               sd_azi = varargin{iarg+1} ;
+               sd_inc = varargin{iarg+2} ;
+               sd_pol = varargin{iarg+3} ;
+               sd_mag = varargin{iarg+4} ;
+               iarg = iarg + 5 ;
             case 'velmesh'
                velmesh = varargin{iarg+1} ;
                iarg = iarg + 2 ;
@@ -391,6 +398,8 @@ for i=1:ndir
 end   
 
 % do the data overlay.
+
+% P-wave velocity overlay.
 if iplot_pdata
    hold on
 %  reshape the data
@@ -420,6 +429,60 @@ if iplot_pdata
          sph2cart(-pd_azi(i).*pi/180,pd_inc(i).*pi/180,1.02) ; % position of marker.
       h=plot3(xd,yd,zd,'ko','MarkerSize',12) ;
       set(h,'MarkerFaceColor',pd_col(i,:)) ; % recolour according to cmap.
+   end
+end
+
+% S-wave orientation / % anisotropy overlay
+if iplot_sdata
+   hold on
+%  reshape the data
+   sd_azi = reshape(sd_azi,1,prod(size(sd_azi))) ;
+   sd_inc = reshape(sd_inc,1,prod(size(sd_inc))) ;
+   sd_pol = reshape(sd_pol,1,prod(size(sd_pol))) ;
+   sd_mag = reshape(sd_mag,1,prod(size(sd_mag))) ;
+   
+   if (length(sd_azi)~=length(sd_inc)) | ...
+      (length(sd_azi)~=length(sd_pol)) | ...
+      (length(sd_azi)~=length(sd_mag)) 
+      error('MS:SPHERE:sdata_mismatch', 'S-wave data arrays must be the same size.') ;
+   end
+   
+   nsdata = length(sd_azi) ;
+   
+%  create a colour for each data point.
+   [Cxmin Cxmax] = caxis ; % get the current colour axis
+   Cx = linspace(Cxmin,Cxmax,length(colormap)) ;
+   Cy = colormap ;
+
+%  create an array of unrotated ticks.   
+   sd_col = [ interp1(Cx,Cy(:,1),sd_mag)', ...
+              interp1(Cx,Cy(:,2),sd_mag)', ...
+              interp1(Cx,Cy(:,3),sd_mag)'] ;
+
+   sd_vec1 = [ zeros(nsdata,1), ...
+              2*FSWTickLength.*sind(sd_pol)' , ...
+              2*FSWTickLength.*cosd(sd_pol)'] ;
+
+   sd_vec2 = [ zeros(nsdata,1), ...
+              -2*FSWTickLength.*sind(sd_pol)' , ...
+              -2*FSWTickLength.*cosd(sd_pol)'] ;    
+      
+%  add each data point  
+   for i=1:nsdata 
+      [xd,yd,zd] = ...
+         sph2cart(-sd_azi(i).*pi/180,sd_inc(i).*pi/180,1.01) ; % position of marker.
+      
+      % add the orientation tick.
+      sd_tick1 = V_rot_gam(V_rot_bet(sd_vec1(i,:),-sd_inc(i)),-sd_azi(i)) ;
+      sd_tick2 = V_rot_gam(V_rot_bet(sd_vec2(i,:),-sd_inc(i)),-sd_azi(i)) ;
+      
+      plot3([sd_tick1(1) sd_tick2(1)]+xd,...
+            [sd_tick1(2) sd_tick2(2)]+yd,...
+            [sd_tick1(3) sd_tick2(3)]+zd,'k-','LineWidth',3) ;
+      
+      % add the coloured marker.
+      h=plot3(xd,yd,zd,'ko','MarkerSize',12,'LineWidth',3) ;
+      set(h,'MarkerFaceColor',sd_col(i,:)) ; % recolour according to cmap.      
    end
 end
 
@@ -794,6 +857,26 @@ FV.faces = F2;
 
 return
 
+function [VR] = V_rot_gam(V,gam)
+
+%  Make rotation matrix
+g = gam * pi/180. ;
+
+RR = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+VR = V * RR ;
+ 
+return
+
+function [VR] = V_rot_bet(V,bet)
+
+%  Make rotation matrix
+b = bet * pi/180. ;
+
+RR = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
+
+VR = V * RR ;
+ 
+return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
