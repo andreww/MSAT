@@ -24,6 +24,17 @@
 %          for blue to be fast/high as is conventional for seismic velocity 
 %          colorscales. Setting this option results in red being fast/high.
 %
+%     MS_sphere(..., 'sdata',azi,inc,phi,magn)
+%          Overlay a S-wave (splitting) dataset onto the sphere at the points. 
+%          indicated by the azi, inc arrays. The data are in 2 vectors: fast 
+%          (SW orientation), magn (% anisotropy). They are plotted as coloured 
+%          spots with vector ticks. 
+%
+%     MS_sphere(..., 'pdata',azi,inc,vel)
+%          Overlay a P-wave (velocity) dataset (in vel) onto the sphere at 
+%          the points. indicated by the azi, inc arrays. They are plotted as 
+%          coloured spots. 
+%
 %     MS_sphere(..., 'FSWTickLength', length)
 %          Set the length of the Fast shear wave direction markers, default
 %          is 0.08.
@@ -123,6 +134,8 @@ dirs = [] ;
 dlen = 1.5 ;
 plotlabels = 1 ;
 plotaxes = 1 ;
+iplot_pdata = 0 ;
+iplot_sdata = 0 ;
 nofig = 0 ;
 nocbar = 0 ;
 velmesh = 3;
@@ -157,6 +170,12 @@ end
             case 'dlen'
                dlen = varargin{iarg+1} ;
                iarg = iarg + 2 ;
+            case 'pdata'
+               iplot_pdata = 1 ;
+               pd_azi = varargin{iarg+1} ;
+               pd_inc = varargin{iarg+2} ;
+               pd_vel = varargin{iarg+3} ;
+               iarg = iarg + 4 ;               
             case 'velmesh'
                velmesh = varargin{iarg+1} ;
                iarg = iarg + 2 ;
@@ -217,6 +236,16 @@ end
 % check input pars
 if mod(length(dirs),2)~=0
    error('MS:SPHERE:baddirs', 'Plot directions must be in (azi,inc) pairs') ;
+end
+
+% check data overlay
+if iplot_pdata & ~strcmpi(mode,'p')
+   error('MS:SPHERE:badpoverlay', 'P-wave data can only overlay a ''P'' mode plot.') ;
+end
+
+% check data overlay
+if iplot_sdata & ~strcmpi(mode,'s')
+   error('MS:SPHERE:badsoverlay', 'S-wave data can only overlay an ''S'' mode plot.') ;
 end
 
 %  ** Setup a seismic colourmap (i.e. red->green->blue)
@@ -360,6 +389,39 @@ for i=1:ndir
            daz(i).*180./pi,din(i).*180./pi),'FontSize',12) ;
    end        
 end   
+
+% do the data overlay.
+if iplot_pdata
+   hold on
+%  reshape the data
+   pd_azi = reshape(pd_azi,1,prod(size(pd_azi))) ;
+   pd_inc = reshape(pd_inc,1,prod(size(pd_inc))) ;
+   pd_vel = reshape(pd_vel,1,prod(size(pd_vel))) ;
+   
+   if (length(pd_azi)~=length(pd_inc)) | ...
+      (length(pd_azi)~=length(pd_vel))
+      error('MS:SPHERE:pdata_mismatch', 'P-wave data arrays must be the same size.') ;
+   end
+   
+   npdata = length(pd_azi) ;
+   
+%  create a colour for each data point.
+   [Cxmin Cxmax] = caxis ; % get the current colour axis
+   Cx = linspace(Cxmin,Cxmax,length(colormap)) ;
+   Cy = colormap ;
+
+   pd_col = [ interp1(Cx,Cy(:,1),pd_vel)', ...
+              interp1(Cx,Cy(:,2),pd_vel)', ...
+              interp1(Cx,Cy(:,3),pd_vel)'] ;
+   
+%  add each data point  
+   for i=1:npdata 
+      [xd,yd,zd] = ...
+         sph2cart(-pd_azi(i).*pi/180,pd_inc(i).*pi/180,1.02) ; % position of marker.
+      h=plot3(xd,yd,zd,'ko','MarkerSize',12) ;
+      set(h,'MarkerFaceColor',pd_col(i,:)) ; % recolour according to cmap.
+   end
+end
 
 % final commands
 
