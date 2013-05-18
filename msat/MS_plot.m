@@ -250,45 +250,11 @@ function MS_plot(C,rh,varargin)
 %  ** VP velocity plot 
 %-------------------------------------------------------------------------------
       subplot(1,3,1)
+  
+      contour_pole(X, Y, VP, view_angle, VPcvect, cmap, fntsz, ...
+          buggyMATLAB, 'V_P (km/s)')
 
-%  ** get VPmin and VPmax values and positions      
-      [imin,jmin,VPmin,imax,jmax,VPmax] = minmax2d(VP) ;
-      
-      [VPmin_x,VPmin_y]=sph2cart(AZ(imin,jmin)*rad,INC(imin,jmin)*rad,1) ;   
-      [VPmax_x,VPmax_y]=sph2cart(AZ(imax,jmax)*rad,INC(imax,jmax)*rad,1) ;   
-
-      
-      if (VPmin ~= VPmax)
-         if buggyMATLAB
-            [h1,h2]=contourf('v6',X,Y,VP,VPcvect) ;
-            for j=1:length(h2)
-               set(h2(j),'LineStyle','none')
-            end
-         else
-            contourf(X,Y,VP,VPcvect,'LineStyle','none') ;
-            if (~isscalar(VPcvect))
-                % Limit the contours to the input vector.
-                caxis([min(VPcvect) max(VPcvect)]);
-            end
-         end
-      else
-         surf(X,Y,zeros(size(VP)),VP) ;
-         shading flat ;
-      end   
-      view(view_angle)
-      colormap(cmap) ;
-      daspect([1 1 1]);
-      colorbar('FontSize',fntsz) ;
-      axis off
-      title('V_P (km/s)','FontSize',fntsz+4,'FontWeight','bold') ;
-
-      hold on
-
-%  ** mark the max. min. values 
-      h=plot(VPmax_x,VPmax_y,'ws') ;
-      set(h,'MarkerFaceColor','black');
-      h=plot(VPmin_x,VPmin_y,'wo') ;
-      set(h,'MarkerFaceColor','black');
+      [VPmin, VPmax] = max_min_pole(AZ, INC, VP);
 
 %  ** add some information to the plot            
       VPlabel1 = sprintf('Min. V_P =%6.2f, max. V_P =%6.2f',VPmin,VPmax) ;
@@ -307,46 +273,10 @@ function MS_plot(C,rh,varargin)
       VSmean = (VS1+VS2)./2.0 ;
       AVS = 100.0*(dVS./VSmean) ;
 
-%  ** get AVSmin and AVSmax values and positions      
-      [imin,jmin,AVSmin,imax,jmax,AVSmax] = minmax2d(AVS) ;
-      [AVSmin_x,AVSmin_y]=sph2cart(AZ(imin,jmin)*rad,INC(imin,jmin)*rad,1) ;   
-      [AVSmax_x,AVSmax_y]=sph2cart(AZ(imax,jmax)*rad,INC(imax,jmax)*rad,1) ;   
-      
-      if (AVSmin ~= AVSmax)
-         if buggyMATLAB
-            contourf('v6',X,Y,AVS,AVScvect) ;
-            [h1,h2]=contourf('v6',X,Y,AVS,AVScvect) ;
-            for j=1:length(h2)
-               set(h2(j),'LineStyle','none')
-            end
-         else
-             contourf(X,Y,AVS,AVScvect,'LineStyle','none') ;
-             if (~isscalar(AVScvect))
-                 % Limit the contours to the input vector.
-                 caxis([min(AVScvect) max(AVScvect)]);
-             end
-         end
-      else
-         surf(X,Y,zeros(size(AVS)),AVS) ;
-         shading flat ;
-      end   
+      contour_pole(X, Y, AVS, view_angle, AVScvect, cmap, fntsz, ...
+          buggyMATLAB, 'dV_S (%)')
 
-      colormap(cmap) ;
-      view(view_angle)
-      daspect([1 1 1]);
-
-      colorbar('FontSize',fntsz) ;
-      caxis_save = caxis;
-      axis tight; axis off
-      title('dV_S (%)','FontSize',fntsz+4,'FontWeight','bold')
-      
-      hold on
-
-%  ** mark the max. min. values 
-      h=plot(AVSmax_x,AVSmax_y,'ws') ;
-      set(h,'MarkerFaceColor','black');
-      h=plot(AVSmin_x,AVSmin_y,'wo') ;
-      set(h,'MarkerFaceColor','black');
+      [AVSmin, AVSmax] = max_min_pole(AZ, INC, AVS);
 
 %  ** add some information to the plot            
       AVSlabel1 = sprintf('V_S anisotropy, min =%6.2f, max =%6.2f',AVSmin,AVSmax) ;
@@ -357,126 +287,17 @@ function MS_plot(C,rh,varargin)
 %-------------------------------------------------------------------------------
       subplot(1,3,3)
       
-      if buggyMATLAB
-         [h1,h2]=contourf('v6',X,Y,AVS,AVScvect) ;
-         for j=1:length(h2)
-            set(h2(j),'LineStyle','none')
-         end
-      else
-         contourf(X,Y,AVS,AVScvect,'LineStyle','none') ;
-         if (~isscalar(AVScvect))
-             % Limit the contours to the input vector.
-             caxis([min(AVScvect) max(AVScvect)]);
-         end
-      end
+      contour_pole(X, Y, AVS, view_angle, AVScvect, cmap, fntsz, ...
+          buggyMATLAB, 'Fast-shear polarisation')
       
-      colormap(cmap) ;
-      colorbar('FontSize',fntsz) ;
-
-      hold on ;
-
-%  ** transform vectors
-      [VS1_x,VS1_y,VS1_z] = vnormalise2(VS1_x,VS1_y,VS1_z) ;
-      [XN,YN,ZN] = vnormalise2(X,Y,Z) ;
-
-      A = zeros(3,61,16) ;
-      B = zeros(3,61,16) ;
-     
-      A(1,:,:) = XN ;
-      A(2,:,:) = YN ;
-      A(3,:,:) = ZN ;
-                  
-      B(1,:,:) =  VS1_x ;
-      B(2,:,:) =  VS1_y ;
-      B(3,:,:) =  VS1_z ;
-     
-      C=cross(A,B) ;
-      D=cross(A,C) ;
-      
-      VS1R_x(:,:) = D(1,:,:) ;
-      VS1R_y(:,:) = D(2,:,:) ;
-      VS1R_z(:,:) = D(3,:,:) ;
-      
-      [VS1R_x,VS1R_y,VS1R_z] = vnormalise2(VS1R_x,VS1R_y,VS1R_z) ;
- 
-%  ** define subset of polarisations to plot      
-      cl = [1,3,5,7,9,11,15] ;
-      drw = [60 10 5 3 2 2 2] ;
-
-      ii=0 ;
-      ip=0 ;
-      np=136 ;
-      ind1 = zeros(1,np) ;
-      ind2 = zeros(1,np) ;
-      
-      for iinc=cl
-         ii=ii+1 ;
-         for iaz=1:drw(ii):61
-            ip = ip + 1;
-            ind1(ip) = iaz ;
-            ind2(ip) = iinc ;
-         end
-      end   
-      
-%  ** rotate the particle motion vector so the normal to sphere is vertical
-      for ip = 1:np
-         [VS1R_xR(ind1(ip),ind2(ip)),VS1R_yR(ind1(ip),...
-                  ind2(ip)),VS1R_zR(ind1(ip),ind2(ip))] = ...
-                    rotate_pm_vector(...
-         VS1R_x(ind1(ip),ind2(ip)),VS1R_y(ind1(ip),...
-                ind2(ip)),VS1R_z(ind1(ip),ind2(ip)),...
-         AZ(ind1(ip),ind2(ip)),INC(ind1(ip),ind2(ip)));          
-      end   
-
-%  ** form the subsets
-      X2 = zeros(1,np) ;
-      Y2 = zeros(1,np) ;
-      Z2 = zeros(1,np) ;
-      U2 = zeros(1,np) ;
-      V2 = zeros(1,np) ;
-      W2 = zeros(1,np) ;
-
-      for i=1:length(ind1) ;
-         X2(i)=X(ind1(i),ind2(i)) ;
-         Y2(i)=Y(ind1(i),ind2(i)) ;
-         Z2(i)=Z(ind1(i),ind2(i)) ;
-         U2(i)=VS1R_xR(ind1(i),ind2(i)) ;
-         V2(i)=VS1R_yR(ind1(i),ind2(i)) ;
-         W2(i)=VS1R_zR(ind1(i),ind2(i)) ;
-      end
-
-
       if (limitsonpol)
-          %  ** mark the max. min. values here too... 
-          h=plot(AVSmax_x,AVSmax_y,'ws') ;
-          set(h,'MarkerFaceColor','black');
-          h=plot(AVSmin_x,AVSmin_y,'wo') ;
-          set(h,'MarkerFaceColor','black');
+         [~, ~] = max_min_pole(AZ, INC, AVS);
       end
+
+      pol_pole(VS1_x,VS1_y,VS1_z, X, Y, Z, AZ, INC, ...
+          qwhite_scale, qblack_scale, qwhite_width, qblack_width);
       
-      
-%  ** plot the vectors (changed to 2D to allow plotting with contourf surface)     
-%      h=quiver3(X2,Y2,Z2,U2,V2,W2,0.18,'k.') ;      
-      h=quiver(X2,Y2,U2,V2,qwhite_scale,'w.') ;
-      set(h,'LineWidth',qwhite_width) ;
-
-      h=quiver(X2,Y2,-U2,-V2,qwhite_scale,'w.') ;
-      set(h,'LineWidth',qwhite_width) ;
-
-      h=quiver(X2,Y2,U2,V2,qblack_scale,'k.') ;
-      set(h,'LineWidth',qblack_width) ;
-
-      h=quiver(X2,Y2,-U2,-V2,qblack_scale,'k.') ;
-      set(h,'LineWidth',qblack_width) ;
-
-
-      view(view_angle);
-      daspect([1 1 1]);
-
-      axis tight; axis off
-      title('Fast-shear polarisation','FontSize',fntsz+4,'FontWeight','bold')
-      
-   return
+end
 %===============================================================================
 
 %===============================================================================
@@ -491,7 +312,7 @@ function MS_plot(C,rh,varargin)
       BN = B./VMAG ;
       CN = C./VMAG ;
       
-   return
+   end
 %===============================================================================
 
 %===============================================================================
@@ -530,7 +351,7 @@ function MS_plot(C,rh,varargin)
       yr = VR(2) ;
       zr = VR(3) ;
 
-   return
+   end
 %===============================================================================
 
 %===============================================================================
@@ -543,5 +364,143 @@ function MS_plot(C,rh,varargin)
       [A,I] = min(Z) ; [Zmin,II] = min(A) ; imin = I(II) ; jmin = II ;
       [A,I] = max(Z) ; [Zmax,II] = max(A) ; imax = I(II) ; jmax = II ;
 
-   return
+   end
 %===============================================================================
+
+      
+function contour_pole(X, Y, vals, view_angle, cvect, cmap, fntsz, ...
+    buggyMATLAB, titletext)
+
+     if (min(min(vals)) ~= max(max(vals)))
+         if buggyMATLAB
+            [h1,h2]=contourf('v6',X,Y,vals,cvect) ;
+            for j=1:length(h2)
+               set(h2(j),'LineStyle','none')
+            end
+         else
+            contourf(X,Y,vals,cvect,'LineStyle','none') ;
+            if (~isscalar(cvect))
+                % Limit the contours to the input vector.
+                caxis([min(cvect) max(cvect)]);
+            end
+         end
+      else
+         surf(X,Y,zeros(size(vals)),vals) ;
+         shading flat ;
+      end   
+      view(view_angle)
+      colormap(cmap) ;
+      daspect([1 1 1]);
+      colorbar('FontSize',fntsz) ;
+      axis off
+      
+      title(titletext,'FontSize',fntsz+4,'FontWeight','bold') ;
+
+      hold on
+
+end
+
+function [VALmin, VALmax] = max_min_pole(AZ, INC, VAL)
+
+      rad = pi./180 ;
+
+      % get min and max values and positions      
+      [imin,jmin,VALmin,imax,jmax,VALmax] = minmax2d(VAL) ;
+      
+      [VALmin_x,VALmin_y]=sph2cart(AZ(imin,jmin)*rad,INC(imin,jmin)*rad,1) ;   
+      [VALmax_x,VALmax_y]=sph2cart(AZ(imax,jmax)*rad,INC(imax,jmax)*rad,1) ;   
+
+      % mark the max. min. values 
+      h=plot(VALmax_x,VALmax_y,'ws') ;
+      set(h,'MarkerFaceColor','black');
+      h=plot(VALmin_x,VALmin_y,'wo') ;
+      set(h,'MarkerFaceColor','black');
+end
+
+function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
+          qwhite_scale, qblack_scale, qwhite_width, qblack_width)
+      
+%  ** transform vectors
+      [V_x,V_y,V_z] = vnormalise2(V_x,V_y,V_z) ;
+      [XN,YN,ZN] = vnormalise2(X,Y,Z) ;
+
+      A = zeros(3,61,16) ;
+      B = zeros(3,61,16) ;
+     
+      A(1,:,:) = XN ;
+      A(2,:,:) = YN ;
+      A(3,:,:) = ZN ;
+                  
+      B(1,:,:) =  V_x ;
+      B(2,:,:) =  V_y ;
+      B(3,:,:) =  V_z ;
+     
+      C=cross(A,B) ;
+      D=cross(A,C) ;
+      
+      VR_x(:,:) = D(1,:,:) ;
+      VR_y(:,:) = D(2,:,:) ;
+      VR_z(:,:) = D(3,:,:) ;
+      
+      [VR_x,VR_y,VR_z] = vnormalise2(VR_x,VR_y,VR_z) ;
+ 
+%  ** define subset of polarisations to plot      
+      cl = [1,3,5,7,9,11,15] ;
+      drw = [60 10 5 3 2 2 2] ;
+
+      ii=0 ;
+      ip=0 ;
+      np=136 ;
+      ind1 = zeros(1,np) ;
+      ind2 = zeros(1,np) ;
+      
+      for iinc=cl
+         ii=ii+1 ;
+         for iaz=1:drw(ii):61
+            ip = ip + 1;
+            ind1(ip) = iaz ;
+            ind2(ip) = iinc ;
+         end
+      end   
+      
+%  ** rotate the particle motion vector so the normal to sphere is vertical
+      for ip = 1:np
+         [VR_xR(ind1(ip),ind2(ip)),VR_yR(ind1(ip),...
+                  ind2(ip)),VR_zR(ind1(ip),ind2(ip))] = ...
+                    rotate_pm_vector(...
+         VR_x(ind1(ip),ind2(ip)),VR_y(ind1(ip),...
+                ind2(ip)),VR_z(ind1(ip),ind2(ip)),...
+         AZ(ind1(ip),ind2(ip)),INC(ind1(ip),ind2(ip)));          
+      end   
+
+%  ** form the subsets
+      X2 = zeros(1,np) ;
+      Y2 = zeros(1,np) ;
+      Z2 = zeros(1,np) ;
+      U2 = zeros(1,np) ;
+      V2 = zeros(1,np) ;
+      W2 = zeros(1,np) ;
+
+      for i=1:length(ind1) ;
+         X2(i)=X(ind1(i),ind2(i)) ;
+         Y2(i)=Y(ind1(i),ind2(i)) ;
+         Z2(i)=Z(ind1(i),ind2(i)) ;
+         U2(i)=VR_xR(ind1(i),ind2(i)) ;
+         V2(i)=VR_yR(ind1(i),ind2(i)) ;
+         W2(i)=VR_zR(ind1(i),ind2(i)) ;
+      end      
+      
+%  ** plot the vectors (changed to 2D to allow plotting with contourf surface)     
+%      h=quiver3(X2,Y2,Z2,U2,V2,W2,0.18,'k.') ;      
+      h=quiver(X2,Y2,U2,V2,qwhite_scale,'w.') ;
+      set(h,'LineWidth',qwhite_width) ;
+
+      h=quiver(X2,Y2,-U2,-V2,qwhite_scale,'w.') ;
+      set(h,'LineWidth',qwhite_width) ;
+
+      h=quiver(X2,Y2,U2,V2,qblack_scale,'k.') ;
+      set(h,'LineWidth',qblack_width) ;
+
+      h=quiver(X2,Y2,-U2,-V2,qblack_scale,'k.') ;
+      set(h,'LineWidth',qblack_width) ;
+end
