@@ -58,6 +58,18 @@
 %          s2 (defaults to 0.18). A useful "neet" alternitive to the
 %          default is s1 = 0.18, s2 = 0.16, w1 = 2.0 and w2 = 1.0.
 %
+%     MS_plot(..., 'plotmap', pmap)
+%          Change the order, or content, of the subplots. This allows a
+%          single pole figure (e.g. the P-wave velocity) to be drawn, or
+%          the pole figures to be drawn in a different order. The argument
+%          pmap must be a cell array of strings. Each string represents a
+%          different pole figure and its location in the cell array
+%          represents the location of the pole figure. Thus the default
+%          {'VP', 'AVS', 'AVSPOL'} draws three pole figures in a row. If
+%          the argument were {'VP'; 'AVS'} two pole figures would be drawn,
+%          one above the other. Valid strings are 'VP", 'AVS' and 'AVSPOL'.
+%          These are not case sensitive.
+%
 %     MS_plot(..., 'quiet')
 %          Don't write isotropic velocities to the terminal. 
 %
@@ -129,6 +141,9 @@ function MS_plot(C,rh,varargin)
 
 %  ** default window title
       wtitle = 'MSAT polefigure.' ;
+      
+%  ** map of what we want to plot
+      plotmap = {'VP', 'AVS', 'AVSPOL'};
             
 %  ** process the optional arguments
       iarg = 1 ;
@@ -177,11 +192,20 @@ function MS_plot(C,rh,varargin)
                   cmap = cmarg ;
                end
                iarg = iarg + 2 ;
+             case 'plotmap'
+               plotmap = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
             otherwise 
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
       end 
 
+      % What to plot - work out size and shape for later.
+      assert(iscellstr(plotmap), 'MS:PLOT:BADPLOTMAP', ...
+          'The plotmap must be a cell string');
+      plotsize = size(plotmap);
+      nrow = plotsize(1);
+      ncol = plotsize(2);
       
       % check the inputs: C
       assert(MS_checkC(C)==1, 'MS:PLOT:badC', 'MS_checkC error MS_plot') ;
@@ -222,6 +246,11 @@ function MS_plot(C,rh,varargin)
       VS1_x = reshape(S1P(:,1),61,16);
       VS1_y = reshape(S1P(:,2),61,16);
       VS1_z = reshape(S1P(:,3),61,16);
+        
+      % aVS data
+      dVS =  (VS1-VS2) ;
+      VSmean = (VS1+VS2)./2.0 ;
+      AVS = 100.0*(dVS./VSmean) ;
       
 %  ** output average velocities
       VPiso=mean(mean(VP)) ;
@@ -232,11 +261,13 @@ function MS_plot(C,rh,varargin)
               VPiso,VSiso) ;
       end
 %  ** Prepare window
+      win_width = 466.667.*ncol;
+      win_height = 400.*nrow;
       if strcmp(wtitle(1),'-')
-         figure('Position',[1 1 1400 400],'name', ...
+         figure('Position',[1 1 win_width win_height],'name', ...
                 wtitle(2:end),'NumberTitle','off') ;
       else
-         figure('Position',[1 1 1400 400],'name',wtitle) ;
+         figure('Position',[1 1 win_width win_height],'name',wtitle) ;
       end   
       
 %  ** Setup a seismic colourmap (i.e. red->green->blue)
@@ -246,56 +277,64 @@ function MS_plot(C,rh,varargin)
 %  ** generate X/Y matrices for plotting
       [X,Y,Z] = sph2cart(AZ.*rad,INC.*rad,ones(size(AZ))) ;
 
-%-------------------------------------------------------------------------------
-%  ** VP velocity plot 
-%-------------------------------------------------------------------------------
-      subplot(1,3,1)
-  
-      contour_pole(X, Y, VP, view_angle, VPcvect, cmap, fntsz, ...
-          buggyMATLAB, 'V_P (km/s)')
-
-      [VPmin, VPmax] = max_min_pole(AZ, INC, VP);
-
-%  ** add some information to the plot            
-      VPlabel1 = sprintf('Min. V_P =%6.2f, max. V_P =%6.2f',VPmin,VPmax) ;
-      text(-1.15,0.8,VPlabel1,'FontSize',fntsz,'FontWeight','bold') ;
-      VPmean = (VPmax+VPmin)./2.0 ;
-      VPani = (VPmax-VPmin)/VPmean .* 100 ;
-      VPlabel2 = sprintf('Anisotropy =%6.1f%%',VPani) ;
-      text(-1.3,0.8,VPlabel2,'FontSize',fntsz,'FontWeight','bold') ;
-      
-%-------------------------------------------------------------------------------
-%  ** dVS anisotropy plot 
-%-------------------------------------------------------------------------------
-      subplot(1,3,2)
-
-      dVS =  (VS1-VS2) ;
-      VSmean = (VS1+VS2)./2.0 ;
-      AVS = 100.0*(dVS./VSmean) ;
-
-      contour_pole(X, Y, AVS, view_angle, AVScvect, cmap, fntsz, ...
-          buggyMATLAB, 'dV_S (%)')
-
-      [AVSmin, AVSmax] = max_min_pole(AZ, INC, AVS);
-
-%  ** add some information to the plot            
-      AVSlabel1 = sprintf('V_S anisotropy, min =%6.2f, max =%6.2f',AVSmin,AVSmax) ;
-      text(-1.15,1.0,AVSlabel1,'FontSize',fntsz,'FontWeight','bold') ;
-
-%-------------------------------------------------------------------------------
-%  ** Fast shear-wave polarisation plot
-%-------------------------------------------------------------------------------
-      subplot(1,3,3)
-      
-      contour_pole(X, Y, AVS, view_angle, AVScvect, cmap, fntsz, ...
-          buggyMATLAB, 'Fast-shear polarisation')
-      
-      if (limitsonpol)
-         [~, ~] = max_min_pole(AZ, INC, AVS);
+      k = 0;
+      for j = 1:nrow;
+          for i = 1:ncol
+              k = k + 1;
+              subplot(nrow,ncol,k)
+              
+              switch lower(plotmap{j,i})
+                  case 'vp'
+                      % VP velocity plot
+                      contour_pole(X, Y, VP, view_angle, VPcvect, ...
+                          cmap, fntsz, buggyMATLAB, 'V_P (km/s)')
+                      
+                      [VPmin, VPmax] = max_min_pole(AZ, INC, VP);
+                      
+                      %  ** add some information to the plot
+                      VPlabel1 = sprintf(['Min. V_P =%6.2f, max.' ...
+                          ' V_P =%6.2f'],VPmin,VPmax) ;
+                      text(-1.15,0.8,VPlabel1,'FontSize',fntsz, ...
+                          'FontWeight','bold') ;
+                      VPmean = (VPmax+VPmin)./2.0 ;
+                      VPani = (VPmax-VPmin)/VPmean .* 100 ;
+                      VPlabel2 = sprintf('Anisotropy =%6.1f%%',VPani) ;
+                      text(-1.3,0.8,VPlabel2,'FontSize',fntsz, ...
+                          'FontWeight','bold') ;
+                      
+                  case 'avs'
+                      % dVS anisotropy plot
+                      contour_pole(X, Y, AVS, view_angle, AVScvect,...
+                          cmap, fntsz, ...
+                          buggyMATLAB, 'dV_S (%)')
+                      
+                      [AVSmin, AVSmax] = max_min_pole(AZ, INC, AVS);
+                      
+                      %  ** add some information to the plot
+                      AVSlabel1 = sprintf(['V_S anisotropy, min' ...
+                          ' =%6.2f, max =%6.2f'],AVSmin,AVSmax) ;
+                      text(-1.15,1.0,AVSlabel1,'FontSize',fntsz,...
+                          'FontWeight','bold') ;
+                      
+                  case 'avspol'
+                      % Fast shear-wave polarisation plot
+                      contour_pole(X, Y, AVS, view_angle, AVScvect, cmap, ...
+                          fntsz, buggyMATLAB, 'Fast-shear polarisation')
+                      
+                      if (limitsonpol)
+                          [~, ~] = max_min_pole(AZ, INC, AVS);
+                      end
+                      
+                      pol_pole(VS1_x,VS1_y,VS1_z, X, Y, Z, AZ, INC, ...
+                          qwhite_scale, qblack_scale, qwhite_width, ...
+                          qblack_width);
+                      
+                  otherwise
+                      error('MS:PLOT:BADPLOTMAP', ['An elelment of the '...
+                          'plotmap was not recognised']);
+              end
+          end
       end
-
-      pol_pole(VS1_x,VS1_y,VS1_z, X, Y, Z, AZ, INC, ...
-          qwhite_scale, qblack_scale, qwhite_width, qblack_width);
       
 end
 %===============================================================================
