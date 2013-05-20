@@ -119,6 +119,7 @@ function MS_plot(C,rh,varargin)
       cvect = 10 ;     % number of contours
       VPcvect = cvect ;
       AVScvect = cvect ;
+      VScvect = cvect ;
       
 %  ** Put markers on SWS pol plot. 
       limitsonpol = 0;
@@ -166,8 +167,11 @@ function MS_plot(C,rh,varargin)
             case 'pcontours'
                VPcvect = varargin{iarg+1} ;
                iarg = iarg + 2 ;
-            case 'scontours'
+            case 'avscontours'
                AVScvect = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'vscontours'
+               VScvect = varargin{iarg+1} ;
                iarg = iarg + 2 ;
             case 'limitsonpol'
                limitsonpol = 1;
@@ -314,6 +318,44 @@ function MS_plot(C,rh,varargin)
                       AVSlabel1 = sprintf(['V_S anisotropy, min' ...
                           ' =%6.2f, max =%6.2f'],AVSmin,AVSmax) ;
                       text(-1.15,1.0,AVSlabel1,'FontSize',fntsz,...
+                          'FontWeight','bold') ;
+                      
+                  case 'vs1'
+                      % VS1 anisotropy plot
+                      contour_pole(X, Y, VS1, view_angle, VScvect,...
+                          cmap, fntsz, ...
+                          buggyMATLAB, 'V_{S1} (km/s)')
+                      
+                      [VS1min, VS1max] = max_min_pole(AZ, INC, VS1);
+                      
+                      %  ** add some information to the plot
+                      VS1label1 = sprintf(['Min. V_{S1} =%6.2f, max.' ...
+                          ' V_{S1} =%6.2f'],VS1min,VS1max) ;
+                      text(-1.15,0.8,VS1label1,'FontSize',fntsz, ...
+                          'FontWeight','bold') ;
+                      VS1mean = (VS1max+VS1min)./2.0 ;
+                      VS1ani = (VS1max-VS1min)/VS1mean .* 100 ;
+                      VS1label2 = sprintf('Anisotropy =%6.1f%%',VS1ani) ;
+                      text(-1.3,0.8,VS1label2,'FontSize',fntsz, ...
+                          'FontWeight','bold') ;
+                      
+                  case 'vs2'
+                      % VS2 anisotropy plot
+                      contour_pole(X, Y, VS2, view_angle, VScvect,...
+                          cmap, fntsz, ...
+                          buggyMATLAB, 'V_{S2} (km/s)')
+                      
+                      [VS2min, VS2max] = max_min_pole(AZ, INC, VS1);
+                      
+                      %  ** add some information to the plot
+                      VS2label1 = sprintf(['Min. V_{S2} =%6.2f, max.' ...
+                          ' V_{S2} =%6.2f'],VS1min,VS1max) ;
+                      text(-1.15,0.8,VS2label1,'FontSize',fntsz, ...
+                          'FontWeight','bold') ;
+                      VS2mean = (VS2max+VS2min)./2.0 ;
+                      VS2ani = (VS2max-VS2min)/VS2mean .* 100 ;
+                      VS2label2 = sprintf('Anisotropy =%6.1f%%',VS2ani) ;
+                      text(-1.3,0.8,VS2label2,'FontSize',fntsz, ...
                           'FontWeight','bold') ;
                       
                   case 'avspol'
