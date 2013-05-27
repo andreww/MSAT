@@ -146,7 +146,8 @@ function MS_plot(C,rh,varargin)
 %  ** map of what we want to plot
       plotmap = {'VP', 'AVS', 'AVSPOL'};
       sdata_plot = 0; % no sdata overlay
-            
+      pdata_plot = 0; % no pdata overlay      
+      
 %  ** process the optional arguments
       iarg = 1 ;
       while iarg <= (length(varargin))
@@ -200,13 +201,19 @@ function MS_plot(C,rh,varargin)
             case 'plotmap'
                plotmap = varargin{iarg+1} ;
                iarg = iarg + 2 ;
-             case 'sdata'
+            case 'sdata'
                sdata_azi = varargin{iarg+1};
                sdata_inc = varargin{iarg+2};
                sdata_pol = varargin{iarg+3};
                sdata_mag = varargin{iarg+4};
                sdata_plot = 1;
                iarg = iarg + 5;
+            case 'pdata'
+               pdata_azi = varargin{iarg+1};
+               pdata_inc = varargin{iarg+2};
+               pdata_mag = varargin{iarg+3};
+               pdata_plot = 1;
+               iarg = iarg + 4;
             otherwise 
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
@@ -303,6 +310,10 @@ function MS_plot(C,rh,varargin)
                       
                       [VPmin, VPmax] = max_min_pole(AZ, INC, VP);
                       
+                      if pdata_plot
+                          add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0);
+                      end
+                      
                       %  ** add some information to the plot
                       VPlabel1 = sprintf(['Min. V_P =%6.2f, max.' ...
                           ' V_P =%6.2f'],VPmin,VPmax) ;
@@ -381,7 +392,7 @@ function MS_plot(C,rh,varargin)
                       
                       if sdata_plot
                           add_data(sdata_azi, sdata_inc, sdata_pol, ...
-                              sdata_mag);
+                              sdata_mag, 1);
                       end
                       
                   otherwise
@@ -461,7 +472,7 @@ end
    end
 %===============================================================================
 
-function add_data(data_azi, data_inc, data_pol, data_mag)
+function add_data(data_azi, data_inc, data_pol, data_mag, with_pol)
 
     % Get data points as XYZ
     % reverse so sph2cart() works properly
@@ -470,64 +481,67 @@ function add_data(data_azi, data_inc, data_pol, data_mag)
     % Data points
     [X,Y,Z] = sph2cart(data_azi.*rad, data_inc.*rad, ones(size(data_azi)));
     
-    % Vectors in ray frame:
-    nsdata = length(data_pol);
-    vec = [ zeros(nsdata,1), sind(data_pol)', cosd(data_pol)'];
-    V_x = zeros(nsdata,1);
-    V_y = zeros(nsdata,1);
-    V_z = zeros(nsdata,1);
-    % Rotate into fame used to describe ray direction
-    for i = 1:nsdata
-        vecout = V_rot_gam(V_rot_bet(vec(i,:),-data_inc(i)),data_azi(i))';
-        V_x(i) = vecout(1);
-        V_y(i) = vecout(2);
-        V_z(i) = vecout(3);
-    end
+    if with_pol
+        % Vectors in ray frame:
+        nsdata = length(data_pol);
+        vec = [ zeros(nsdata,1), sind(data_pol)', cosd(data_pol)'];
+        V_x = zeros(nsdata,1);
+        V_y = zeros(nsdata,1);
+        V_z = zeros(nsdata,1);
+        % Rotate into fame used to describe ray direction
+        for i = 1:nsdata
+            vecout = V_rot_gam(V_rot_bet(vec(i,:),-data_inc(i)),data_azi(i))';
+            V_x(i) = vecout(1);
+            V_y(i) = vecout(2);
+            V_z(i) = vecout(3);
+        end
     
-    %  ** transform vectors
-    [V_x,V_y,V_z] = vnormalise2(V_x,V_y,V_z) ;
-    [XN,YN,ZN] = vnormalise2(X,Y,Z) ;
+        %  ** transform vectors
+        [V_x,V_y,V_z] = vnormalise2(V_x,V_y,V_z) ;
+        [XN,YN,ZN] = vnormalise2(X,Y,Z) ;
 
-    A = zeros(3,nsdata) ;
-    B = zeros(3,nsdata) ;
+        A = zeros(3,nsdata) ;
+        B = zeros(3,nsdata) ;
      
-    A(1,:) = XN ;
-    A(2,:) = YN ;
-    A(3,:) = ZN ;
+        A(1,:) = XN ;
+        A(2,:) = YN ;
+        A(3,:) = ZN ;
                   
-    B(1,:) =  V_x ;
-    B(2,:) =  V_y ;
-    B(3,:) =  V_z ;
+        B(1,:) =  V_x ;
+        B(2,:) =  V_y ;
+        B(3,:) =  V_z ;
      
-    C=cross(A,B) ;
-    D=cross(A,C) ;
+        C=cross(A,B) ;
+        D=cross(A,C) ;
         
-    VR_x = D(1,:) ;
-    VR_y = D(2,:) ;
-    VR_z = D(3,:) ;
+        VR_x = D(1,:) ;
+        VR_y = D(2,:) ;
+        VR_z = D(3,:) ;
       
-    [VR_x,VR_y,VR_z] = vnormalise2(VR_x,VR_y,VR_z) ;
+        [VR_x,VR_y,VR_z] = vnormalise2(VR_x,VR_y,VR_z) ;
     
-    %  ** rotate the particle motion vector so the normal to sphere is vertical
-    VR_xR = zeros(1,nsdata);
-    VR_yR = zeros(1,nsdata);
-    VR_zR = zeros(1,nsdata);
-    for ip = 1:nsdata
-         [VR_xR(ip),VR_yR(ip),VR_zR(ip)] = ...
-                    rotate_pm_vector(...
-         VR_x(ip),VR_y(ip),VR_z(ip),...
-         data_azi(ip),data_inc(ip));          
-    end 
+        %  ** rotate the particle motion vector so the normal to sphere is vertical
+        VR_xR = zeros(1,nsdata);
+        VR_yR = zeros(1,nsdata);
+        VR_zR = zeros(1,nsdata);
+        for ip = 1:nsdata
+             [VR_xR(ip),VR_yR(ip),VR_zR(ip)] = ...
+                        rotate_pm_vector(...
+             VR_x(ip),VR_y(ip),VR_z(ip),...
+             data_azi(ip),data_inc(ip));          
+        end 
         
-    h=quiver(X,Y,VR_xR,VR_yR,0.1,'w.') ;
-    set(h,'LineWidth',3.0) ;
+        h=quiver(X,Y,VR_xR,VR_yR,0.1,'w.') ;
+        set(h,'LineWidth',3.0) ;
 
-    h=quiver(X,Y,-VR_xR,-VR_yR,0.1,'w.') ;
-    set(h,'LineWidth',3.0) ;
+        h=quiver(X,Y,-VR_xR,-VR_yR,0.1,'w.') ;
+        set(h,'LineWidth',3.0) ;
       
-    %pol_pole(V_X', V_Y', V_Z', X, Y, Z, data_azi, data_inc, ...
-    %      0.20, 0.20, 5.0, 3.0)
+        %pol_pole(V_X', V_Y', V_Z', X, Y, Z, data_azi, data_inc, ...
+        %      0.20, 0.20, 5.0, 3.0)
 
+    end
+    % Pivot arrays to prevent data_mag looking like a colour.
     scatter(X',Y',25,data_mag','.')
     scatter(X,Y,26,'wo')
     
