@@ -70,12 +70,26 @@
 %          one above the other. Valid strings are 'VP", 'AVS' and 'AVSPOL'.
 %          These are not case sensitive.
 %
+%     MS_plot(..., 'pdata', azimuth, inclination, vp)
+%     MS_plot(..., 'sdata', azimuth, inclination, polarisation, avs)
+%          Add data points to the P-wave velocity ('VP') or S-wave 
+%          polarisation plot ('AVSPOL'), respectively. This can be used,
+%          for example, to compare an elastic model with shear-wave
+%          splitting measurements. In each case data points relate
+%          to a ray propagating in a direction described by the azimuth 
+%          and inclination. The point is coloured according to either 
+%          the P-wave velocity, vp, or S-wave anisotropy, avs, in km/s
+%          or %. In the case of S-wave anisotropy, the fast polarisation 
+%          direction is also shown. Each argument (azimuth, inclination, 
+%          vp, polarisation and avs) is an array and each must be the 
+%          same length.
+% 
 %     MS_plot(..., 'quiet')
 %          Don't write isotropic velocities to the terminal. 
 %
 % See also: MS_SPHERE, MS_PHASEVELS
 
-% Copyright (c) 2011, 2012 James Wookey and Andrew Walker
+% Copyright (c) 2011-2013 James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
@@ -229,6 +243,26 @@ function MS_plot(C,rh,varargin)
       % check the inputs: C
       assert(MS_checkC(C)==1, 'MS:PLOT:badC', 'MS_checkC error MS_plot') ;
 
+      % Check any data inputs
+      if pdata_plot
+          assert(length(pdata_azi)==length(pdata_inc),...
+              'MS:PLOT:pdata_mismatch', ...
+              'P-wave data arrays must be the same size.') ;
+          assert(length(pdata_azi)==length(pdata_mag),...
+              'MS:PLOT:pdata_mismatch', ...
+              'P-wave data arrays must be the same size.') ;
+      end
+      if sdata_plot
+          assert(length(sdata_azi)==length(sdata_inc),...
+              'MS:PLOT:sdata_mismatch', ...
+              'S-wave data arrays must be the same size.') ;
+          assert(length(sdata_azi)==length(sdata_mag),...
+              'MS:PLOT:sdata_mismatch', ...
+              'S-wave data arrays must be the same size.') ;
+          assert(length(sdata_azi)==length(sdata_pol),...
+              'MS:PLOT:sdata_mismatch', ...
+              'S-wave data arrays must be the same size.') ;
+      end
 %  ** buggy MATLAB contourf (version 7.1-7.3)
 %
 %     in these versions of MATLAB, the contourf routine doesn't seem able to
