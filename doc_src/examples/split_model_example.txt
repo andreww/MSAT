@@ -14,7 +14,7 @@ split_model.m in the examples/splitting
 directory distributed with MSAT. 
 
 The first step is to set up the geometrical parameters of the model
-and calcuate the ray distances in the two layers.
+and calculate the ray distances in the two layers.
 [code, python]
 ----
 %  ** Setup model parameters
