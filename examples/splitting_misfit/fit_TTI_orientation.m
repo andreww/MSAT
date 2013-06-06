@@ -54,8 +54,8 @@ function fit_TTI_orientation()
 %==============================================================================
    
    %% set the raypath parameters. ---------------------------------------------
-   razi = [045 135] ;
-   rinc = [000 000] ;
+   razi = [045 135 048] ;
+   rinc = [000 000 032] ;
    dist = 50 ; % km
    
    %% set up the medium to be modelled. ---------------------------------------
@@ -72,7 +72,7 @@ function fit_TTI_orientation()
    fprintf( ...
       'Creating dataset with orientation at strike = %2.0f, dip = %2.0f\n',...
          str,dip)
-   [fast,tlag]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;
+   [fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;
 
    %% calculate a grid of misfits over a range of strikes and dips. -----------
    fprintf('Grid searching over strike and dip ... \n')
@@ -109,6 +109,12 @@ function fit_TTI_orientation()
    xlabel('Strike (deg)')
    ylabel('Dip (deg)')   
    title('Misfit of TTI orientation to splitting data')
+   
+   %% plot comparing obs with best fitting result
+   % First get a best model
+   fprintf('Plotting model and observations\n')
+   Cbest = MS_rot3(Craw, 0, -GDIP(imin,jmin), GSTR(imin,jmin));
+   MS_plot(Cbest,rh,'sdata',razi,rinc,fast',ravs','plotmap', {'avspol'}) ;
 
 end   
 %==============================================================================
@@ -145,7 +151,7 @@ end
 %==============================================================================
 
 %==============================================================================
-function [fast,tlag]=create_dataset(Craw,rh,str,dip,razi,rinc,dist)
+function [fast,tlag,avs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist)
 %==============================================================================
 %
 %  Calculate a set of shear-wave splitting results (at raypaths razi,rinc,dist)
