@@ -25,8 +25,8 @@ install: html_funcs html_docs example-docs
 	cp ./examples/*.html ../msat/html/examples
 	$(MAKE) clean
 
-example-docs: examples/diopside_example.txt examples/index.txt examples/lmm_anisotropy_example.txt examples/loading_examples.txt examples/split_model_example.txt examples/texture_example.txt
-	(cd examples; $(AD) diopside_example.txt; $(AD) index.txt ; $(AD) lmm_anisotropy_example.txt ; $(AD) loading_examples.txt ; $(AD) split_model_example.txt ; $(AD) texture_example.txt)
+example-docs: examples/diopside_example.txt examples/index.txt examples/lmm_anisotropy_example.txt examples/loading_examples.txt examples/splitting_model_example.txt examples/texture_example.txt
+	(cd examples; $(AD) diopside_example.txt; $(AD) index.txt ; $(AD) lmm_anisotropy_example.txt ; $(AD) loading_examples.txt ; $(AD) splitting_model_example.txt ; $(AD) texture_example.txt)
 
 external-install: html_funcs html_docs
 	# NB - $(TARGET) must be set on the command line 
