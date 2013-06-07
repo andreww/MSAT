@@ -13,6 +13,9 @@ how this approach can be used to find the best-fitting model assuming
 tilted transverse isotropy (TTI) to a collection of synthetic SWS 
 measurements. 
 
+Calculating a misfit
+--------------------
+
 The example file demo_splitting_misfit in the examples/splitting_misfit
 directory shows how the MSAT function MS_splitting_misfit can be used 
 and plots the value of the misfit function for pairs of splitting 
@@ -50,6 +53,28 @@ polarisation directions and misfit calculation methods ("simple",
 "intensity", "lam2" and "lam2S") and the calculated misfit 
 surfaces plotted.  
 
+The images below show the misfit surfaces produced by the 
+demo_splitting_misfit example for the 0 degree polarisation angle. 
+It is instructive to first considerate "simple" approach (lower XXX
+figure).  WHAT IT DOES - reference - WHAT IT LOOKS LIKE - CHANGING 
+WAITING. Another approach is the comparison of splitting intensity 
+activated by the "intensity" method. This is described by XXX and 
+WORKS LIKE THIS. SHOWN IN XXX. MSAT also implements two other
+approaches motivated by the way that SWS parameters are 
+extracted and, in particular the XXX method of (REFERENCES). 
+Details of the approach, which involves splitting a 
+probe wavelet using latexmath:[$\Gamma_1$],  
+"unsplitting" it using latexmath:[$\Gamma_2$], and comparing the 
+result with the probe wavelet, is given in the user guide 
+LINK but the results are shown in the XXX and YYY figures. In the 
+following section the "XXX" misfit function is used to
+
+Misfit to model
+---------------
+
+The file does
+
+CHOP UP AND EXPLAIN.
 
 
     
