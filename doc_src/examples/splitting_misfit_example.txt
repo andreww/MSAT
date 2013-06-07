@@ -1,0 +1,56 @@
+Example 6: Splitting misfit measurement and model fitting
+=========================================================
+
+In this example we show the results of various methods that can be used 
+to determine the misfit between different shear wave splitting (SWS) 
+parameters and illustrate how these can be used to fit a model
+to measured SWS data. The four methods that are implemented in MSAT 
+which can be used to estimate the difference between one 
+splitting parameter, latexmath:[$\Gamma_1 = (dt_1 , \phi_1)$], and 
+a second, latexmath:[$\Gamma_2 = (dt_2 , \phi_2)$], are first outlined
+and results illustrated. In the second part of the example we show 
+how this approach can be used to find the best-fitting model assuming 
+tilted transverse isotropy (TTI) to a collection of synthetic SWS 
+measurements. 
+
+The example file demo_splitting_misfit in the examples/splitting_misfit
+directory shows how the MSAT function MS_splitting_misfit can be used 
+and plots the value of the misfit function for pairs of splitting 
+parameters. The reference splitting parameters, latexmath:[$\Gamma_1$],
+for this illustration are latexmath:[$dt_1 = 2$] seconds and 
+latexmath:[$\phi_1 = 0$] degrees. This is compared with 
+latexmath:[$\Gamma_2$] with values varying from
+latexmath:[$\phi_2 = -90$] to latexmath:[$\phi_2 = 90$] degrees and 
+latexmath:[$dt_2 = 0$] to latexmath:[$dt_2 = 4$] seconds. For the methods
+that are sensitive to source polarization three values are used, 45, 
+30 and 0 degrees. The calculation of misfit over this grid of values 
+of latexmath:[$\Gamma_2$] is done as follows in the function 
+calc_misfit_surface:
+[code, python]
+----
+   fast = [-90:5:90] ;
+   tlag = [0:0.1:4] ;
+
+   [TLAG,FAST] = meshgrid(tlag,fast) ;
+   MISFIT = FAST.*0 ;
+
+   % generate misfit 
+   for itlag=1:length(tlag)
+      for ifast=1:length(fast)
+        MISFIT(ifast,itlag) = ...
+           MS_splitting_misfit(fast_ref,tlag_ref, ...
+              fast(ifast),tlag(itlag),spol,0.1,'mode',modeStr,'max_tlag',10) ;
+      end
+   end
+
+----
+The call to MS_splitting_misfit calculates the misfit for each of the 
+values of latexmath:[$\Gamma_2$]. This is done for each of the 
+polarisation directions and misfit calculation methods ("simple", 
+"intensity", "lam2" and "lam2S") and the calculated misfit 
+surfaces plotted.  
+
+
+
+    
+

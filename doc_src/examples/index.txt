@@ -11,4 +11,5 @@ examples include:
 * link:diopside_example.html[Example 2: Analysis of single crystal elasticity]
 * link:texture_example.html[Example 3: Texture analysis and MTEX]
 * link:lmm_anisotropy_example.html[Example 4: Lowermost mantle anisotropy]
-* link:split_model_example.html[Example 5: modelling shear-wave splitting variation with backazimuth]
+* link:splitting_model_example.html[Example 5: modelling shear-wave splitting variation with backazimuth]
+* link:splitting_misfit_example.html[Example 6: measuring splitting misfit and fitting elasticity from SWS measurement] 
