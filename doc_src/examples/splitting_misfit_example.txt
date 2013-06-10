@@ -16,8 +16,8 @@ measurements.
 Calculating a misfit
 --------------------
 
-The example file demo_splitting_misfit in the examples/splitting_misfit
-directory shows how the MSAT function MS_splitting_misfit can be used 
+The example file `demo_splitting_misfit.m` in the `examples/splitting_misfit`
+directory shows how the MSAT function `MS_splitting_misfit` can be used 
 and plots the value of the misfit function for pairs of splitting 
 parameters. The reference splitting parameters, latexmath:[$\Gamma_1$],
 for this illustration are latexmath:[$dt_1 = 2$] seconds and 
@@ -28,7 +28,7 @@ latexmath:[$dt_2 = 0$] to latexmath:[$dt_2 = 4$] seconds. For the methods
 that are sensitive to source polarization three values are used, 45, 
 30 and 0 degrees. The calculation of misfit over this grid of values 
 of latexmath:[$\Gamma_2$] is done as follows in the function 
-calc_misfit_surface:
+`calc_misfit_surface`:
 [code, python]
 ----
    fast = [-90:5:90] ;
@@ -47,18 +47,38 @@ calc_misfit_surface:
    end
 
 ----
-The call to MS_splitting_misfit calculates the misfit for each of the 
+The call to `MS_splitting_misfit` calculates the misfit for each of the 
 values of latexmath:[$\Gamma_2$]. This is done for each of the 
 polarisation directions and misfit calculation methods ("simple", 
 "intensity", "lam2" and "lam2S") and the calculated misfit 
-surfaces plotted.  
+surfaces plotted.
 
-The images below show the misfit surfaces produced by the 
-demo_splitting_misfit example for the 0 degree polarisation angle. 
-It is instructive to first considerate "simple" approach (lower XXX
-figure).  WHAT IT DOES - reference - WHAT IT LOOKS LIKE - CHANGING 
-WAITING. Another approach is the comparison of splitting intensity 
-activated by the "intensity" method. This is described by XXX and 
+image:splitting_misfit_pol0.png[Misfit surfaces for 0 degree polarisation]
+
+The images above show the misfit surfaces produced by the 
+`demo_splitting_misfit` example for the 0 degree polarisation angle. 
+It is instructive to first consider the "simple" approach (lower left 
+figure). This approach takes the average of the magnitude of the  
+difference between the delay times and magnitude of the difference
+of between the fast directions. That is:
+
+latexmath:[$\displaystyle{\frac{1}{2} \left(\frac{|dt_1-dt_2|}{(0.25/f_d)} + \frac{|\phi_1 - \phi_1|}{90}\right)}$],
+ 
+where latexmath:[$f_d$], the dominant frequency, and 90 are included to 
+properly normalise the two parts of the sum. This is not dependent on the
+initial polarisation direction and always forms a diamond shape with a minimum
+located at the point where latexmath:[$dt_1 = dt_2$] and latexmath:[$\phi_1 = \phi_2$].
+Another approach is the comparison of splitting intensity 
+activated by the "intensity" method. The approach is to calculate the
+splitting intensity for both pairs of parameters:
+
+latexmath:[$\displaystyle{S_i = dt_i \sin(2 \beta_i)}$],
+
+(where latexmath:[$\beta$] is the difference between the polarisation angle 
+and latexmath:[$\phi$]) and taking the magnitude of the difference between 
+latexmath:[$S_1$] and latexmath:[$S_2$].
+
+  
 WORKS LIKE THIS. SHOWN IN XXX. MSAT also implements two other
 approaches motivated by the way that SWS parameters are 
 extracted and, in particular the XXX method of (REFERENCES). 
@@ -68,6 +88,7 @@ probe wavelet using latexmath:[$\Gamma_1$],
 result with the probe wavelet, is given in the user guide 
 LINK but the results are shown in the XXX and YYY figures. In the 
 following section the "XXX" misfit function is used to
+
 
 Misfit to model
 ---------------
