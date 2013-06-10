@@ -62,7 +62,7 @@ figure). This approach takes the average of the magnitude of the
 difference between the delay times and magnitude of the difference
 of between the fast directions. That is:
 
-latexmath:[$\displaystyle{\frac{1}{2} \left(\frac{|dt_1-dt_2|}{(0.25/f_d)} + \frac{|\phi_1 - \phi_1|}{90}\right)}$],
+latexmath:[$\displaystyle{\frac{1}{2} \left(\frac{|dt_1-dt_2|}{(0.25/f_d)} + \frac{|\phi_1 - \phi_2|}{90}\right)}$],
  
 where latexmath:[$f_d$], the dominant frequency, and 90 are included to 
 properly normalise the two parts of the sum. This is not dependent on the
@@ -74,28 +74,78 @@ splitting intensity for both pairs of parameters:
 
 latexmath:[$\displaystyle{S_i = dt_i \sin(2 \beta_i)}$],
 
-(where latexmath:[$\beta$] is the difference between the polarisation angle 
+(where latexmath:[$\beta$] is the difference between the initial polarisation angle 
 and latexmath:[$\phi$]) and taking the magnitude of the difference between 
-latexmath:[$S_1$] and latexmath:[$S_2$].
-
-  
-WORKS LIKE THIS. SHOWN IN XXX. MSAT also implements two other
-approaches motivated by the way that SWS parameters are 
-extracted and, in particular the XXX method of (REFERENCES). 
+latexmath:[$S_1$] and latexmath:[$S_2$]. As shown in the lower right figure,
+the misfit surface is more complex but retains a minimum where the two
+splitting operators are equal. MSAT also implements two other
+approaches motivated by the way that SWS parameters can be 
+extracted from data and, in particular the minimum eigenvalue 
+method (Silver and Chan, 1991). 
 Details of the approach, which involves splitting a 
 probe wavelet using latexmath:[$\Gamma_1$],  
 "unsplitting" it using latexmath:[$\Gamma_2$], and comparing the 
-result with the probe wavelet, is given in the user guide 
-LINK but the results are shown in the XXX and YYY figures. In the 
-following section the "XXX" misfit function is used to
+result with the probe wavelet, is given in the link:../MSATfunctions.html[user guide] 
+but the result is shown in the top two figures. The top left
+figure shows the results of the "lam2" method which, because
+SWS operators are not commutative, differs if the values of
+latexmath:[$\Gamma_1$] and latexmath:[$\Gamma_2$] are exchanged. The 
+top right figure shows the "lam2S" method where the forward and 
+reversed "lam2" results are averaged to give a misfit function which is
+independent of the order that the splitting functions are supplied. The 
+misfit function for both eigenvalue based methods change with both the initial
+polarisation angle and the dominant frequency of the test wavelet. In the 
+following section the "lam2" misfit function is used to derive and elastic 
+model that best fits SWS results.
 
-
-Misfit to model
----------------
+From a misfit to a model
+------------------------
 
 The file does
 
-CHOP UP AND EXPLAIN.
+[code, python]
+----
+   %% set the raypath parameters. ---------------------------------------------
+   razi = [045 135 048] ;
+   rinc = [000 000 032] ;
+   dist = 50 ; % km
+   
+   %% set up the medium to be modelled. ---------------------------------------
+   str = 60 ;
+   dip = 25 ;
+
+   vpi=2;
+   vsi=1;
+   rh=2000;
+   
+   [Craw]=MS_VTI(vpi,vsi,rh,0.05,0.05,0.05) ;
+----
+   
+
+`[fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;`
+
+[code, python]
+----
+   %% calculate a grid of misfits over a range of strikes and dips. -----------
+   fprintf('Grid searching over strike and dip ... \n')
+   [GSTR GDIP] = meshgrid([0:10:360],[0:5:90]) ;
+   GMIS=GSTR.*0 ;
+   [n,m]=size(GSTR) ;
+   for i=1:n
+      for j=1:m
+         str_dip = [GSTR(i,j) GDIP(i,j)] ;
+         GMIS(i,j) = orientation_misfit(str_dip,Craw,rh,...
+            0,0.1,fast,tlag,razi,rinc,dist) ;
+      end
+   end
+----
+
+[code, python]
+----
+   fprintf('Plotting model and observations\n')
+   Cbest = MS_rot3(Craw, 0, -GDIP(imin,jmin), GSTR(imin,jmin));
+   MS_plot(Cbest,rh,'sdata',razi,rinc,fast',ravs','plotmap', {'avspol'}) ;
+----
 
 
     
