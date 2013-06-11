@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.6" />
-<title>Matlab Seismic Anisotropy Toolkit - using the functions</title>
+<title>Example 6: Splitting misfit measurement and model fitting</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -1962,473 +1962,207 @@ else
 </head>
 <body class="article">
 <div id="header">
-<h1>Matlab Seismic Anisotropy Toolkit - using the functions</h1>
+<h1>Example 6: Splitting misfit measurement and model fitting</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>This section of the user guide includes some information on the functions provided in, and
-theory implemented by, the MSAT toolkit.
-The functions provided by MSAT can be classified into groups according to how they are used. These groups
-broadly correspond to how elasticity matrices appear in the input and output arguments lists. In all
-cases function names begin with "MS_" and argument lists typically begin with the elasticity
-followed, where needed, by the density. Units are always GPa for the elasticity,
-km/s for phase velocities and kg/m^3 for densities.</p></div>
-<div class="paragraph"><p>In all cases when elastic constants (stiffness) tensors are used they
-are represented using Voigt notation. This takes advantage of the
-major ($C_{ijkl} = C_{klij}$) and minor ($C_{ijkl} = C_{jikl}$ and
-$C_{ijkl} = C_{ijlk}$) symmetries of the tensor to
-limit the number of constants needed with no loss of data. The
-4th order tensor $C_{ijkl}$ is expressed
-as a symmetric $6\times 6$ Matlab array $C_{\alpha \beta}$
-with elements given by:</p></div>
-<div class="paragraph"><p>$
-\begin{array}{ccccc}
-ij &amp;\mathrm{or} &amp;kl &amp;: &amp; \\
-\downarrow &amp; &amp;\downarrow &amp; &amp; \\
-\alpha &amp; &amp;\beta &amp; &amp;
-\end{array}
-\begin{array}{cccccc}
-11 &amp;22 &amp;33 &amp;32=23 &amp;31=13 &amp;12=21 \\
-\downarrow &amp;\downarrow &amp;\downarrow
-&amp;\downarrow &amp;\downarrow &amp;\downarrow \\
-1 &amp;2 &amp;3 &amp;4 &amp;5 &amp;6
-\end{array}.
-$</p></div>
-<div class="paragraph"><p>In the MSAT documentation we call the Voigt representation of
-the elastic constants tensor the elasticity matrix (in an attempt to
-avoid confusion) and note that, if the matrix is to make physical sense,
-it must be symmetric, consist of real numbers, and be positive definite.
-Conversion and validation functions are described in the section
-"Other functions", below. Functions are otherwise classified as follows.</p></div>
+<div class="paragraph"><p>In this example we show the results of various methods that can be used
+to determine the misfit between different shear wave splitting (SWS)
+parameters and illustrate how these can be used to fit a model
+to measured SWS data. The four methods that are implemented in MSAT
+which can be used to estimate the difference between one
+splitting parameter, $\Gamma_1 = (dt_1 , \phi_1)$, and
+a second, $\Gamma_2 = (dt_2 , \phi_2)$, are first outlined
+and results illustrated. In the second part of the example we show
+how this approach can be used to find the best-fitting model assuming
+tilted transverse isotropy (TTI) to a collection of synthetic SWS
+measurements.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_input_and_generation_functions">The input and generation functions</h2>
+<h2 id="_calculating_a_misfit">Calculating a misfit</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The first group of functions generate elasticity matrices from input
-arguments (see the table below). MS_load and MS_load_list
-read data from input files
-while MS_elasticDB extracts elasticity information from a
-built-in database. Other functions create elasticity matrices
-from summary information and a knowledge of the symmetry.</p></div>
-<div class="paragraph"><p>In the most general case 21 elastic constants are required to represent minerals and materials
-with a triclinic symmetry, but systems with a higher symmetry
-(e.g. orthorhombic, hexagonal or cubic) require fewer elastic constants. In the simplest case,
-that of isotropic materials, this reduces to two parameters.
-The limitations of what
-can usually be resolved using seismology mean that higher symmetry classes are often assumed.
-A class which is commonly invoked is transverse isotropy (TI, also known as radial
-or polar anisotropy). In a TI medium properties only vary with angle from the
-symmetry axis. This can arise in a number of ways and is exhibited by: crystalline materials with a
-hexagonal symmetry, isotropic thin layers of different stiffness,
-aligned inclusions
-or cracks which are uniformly oriented. TI requires five
-independent constants to parameterise. There are a number of commonly used choices of
-parameter sets (depending on the area of literature); MSAT has functions to work with
-several of these.</p></div>
-<div class="paragraph"><p>It is also possible to model the effective anisotropic elasticity caused by particular
-rock fabrics; an effect that can be important even if all the components of the rock are isotropic
-on a short length scale compared to the seismic wavelength. Several effective medium models are
-supported by the MS_effective_medum function. These include the case of an
-elastically isotropic medium contains aligned ellipsoidal
-inclusions filled with an elastically isotropic material of a different stiffness,
-the case of layering of isotropic materials of different stiffness, and the effect of
-aligned cracks.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="80%"
-frame="hsides"
-cellspacing="0" cellpadding="4">
-<caption class="title">Table 1. MSAT Input / generation of elastic constants.</caption>
-<col width="23%" />
-<col width="76%" />
-<thead>
-<tr>
-<th align="left" valign="top">Function</th>
-<th align="left" valign="top">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_build_isotropic.html">MS_build_isotropic</a></p></td>
-<td align="left" valign="top"><p class="table">Create elasticity matrix from pairs of isotropic moduli.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_TI.html">MS_TI</a></p></td>
-<td align="left" valign="top"><p class="table">Generate elastic constants for a vertically transverse isotropic medium from Thomsen parameters or other parameterisation. Symmetry is in the 3-axis.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_effective_medium.html">MS_effective_medium</a></p></td>
-<td align="left" valign="top"><p class="table">Generate elastic constants from various effective medium theories.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_elasticDB.html">MS_elasticDB</a></p></td>
-<td align="left" valign="top"><p class="table">Database of various elastic constants.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_expand.html">MS_expand</a></p></td>
-<td align="left" valign="top"><p class="table">Fill out elasticity matrix.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_iso.html">MS_iso</a></p></td>
-<td align="left" valign="top"><p class="table">Generate elastic matrix from isotropic velocities.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_load.html">MS_load</a></p></td>
-<td align="left" valign="top"><p class="table">Load a set of elastic constants from a file.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_load_list.html">MS_load_list</a></p></td>
-<td align="left" valign="top"><p class="table">Load a list of CIJs, in a specific format</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="paragraph"><p>The example file <tt>demo_splitting_misfit.m</tt> in the <tt>examples/splitting_misfit</tt>
+directory shows how the MSAT function <tt>MS_splitting_misfit</tt> can be used
+and plots the value of the misfit function for pairs of splitting
+parameters. The reference splitting parameters, $\Gamma_1$,
+for this illustration are $dt_1 = 2$ seconds and
+$\phi_1 = 0$ degrees. This is compared with
+$\Gamma_2$ with values varying from
+$\phi_2 = -90$ to $\phi_2 = 90$ degrees and
+$dt_2 = 0$ to $dt_2 = 4$ seconds. For the methods
+that are sensitive to source polarization three values are used, 45,
+30 and 0 degrees. The calculation of misfit over this grid of values
+of $\Gamma_2$ is done as follows in the function
+<tt>calc_misfit_surface</tt>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>   fast = [-90:5:90] ;
+   tlag = [0:0.1:4] ;
+
+   [TLAG,FAST] = meshgrid(tlag,fast) ;
+   MISFIT = FAST.*0 ;
+
+   % generate misfit
+   <strong>for</strong> itlag=1:length(tlag)
+      <strong>for</strong> ifast=1:length(fast)
+        MISFIT(ifast,itlag) = ...
+           MS_splitting_misfit(fast_ref,tlag_ref, ...
+              fast(ifast),tlag(itlag),spol,0.1,'mode',modeStr,'max_tlag',10) ;
+      end
+   end</tt></pre>
+</div></div>
+<div class="paragraph"><p>The call to <tt>MS_splitting_misfit</tt> calculates the misfit for each of the
+values of $\Gamma_2$. This is done for each of the
+polarisation directions and misfit calculation methods ("simple",
+"intensity", "lam2" and "lam2S") and the calculated misfit
+surfaces plotted.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="splitting_misfit_pol0.png" alt="Misfit surfaces for 0 degree polarisation" />
+</span></p></div>
+<div class="paragraph"><p>The images above show the misfit surfaces produced by the
+<tt>demo_splitting_misfit</tt> example for the 0 degree polarisation angle.
+It is instructive to first consider the "simple" approach (lower left
+figure). This approach takes the average of the magnitude of the
+difference between the delay times and magnitude of the difference
+of between the fast directions. That is:</p></div>
+<div class="paragraph"><p>$\displaystyle{\frac{1}{2} \left(\frac{|dt_1-dt_2|}{(0.25/f_d)} + \frac{|\phi_1 - \phi_2|}{90}\right)}$,</p></div>
+<div class="paragraph"><p>where $f_d$, the dominant frequency, and 90 are included to
+properly normalise the two parts of the sum. This is not dependent on the
+initial polarisation direction and always forms a diamond shape with a minimum
+located at the point where $dt_1 = dt_2$ and $\phi_1 = \phi_2$.
+Another approach is the comparison of splitting intensity
+activated by the "intensity" method. The approach is to calculate the
+splitting intensity for both pairs of parameters:</p></div>
+<div class="paragraph"><p>$\displaystyle{S_i = dt_i \sin(2 \beta_i)}$,</p></div>
+<div class="paragraph"><p>(where $\beta$ is the difference between the initial polarisation angle
+and $\phi$) and taking the magnitude of the difference between
+$S_1$ and $S_2$. As shown in the lower right figure,
+the misfit surface is more complex but retains a minimum where the two
+splitting operators are equal. MSAT also implements two other
+approaches motivated by the way that SWS parameters can be
+extracted from data and, in particular the minimum eigenvalue
+method (Silver and Chan, 1991).
+Details of the approach, which involves splitting a
+probe wavelet using $\Gamma_1$,
+"unsplitting" it using $\Gamma_2$, and comparing the
+result with the probe wavelet, is given in the <a href="../MSATfunctions.html">user guide</a>
+but the result is shown in the top two figures. The top left
+figure shows the results of the "lam2" method which, because
+SWS operators are not commutative, differs if the values of
+$\Gamma_1$ and $\Gamma_2$ are exchanged. The
+top right figure shows the "lam2S" method where the forward and
+reversed "lam2" results are averaged to give a misfit function which is
+independent of the order that the splitting functions are supplied. The
+misfit function for both eigenvalue based methods change with both the initial
+polarisation angle and the dominant frequency of the test wavelet. In the
+following section the "lam2" misfit function is used to derive and elastic
+model that best fits SWS results.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_manipulation_functions">The manipulation functions</h2>
+<h2 id="_from_a_misfit_to_a_model">From a misfit to a model</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>A second group of functions include elasticity matrices as input and output. These
-functions, listed below, are used to manipulate or
-transform an elasticity matrix.</p></div>
-<div class="paragraph"><p>One important manipulation is tensor rotation. MS_rot3,
-MS_rotEuler and MS_rotR all rotate an elasticity matrix (the
-functions differ in the way the rotation is specified: in all
-cases a rotation matrix is constructed and MS_rotR is used
-to perform the actual manipulation). To understand the approach
-recall that a vector, $\mathbf{v}$ is
-rotated from to a new orientation, $\mathbf{v}^{(R)}$, by multiplication by a rotation matrix:
-$\mathbf{v}^{(R)}=\mathbf{g}\mathbf{v}$, where the rotation matrix, $\mathbf{g}$, is a
-$3 \times 3$ orthogonal matrix with determinant 1 and elements that represent the cosines of
-angles of the rotation. This transformation be also be written element-wise as:
-$v_i^{(R)}$ = $g_{ij}v_j$ (with an implicit summation over $j=1,3$). This formula
-can be extended for higher order Cartesian tensors. For example, the second order
-stress tensor is rotated: $\sigma_{ij}^{(R)}$ = $g_{ik}g_{jl}\sigma_{kl}$ (with two
-implicit summations) and the elastic stiffness tensor rotated:
-$C_{ijkl}^{(R)}$ = $g_{im}g_{jn}g_{kp}g_{lq}C_{mnpq}$ (with four summations and avoiding Voigt
-notation). For second
-order tensors the transformation can also be written in the form of matrix multiplication by the
-rotation matrix and its transpose: $\mathbf{\sigma}^{(R)} = \mathbf{g} \mathbf{\sigma} \mathbf{g}^{T}$,
-but this shortcut is not available for higher order tensors. However,
-it is possible (in fact, highly desirable for performance reasons) to perform rotations on
-elastic constants in Voigt form without requiring to transform to the $3\times3\times3\times3$
-tensor form. In order to do this we use the basis change formula from
-Bower (2009; Section 3.2.11):</p></div>
-<div class="paragraph"><p>$
-\mathrm{C}^{(R)}=\mathrm{K}\,\mathrm{C}\,\mathrm{K}^T
-$</p></div>
-<div class="paragraph"><p>where $\mathrm{C}^{(R)}$ is the rotated version of $\mathrm{C}$. In this equation
-$\mathrm{K}$ is a $6\times6$ matrix derived from combinations of the normal
-is its matrix transpose.</p></div>
-<div class="paragraph"><p>MS_axes also rotates an
-input matrix but by an amount designed to allow the anisotropic nature of the
-matrix to be analysed. Such analysis makes use of two other functions,
-MS_decomp and MS_norms. Taken together, these three
-functions allow the symmetry of elasticity matrices to be expressed following
-the approach of Browaeys and Chevrot (2004). Example of this approach are
-provided elsewhere in the documentation.</p></div>
-<div class="paragraph"><p>Another type of manipulation concerns the
-averaging of elastic constants. In many fields we do not deal with
-single crystals. We need, therefore, a method of estimating
-the aggregate elastic properties of a polycrystalline material containing a range of crystal types
-and orientations. While much more rigorous treatments exist
-for many purposes simple
-averaging schemes suffice. These either assume constant strain (Voigt averaging)
-or stress (Reuss averaging) throughout the sample, and essentially amount to taking
-the arithmetic average of each element of the stiffness or compliance tensor, respectively. These two
-values place an upper (Voigt) and lower (Reuss) bound on the true value. It was
-observed by Hill (1952) that experimental values were often close to the
-average of these two bounds, a value which has become known as the
-Voigt-Reuss-Hill (VRH) average:</p></div>
-<div class="paragraph"><p>$
-C^{\mathrm{VRH}}=\frac{1}{2}\left(C^{\mathrm{Voigt}}+C^{\mathrm{Reuss}}\right)
-$</p></div>
-<div class="paragraph"><p>where</p></div>
-<div class="paragraph"><p>$
-C^{\mathrm{Voigt}}=\sum_{i=1}^{N}{v_iC_i}\;\;\;
-\mathrm{and}\;\;\;C^{\mathrm{Reuss}}=\left(\sum_{i=1}^{N}{v_iS_i}\right)^{-1}.
-$</p></div>
-<div class="paragraph"><p>Here, $v_i$ are the volume fractions of the $N$ individual components, with
-associated elasticities ($C_i$) and compliances ($S_i$). This is very commonly
-employed.
-It should be noted that it is an empirical relation with
-no strict theoretical foundation, albeit a useful one.
-MS_VRH calculates the Voigt, Reuss, and
-Voigt-Reuss-Hill average elasticity of an aggregate of materials,
-each described by their own elasticity matrix and volume fraction, while
-MS_polyaverage takes this averaging one step further and estimates the
-isotopic elasticity matrix if the components are randomly oriented.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="80%"
-frame="hsides"
-cellspacing="0" cellpadding="4">
-<caption class="title">Table 2. MSAT Manipulation / transformation</caption>
-<col width="23%" />
-<col width="76%" />
-<thead>
-<tr>
-<th align="left" valign="top">Function</th>
-<th align="left" valign="top">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_VRH.html">MS_VRH</a></p></td>
-<td align="left" valign="top"><p class="table">N phase Voigt-Reuss-Hill average of elasticity.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_axes.html">MS_axes</a></p></td>
-<td align="left" valign="top"><p class="table">Reorient elasticity matrix for optimal decomposition.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_decomp.html">MS_decomp</a></p></td>
-<td align="left" valign="top"><p class="table">Browaeys and Chevrot decomposition of the elasticity matrix.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_interpolate.html">MS_interpolate</a></p></td>
-<td align="left" valign="top"><p class="table">Symmetry preserving elasticity interpolation</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_polyaverage.html">MS_polyaverage</a></p></td>
-<td align="left" valign="top"><p class="table">Isotropic elasticity for polycrystal</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_rot3.html">MS_rot3</a></p></td>
-<td align="left" valign="top"><p class="table">Elasticity matrix rotation.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotEuler.html">MS_rotEuler</a></p></td>
-<td align="left" valign="top"><p class="table">Rotate an elasticity matrix using Bunge&#8217;s Euler angles.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotR.html">MS_rotR</a></p></td>
-<td align="left" valign="top"><p class="table">Script to rotate a set of elastic constants by a rotation matrix</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_the_analysis_functions">The analysis functions</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>The third group of functions allow elasticity to be analysed or displayed.
-They take elasticity matrices as input arguments and either return derived
-quantities or cause graphics to be produced. Examples include MS_anisotropy,
-which implements some of the attempts to capture the degree of elastic anisotropy
-of a material as a single value and
-MS_poisson which calculates
-Poisson&#8217;s ratio for a general anisotropic material as a function of direction.</p></div>
-<div class="paragraph"><p>For seismology, one of the most important ways to analyse the anisotropic
-elasticity of a medium is in terms of seismic phase velocities.
-The propagation of motion through an elastic medium is governed
-by the elastodynamics equation:</p></div>
-<div class="paragraph"><p>$
-\rho\left(\frac{\partial^2u_i}{\partial t^2}\right) = C_{ijkl}\left(\frac{\partial^2u_l}{\partial x_jx_k}\right)
-$</p></div>
-<div class="paragraph"><p>where $\rho$ is the density, $u_i$ is the displacement, $x_j$ is position
-and $t$ is time. By substituting into this the displacement associated with a
-monochromatic plane wave as a function of time, we obtain the well-known
-Christoffel equation:</p></div>
-<div class="paragraph"><p>$
-\left(C_{ijkl}n_jn_l-\rho V^2\delta_{ik}\right)p_{k}=0
-$</p></div>
-<div class="paragraph"><p>where $n_j$ is the propagation unit vector, $V$ are the phase velocities, $p_k$ are
-the polarisation unit vectors and $\delta_{ik}$ is the Kronecker delta function.
-Solutions to this equation for a given direction ($n_j$) yield the three orthogonal
-waves with different phase velocities. One of these will be close to the wavefront
-normal (designated quasi-P or qP) and two will be near perpendicular (quasi-S1,
-quasi-S2; qS1 and qS2). In practice the quasi- prefix is often omitted. The reader
-is directed to Mainprice (2007) for a more complete treatment of the subject.
-MSAT follows the methodology of Mainprice (1990) to calculate phase
-velocities and this is implemented in  MS_phasevels.
-The function accepts a (set of) propagation direction(s) and returns the three seismic phase velocities
-along with their polarisations. This function is used by MS_plot and MS_sphere,
-which plot the resulting seismic anisotropy on a pole figures and a three-dimensional
-spherical representation, respectively.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="80%"
-frame="hsides"
-cellspacing="0" cellpadding="4">
-<caption class="title">Table 3. MSAT Analysis</caption>
-<col width="23%" />
-<col width="76%" />
-<thead>
-<tr>
-<th align="left" valign="top">Function</th>
-<th align="left" valign="top">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_anisotropy.html">MS_anisotropy</a></p></td>
-<td align="left" valign="top"><p class="table">Simple measures of anisotropy</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_phasevels.html">MS_phasevels</a></p></td>
-<td align="left" valign="top"><p class="table">Wave velocities in anisotropic media.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_plot.html">MS_plot</a></p></td>
-<td align="left" valign="top"><p class="table">Plot phasevels/anisotropy on pole figures.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_poisson.html">MS_poisson</a></p></td>
-<td align="left" valign="top"><p class="table">Poisson&#8217;s ratio in anisotropic media.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_norms.html">MS_norms</a></p></td>
-<td align="left" valign="top"><p class="table">Browaeys and Chevrot analysis of the elasticity matrix.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_sphere.html">MS_sphere</a></p></td>
-<td align="left" valign="top"><p class="table">Plot a spherical plot of phasevels/anisotropy from a set of elastic constants.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_TI_parameters.html">MS_TI_parameters</a></p></td>
-<td align="left" valign="top"><p class="table">Calculate Thomsen and other parameters for a vertically transverse isotropic medium given the elasticity matrix. Symmetry is in the 3-axis.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_shear_wave_splitting">Shear wave splitting</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Alongside the functions designed to analyse aspects of elasticity, MSAT also contains functions to
-deal with simple aspects of modelling one of the most common seismological observations related to
-elastic anisotropy, shear wave splitting. As discussed above, seismic waves can propagate at
-three velocities through an anisotropy body and two of these velocities correspond to shear waves.
-If a shear wave passes through an anisotropic region it is split into two shear waves with
-particle motion polarised at 90 degrees to each other (and approximately perpendicular to the
-direction of wave propagation. As the two shear waves have different velocities they will emerge
-from the anisotropic region at different times and with particle motion direction imposed by the
-elastic anisotropy of the medium. This process is known as shear wave splitting (SWS) and its
-observation in seismic data is considered strong evidence for anisotropy somewhere along the ray
-path.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="80%"
-frame="hsides"
-cellspacing="0" cellpadding="4">
-<caption class="title">Table 4. MSAT Shear wave splitting</caption>
-<col width="23%" />
-<col width="76%" />
-<thead>
-<tr>
-<th align="left" valign="top">Function</th>
-<th align="left" valign="top">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_make_trace.html">MS_make_trace</a></p></td>
-<td align="left" valign="top"><p class="table">Create simple wavelet for splitting calculation</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_split_trace.html">MS_split_trace</a></p></td>
-<td align="left" valign="top"><p class="table">Apply splitting operators to wavelet</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_effective_spltting_N.html">MS_effective_splitting_N</a></p></td>
-<td align="left" valign="top"><p class="table">N-layer effective splitting operator calculation</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_measure_trace_splitting.html">MS_measure_trace_splitting</a></p></td>
-<td align="left" valign="top"><p class="table">Measure splitting from wavelet</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_splitting_misfit.html">MS_splitting_misfit</a></p></td>
-<td align="left" valign="top"><p class="table">Calculate misfit between two splitting operators</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_plot_trace.html">MS_plot_trace</a></p></td>
-<td align="left" valign="top"><p class="table">Plot wavelet and splitting measurement results</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="paragraph"><p>In MSAT we only implement functions to handle the simplest aspects of SWS. Time series of particle displacements are described by
-three arrays we call <tt>time</tt>, <tt>T00</tt> and <tt>T90</tt>. <tt>T00(i)</tt> and <tt>T90(i)</tt> relate to the particle position of two perpendicular traces at
-time <tt>time(i)</tt>. The function <tt>MS_make_trace</tt> generates these assuming a first derivative Gaussian shape for a given dominant frequency
-making space in the arrays for a user selected maximum amount of splitting. <tt>MS_phasevels</tt> can calculate splitting parameters from
-an elasticity matrix and this can be used with <tt>MS_split_trace</tt> to apply splitting parameters. The effective splitting generated
-by a wave passing through multiple layers can be found by combing splitting operators using <tt>MS_effective_spltting_N</tt>. This either
-implements an analytic approach to calculating the resulting splitting parameters or uses <tt>MS_split_trace</tt> multiple times and then
-makes a measurement of the resulting effective splitting using <tt>MS_measure_trace_splitting</tt>. <tt>MS_splitting_misfit</tt> allows
-two splitting operators to be compared (allowing the best fitting elasticity to be found, see the
-<a href="examples/splitting_misfit_example.html">Splitting misfit example</a>) and <tt>MS_plot_trace</tt> can be used to visualise
-<tt>time</tt>, <tt>T00</tt> and <tt>T90</tt>. For complex applications these three arrays can be converted to and from SAC records using the functions
-available from <a href="http://www1.gly.bris.ac.uk/~wookey/codes/index.htm">MSAC</a>.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_other_functions">Other functions</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Finally, range of miscellaneous and utility functions are provided to, for example, convert between different ways of representing elasticity or check that
-a particular Matlab array is a valid elasticity matrix.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="80%"
-frame="hsides"
-cellspacing="0" cellpadding="4">
-<caption class="title">Table 5. MSAT Miscellaneous / utility</caption>
-<col width="23%" />
-<col width="76%" />
-<thead>
-<tr>
-<th align="left" valign="top">Function</th>
-<th align="left" valign="top">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_Vrot3.html">MS_Vrot3</a></p></td>
-<td align="left" valign="top"><p class="table">Rotate a (set of) 3-vector(s) by 3 angles.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_cij2cijkl.html">MS_cij2cijkl</a></p></td>
-<td align="left" valign="top"><p class="table">Convert from Voigt elasticity matrix to tensor</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_cijkl2cij.html">MS_cijkl2cij</a></p></td>
-<td align="left" valign="top"><p class="table">Convert from elastic tensor to Voigt elasticity matrix</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_list.html">MS_list</a></p></td>
-<td align="left" valign="top"><p class="table">Print elasticity matrix (in <em>list</em> format)</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_rotM.html">MS_rotM</a></p></td>
-<td align="left" valign="top"><p class="table">Create a cartesian rotation matrix.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_unwind_pm_90.html">MS_unwind_pm_90</a></p></td>
-<td align="left" valign="top"><p class="table">Unwind an angle until it is between 0 and 360 degrees</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_checkC.html">MS_checkC</a></p></td>
-<td align="left" valign="top"><p class="table">Check consistency of a stiffness matrix against various criteria</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><a href="funcs/MS_info.html">MS_info</a></p></td>
-<td align="left" valign="top"><p class="table">Information about an elasticity matrix.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="paragraph"><p>The file <tt>examples/splitting_misfit/fit_TTI_orientation.m</tt> shows how the splitting
+misfit described above can be used to find an elastic model that matches a set
+of SWS measurements. In the following example an elastic model with tilted
+transverse anisotropy (TTI) is generated and used to calculate three splitting parameters
+that would correspond to observations of rays arriving from different azimuths and
+inclinations. A grid search over different orientations of the TTI medium is then
+performed and at each orientation the model&#8217;s predicted splitting parameters are
+calculated. These are then compared with the "observations" and the orientation that
+minimises the sum of the misfit found. This orientation is then reported (along with
+the resulting misfit surface. Key parts of the code for this example are
+described below</p></div>
+<div class="paragraph"><p>The first step is to generate an elasticity matrix describing the "observed"
+TTI medium and calculate the "observed" splitting parameters. The model is set up
+as follows:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>   %% set the raypath parameters. ---------------------------------------------
+   razi = [045 135 048] ;
+   rinc = [000 000 032] ;
+   dist = 50 ; % km
+
+   %% set up the medium to be modelled. ---------------------------------------
+   str = 60 ;
+   dip = 25 ;
+
+   vpi=2;
+   vsi=1;
+   rh=2000;
+
+   [Craw]=MS_VTI(vpi,vsi,rh,0.05,0.05,0.05) ;</tt></pre>
+</div></div>
+<div class="paragraph"><p>and we note that (as is commonly the case for SWS) there is no way to distinguish
+a thin layer of strong anisotropy from a thick layer of weak anisotropy. We thus
+assume a 50 km thick layer of fixed strength of anisotropy throughout and only solve
+for the orientation of this layer. The "observed" parameters are returned by a
+the function call <tt>[fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;</tt>,
+which makes use of MS_phasevels`.</p></div>
+<div class="paragraph"><p>The second stage of the calculation is to compute the misfit between <tt>fast</tt> and
+<tt>tlag</tt> and the calculated splitting parameters for a range of TTI orientations.
+This is done in the loop over strikes and dips thus:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>   %% calculate a grid of misfits over a range of strikes <strong>and</strong> dips. -----------
+   fprintf('Grid searching over strike <strong>and</strong> dip ... \n')
+   [GSTR GDIP] = meshgrid([0:10:360],[0:5:90]) ;
+   GMIS=GSTR.*0 ;
+   [n,m]=size(GSTR) ;
+   <strong>for</strong> i=1:n
+      <strong>for</strong> j=1:m
+         str_dip = [GSTR(i,j) GDIP(i,j)] ;
+         GMIS(i,j) = orientation_misfit(str_dip,Craw,rh,...
+            0,0.1,fast,tlag,razi,rinc,dist) ;
+      end
+   end</tt></pre>
+</div></div>
+<div class="paragraph"><p>with the misfit stored in <tt>GMIS</tt>. Calculation of the misfit for each orientation
+is performed by the <tt>orientation_misfit</tt> function with the body of the calculation
+involving the use of <tt>MS_phasevels</tt> and <tt>MS_splitting_misfit</tt> for each "observed"
+splitting function:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>   % rotate the test matrix
+   [Ctest]=MS_rot3(Cbase,0,-str_dip(2),str_dip(1)) ;
+
+   % calculate associated splitting
+   [pol,avs,vs1,vs2,~,~,~] = MS_phasevels(Ctest,rh,rinc,razi) ;
+   fast = pol ;
+   tlag = dist./vs2 - dist./vs1 ;
+
+
+   % calculate the misfit (the average over all raypaths)
+   misfit=0 ;
+   <strong>for</strong> i=1:length(data_fast)
+      misfit = misfit + MS_splitting_misfit(data_fast(i),data_tlag(i),...
+                           fast(i),tlag(i),data_spol,data_dfreq,'mode','lam2') ;
+   end
+   misfit = misfit ./ length(data_fast) ;</tt></pre>
+</div></div>
+<div class="paragraph"><p>The final step is to report and plot the best fitting model and misfit surface. The
+model and "observations" are plotted together using the "sdata" option in <tt>MS_plot</tt>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>   fprintf('Plotting model <strong>and</strong> observations\n')
+   Cbest = MS_rot3(Craw, 0, -GDIP(imin,jmin), GSTR(imin,jmin));
+   MS_plot(Cbest,rh,'sdata',razi,rinc,fast',ravs','plotmap', {'avspol'}) ;</tt></pre>
+</div></div>
+<div class="paragraph"><p>which produces the diagnostic pole figure below. In this figure "observed" SWS data
+(white lines, coloured spots refer to strength of anisotropy) and the best fitting
+model (black lines, coloured contours refer to strength of anisotropy) are both shown.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="splitting_fit.png" alt="Pole figure of "observed" SWS data (white lines" />
+</span></p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-06-11 16:57:54 BST
+Last updated 2013-06-11 16:24:11 BST
 </div>
 </div>
 </body>

@@ -53,16 +53,22 @@
         <tocitem target="./funcs/MS_list.html" image="$toolbox/matlab/icons/help_fx.png">MS_list</tocitem>
         <tocitem target="./funcs/MS_load.html" image="$toolbox/matlab/icons/help_fx.png">MS_load</tocitem>
         <tocitem target="./funcs/MS_load_list.html" image="$toolbox/matlab/icons/help_fx.png">MS_load_list</tocitem>
+        <tocitem target="./funcs/MS_make_trace.html" image="$toolbox/matlab/icons/help_fx.png">MS_make_trace</tocitem>
+        <tocitem target="./funcs/MS_measure_trace_splitting.html" image="$toolbox/matlab/icons/help_fx.png">MS_measure_trace_splitting</tocitem>
         <tocitem target="./funcs/MS_norms.html" image="$toolbox/matlab/icons/help_fx.png">MS_norms</tocitem>
         <tocitem target="./funcs/MS_phasevels.html" image="$toolbox/matlab/icons/help_fx.png">MS_phasevels</tocitem>
         <tocitem target="./funcs/MS_plot.html" image="$toolbox/matlab/icons/help_fx.png">MS_plot</tocitem>
+        <tocitem target="./funcs/MS_plot_trace.html" image="$toolbox/matlab/icons/help_fx.png">MS_plot_trace</tocitem>
         <tocitem target="./funcs/MS_poisson.html" image="$toolbox/matlab/icons/help_fx.png">MS_poisson</tocitem>
         <tocitem target="./funcs/MS_polyaverage.html" image="$toolbox/matlab/icons/help_fx.png">MS_polyaverage</tocitem>
         <tocitem target="./funcs/MS_rot3.html" image="$toolbox/matlab/icons/help_fx.png">MS_rot3</tocitem>
         <tocitem target="./funcs/MS_rotEuler.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotEuler</tocitem>
         <tocitem target="./funcs/MS_rotM.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotM</tocitem>
         <tocitem target="./funcs/MS_rotR.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotR</tocitem>
+        <tocitem target="./funcs/MS_save.html" image="$toolbox/matlab/icons/help_fx.png">MS_save</tocitem>
         <tocitem target="./funcs/MS_sphere.html" image="$toolbox/matlab/icons/help_fx.png">MS_sphere</tocitem>
+        <tocitem target="./funcs/MS_split_trace.html" image="$toolbox/matlab/icons/help_fx.png">MS_split_trace</tocitem>
+        <tocitem target="./funcs/MS_splitting_misfit.html" image="$toolbox/matlab/icons/help_fx.png">MS_splitting_misfit</tocitem>
         <tocitem target="./funcs/MS_unwind_pm_90.html" image="$toolbox/matlab/icons/help_fx.png">MS_unwind_pm_90</tocitem>
 	</tocitem>
        

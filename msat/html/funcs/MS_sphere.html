@@ -778,6 +778,21 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
+<pre><tt>MS_sphere(..., 'sdata',azi,inc,pol,magn)
+     Overlay a S-wave (splitting) dataset onto the sphere at the points.
+     indicated by the azi, inc arrays. The data are in 2 vectors: pol
+     (SW orientation) and mag ( anisotropy). They are plotted as coloured
+     spots with vector ticks.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_sphere(..., 'pdata',azi,inc,vel)
+     Overlay a P-wave (velocity) dataset (in vel) onto the sphere at
+     the points. indicated by the azi, inc arrays. They are plotted as
+     coloured spots.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
 <pre><tt>MS_sphere(..., 'FSWTickLength', length)
      Set the length of the Fast shear wave direction markers, default
      is 0.08.</tt></pre>
@@ -854,7 +869,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-05 12:07:45 GMT
+Last updated 2013-06-11 16:58:45 BST
 </div>
 </div>
 </body>

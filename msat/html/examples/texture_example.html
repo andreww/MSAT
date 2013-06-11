@@ -741,20 +741,20 @@ asciidoc.install();
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p>This example demonstrates how to combine MTEX and MSAT to calculate the
-composite elastic constants of a rock consisiting of two phases where the
-crystals are partially alligned. Based on the MTEX Aachen EBSD example we
+composite elastic constants of a rock consisting of two phases where the
+crystals are partially aligned. Based on the MTEX Aachen EBSD example we
 read the EBSD data and assume that each data point represents a equal
-volume of the rock. MTEX is used to convert the EBSD measurment into a
+volume of the rock. MTEX is used to convert the EBSD measurement into a
 list of Euler angles. The MSAT function MS_rotEuler is then used to build
 a list of elastic constants tensors aligned with each measured crystal
-orentation. Finally the tensors are averaged using MS_VRH and the seismic
+orientation. Finally the tensors are averaged using MS_VRH and the seismic
 properties of the sample reported.</p></div>
 <div class="paragraph"><p>For this example script to work both MSAT and MTEX must be installed. It is worth
 noting that recent version of MTEX are able to calculate the composite
 elastic constants from an orientation distribution function (ODF) without
 having to sample a finite number of orientations. If the source data is
 from an EBSD run this implies the need to first create an ODF from the
-discrete orientation measurments.</p></div>
+discrete orientation measurements.</p></div>
 <div class="paragraph"><p>The source code for this
 example are contained in the file
 texture_example.m in the examples/texture
@@ -802,9 +802,9 @@ and KCl data ends up in ebsd(2).</p></div>
 
     telap = toc; fprintf(' done (%4.2f secs)\n',telap);</tt></pre>
 </div></div>
-<div class="paragraph"><p>Third, for each EBSD measurment, create an elastic matrix with the measured
-orentation. Work on NaCl, then KCl before joining the elastic
-matricies together.</p></div>
+<div class="paragraph"><p>Third, for each EBSD measurement, create an elastic matrix with the measured
+orientation. Work on NaCl, then KCl before joining the elastic
+matrices together.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>    tic; fprintf('Extracting Euler angles ...');
@@ -837,7 +837,7 @@ matricies together.</p></div>
 
 
     % Build the input arguments <strong>for</strong> MS_VRH <strong>and</strong> calculate the
-    % avarage.
+    % average.
 
     tic; fprintf('Calculating VRH average matrix ...');
     Cs = zeros(6,6,num_xtals);
@@ -865,7 +865,7 @@ end</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-11 10:03:18 BST
+Last updated 2013-06-10 09:51:53 BST
 </div>
 </div>
 </body>

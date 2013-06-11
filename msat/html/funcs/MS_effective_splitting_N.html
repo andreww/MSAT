@@ -746,15 +746,17 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)</tt></pre>
+<pre><tt>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Inputs:
-   f (scalar) : Dominant frequency of wave
-   spol (scalar) : initial source polarisation
-   fast (scalar/vector) : fast direction(s) of layer(s) to be included
-   tlag (scalar/vector) : lag time(s) of layer(s) to be included</tt></pre>
+<pre><tt>Common Inputs:
+   f (scalar) : Dominant frequency of wave (Hz)
+   spol (scalar) : initial source polarisation (degrees)
+   fast (scalar/vector) : fast direction(s) of layer(s) to be
+                          included (s)
+   tlag (scalar/vector) : lag time(s) of layer(s) to be included
+                          (degrees)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -762,16 +764,55 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>CAUTION! The method gives unstable results when
-the source polarisation is near the effective fast direction. This would,
-however probably be seen as a null result anyway.</tt></pre>
+<pre><tt>Usage:
+ [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag)
+   or
+ [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+ 'mode', 'S&amp;S')</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Reference:
+<pre><tt>Calculate effective splitting parameters using the method of Silver
+and Savage (1994). CAUTION! This is quick but is known to fail if the delay
+time becomes large compared to the dominant frequency of the wave. It
+also gives unstable results when the source polarisation is near the
+effective fast direction. This would, however probably be seen as a
+null result anyway.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+'mode', 'GaussianWavelet')</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Calculate effective splitting parameters by first applying the
+splitting operators in sequence to an unsplit first-derivative
+Gaussian wavelet then searching for the effective splitting operator
+that minimises the second eigenvalue of the covariance matrix
+of the result. This is the ray theory approach described by
+Bonnin et al. (2012).</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+'mode', 'GaussianWavelet', 'PlotWavelet')</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Plot the resulting wavelet when in GaussianWavelet mode.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>References:
+    M. Bonnin, A. Tommasi, R. Hassani, S. Chevrot, J. Wookey, G. Barruol
+      (2012) "Numerical modelling of the upper-mantle anisotropy beneath
+      a migrating strike-slip plate boundary: the San Andreas Fault
+      system" Geophysical Journal International, v191 pp 436-458.
+      http://dx.doi.org/10.1111/j.1365-246X.2012.05650.x
     Silver, P. G. and Savage, M. K. 1994 "The interpretation of shear-wave
-    splitting parameters in the presence of two anisotropic layers"
-    Geophysical Journal International, v119 pp 949-963.</tt></pre>
+      splitting parameters in the presence of two anisotropic layers"
+      Geophysical Journal International, v119 pp 949-963.</tt></pre>
 </div></div>
 </div>
 </div>
@@ -779,7 +820,7 @@ however probably be seen as a null result anyway.</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-05 12:07:45 GMT
+Last updated 2013-06-11 16:58:45 BST
 </div>
 </div>
 </body>

@@ -806,6 +806,32 @@ Romanowicz, 2006)</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
+<h3 id="_em_global_em"><em>global</em></h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[C]=MS_TI(vp,vs,rh,xi,phi,eta,'global')</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Inputs:
+    rh  : Density (kg/m2)
+    vp  : km/s (Voigt isotropic average)
+    vs  : km/s (Voigt isotropic average)
+    xi, phi, eta : Dimensionless anisotropy parameters</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Output:
+     C : Stiffness tensor (6x6 notation, GPa)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Calculates the elastic tensor for a VTI medium from the Voigt average
+Vp and Vs and anisotropic parameters xi, phi and eta (see, e.g., Babuska
+and Cara, 1991)</tt></pre>
+</div></div>
+</div>
+<div class="sect2">
 <h3 id="_em_love_em"><em>love</em></h3>
 <div class="literalblock">
 <div class="content">
@@ -842,6 +868,11 @@ Romanowicz, 2006)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
+<pre><tt>Babuska, V. and Cara, M. (1991). Seismic Anisotropy in the Earth. Kluwer
+   Academic, Boston.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
 <pre><tt>Love, A.E.H., (1927). A Treatise on the Theory of Elasticity,
    Cambridge Univ. Press, Cambridge.</tt></pre>
 </div></div>
@@ -856,7 +887,7 @@ Romanowicz, 2006)</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-05 12:07:45 GMT
+Last updated 2013-06-11 16:58:45 BST
 </div>
 </div>
 </body>

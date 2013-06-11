@@ -792,6 +792,66 @@ asciidoc.install();
 </div></div>
 <div class="literalblock">
 <div class="content">
+<pre><tt>MS_plot(..., 'pcontours', pcvect)
+MS_plot(..., 'scontours', scvect)
+     Set the contour levels for the P-wave velocity and S-wave
+     anisotropy plots. The values of pcvect and scvect can be scalars
+     indicating the number of contour lines to use or vectors, where
+     each value represents a different contour line. Thus, the
+     minimum, maximum values and spacing of contours can easily be
+     set using the syntax [minval:spacing:maxval] for pcvect and
+     scvect.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'limitsonpol')
+     Include markers for the maximum and minimum values of S-wave
+     anisotropy on the plot of fast S-wave polarisation direction.
+     Not shown by default.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'polsize' s1, s2, w1, w2)
+     Set the size of the markers used to indicate the fast S-wave
+     polarisation direction. There are two markers used a larger
+     white "background" marker with a length set by s1 (defaults to
+     0.18) and width set by w1 (defaults to 3.0) and an inner black
+     marker with width set by w2 (defaults to 2.0) and length set by
+     s2 (defaults to 0.18). A useful "neet" alternitive to the
+     default is s1 = 0.18, s2 = 0.16, w1 = 2.0 and w2 = 1.0.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'plotmap', pmap)
+     Change the order, or content, of the subplots. This allows a
+     single pole figure (e.g. the P-wave velocity) to be drawn, or
+     the pole figures to be drawn in a different order. The argument
+     pmap must be a cell array of strings. Each string represents a
+     different pole figure and its location in the cell array
+     represents the location of the pole figure. Thus the default
+     {'VP', 'AVS', 'AVSPOL'} draws three pole figures in a row. If
+     the argument were {'VP'; 'AVS'} two pole figures would be drawn,
+     one above the other. Valid strings are 'VP", 'AVS' and 'AVSPOL'.
+     These are not case sensitive.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>MS_plot(..., 'pdata', azimuth, inclination, vp)
+MS_plot(..., 'sdata', azimuth, inclination, polarisation, avs)
+     Add data points to the P-wave velocity ('VP') or S-wave
+     polarisation plot ('AVSPOL'), respectively. This can be used,
+     for example, to compare an elastic model with shear-wave
+     splitting measurements. In each case data points relate
+     to a ray propagating in a direction described by the azimuth
+     and inclination. The point is coloured according to either
+     the P-wave velocity, vp, or S-wave anisotropy, avs, in km/s
+     or. In the case of S-wave anisotropy, the fast polarisation
+     direction is also shown. Each argument (azimuth, inclination,
+     vp, polarisation and avs) is an array and each must be the
+     same length.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
 <pre><tt>MS_plot(..., 'quiet')
      Don't write isotropic velocities to the terminal.</tt></pre>
 </div></div>
@@ -805,7 +865,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-05 12:07:45 GMT
+Last updated 2013-06-11 16:58:45 BST
 </div>
 </div>
 </body>

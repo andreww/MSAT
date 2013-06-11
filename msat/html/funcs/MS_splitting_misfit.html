@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.6" />
-<title>Example 2: Analysis of single crystal elasticity</title>
+<title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -735,77 +735,59 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>Example 2: Analysis of single crystal elasticity</h1>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_ms_splitting_misfit">MS_splitting_misfit</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This example shows how MSAT can be used to perform analysis of single
-crystal elasticity data.
-The source code for this
-example are contained in the file
-diopside_example.m in the examples/diopside
-directory distributed with MSAT. This
-directory also contains the data file needed to run the example.
-In this case the data is taken from calculations
-using density functional theory stored in the file diopside_P.txt - see
-<a href="http://dx.doi.org/10.1016/j.pepi.2011.10.002">Walker 2012</a>. From this data the
-the properties of an aggregate, along with some measures of anisotropy
-are calculated and the anisotropy plotted as a function of wave
-propagation direction.</p></div>
-<div class="paragraph"><p>The first task is to load the input data (1D arrays of pressure, <tt>P</tt>,
-and density, <tt>r</tt>, and a 3D size 6x6xn array of elasticity matrices).
-Note that MS_load_list allows multiple sets of elasticity data
-(in this case, each representing a different pressure point) to
-be loaded in one go:</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt>[P, C, r] = MS_load_list('diopside_P.txt');</tt></pre>
+<pre><tt>MS_SPLITTING_MISFIT - Calculate the misfit between a pair of splitting
+                      operators.</tt></pre>
 </div></div>
-<div class="paragraph"><p>The remaining part of the example involves looping over the
-data and performing analysis for each pressure point.</p></div>
-<div class="paragraph"><p>First, <tt>MS_anisotropy</tt> is used to calculate
-various measures of the "strength" of the anisotropy
-exhibited by the elasticity matrix at this pressure.</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt><strong>for</strong> i = 1:length(P)
-
-    % Calculate anisotropy index
-    [ uA, lmA ] = MS_anisotropy( C(:,:,i) );</tt></pre>
+<pre><tt>Usage:
+    [misfit] = MS_splitting_misfit(fast1,tlag1,fast2,tlag2,spol,dfreq)
+       Calculate the misfit between splitting operators [fast1,tlag1]
+       and [fast2,tlag2], using the default mode (see below). SPOL is
+       the initial source polarisation, dfreq is the dominant frequency.</tt></pre>
 </div></div>
-<div class="paragraph"><p>The second step is to build the elasticity matrix
-representing an isotropic rock made up of pure
-diopside at the pressure point and use this to
-calculate the P and S wave velocities:</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt>    % Calculate isotropic elasticity
-    [ K_vrh, G_vrh ] = MS_polyaverage( C(:,:,i) );
-
-    % Get isotropic phase velocities
-    Ciso = MS_build_isotropic('lam', G_vrh, 'K', K_vrh);
-    [ ~, ~, VSiso, ~, VPiso ] = MS_phasevels( Ciso, r(i), 0.0, 0.0 );</tt></pre>
+<pre><tt>Modes of operation:
+    [misfit] = MS_splitting_misfit(...,'mode','lam2')
+       Calculate misfit based on the residual second eigenvalue of applying
+       [f1,t1] to a test wavelet, then removing [f2,t2]. [DEFAULT].</tt></pre>
 </div></div>
-<div class="paragraph"><p>The third step is to calculate the fast and slow S wave velocities
-and from this the expected delay time (splitting magnitude) for
-a 10 km thick layer of fully aligned diopside:</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt>    % Calculate splitting <strong>for</strong> [010] direction (10km layer)
-    % This <strong>is</strong> along the y axis.
-    [ ~, aVS, VS1, VS2, ~ ] = MS_phasevels( C(:,:,i), r(i), 0.0, 90.0 );
-    dt = (10/VS2 - 10/VS1);</tt></pre>
+<pre><tt>[misfit] = MS_splitting_misfit(...,'mode','lam2S')
+   Calculate misfit based on the residual second eigenvalue of applying
+   [f1,t1] to a test wavelet, then removing [f2,t2]. This is then
+   reversed, and the final misfit is the average of the two.</tt></pre>
 </div></div>
-<div class="paragraph"><p>The final step is to produce a set of pole figures showing the
-seismic anisotropy at the pressure represented by this
-loop iteration.</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt>    % Plot polefigs
-    title = sprintf('Diopside seismic anisotropy at %2.1f GPa', P(i));
-    MS_plot(C(:,:,i),r(i), 'wtitle', title, 'fontsize', 10, 'quiet');
-end</tt></pre>
+<pre><tt>[misfit] = MS_splitting_misfit(...,'mode','intensity')
+   Calculates the misfit as the difference between the splitting intensity
+   (see, e.g., Long and Silver, 2009) for the two operators.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[misfit] = MS_splitting_misfit(...,'mode','simple')
+   A simple (normalised) arithmetic misfit.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>References:
+    Long, M. D., &amp; Silver, P. G. (2009). "Shear Wave Splitting and Mantle
+      Anisotropy: Measurements, Interpretations, and New Directions". Surveys
+      in Geophysics, 30(4-5), 407–461. doi:10.1007/s10712-009-9075-1</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>See also: MS_EFFECTIVE_SPLITTING_N</tt></pre>
 </div></div>
 </div>
 </div>
@@ -813,7 +795,7 @@ end</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-06-10 09:51:53 BST
+Last updated 2013-06-11 16:58:45 BST
 </div>
 </div>
 </body>

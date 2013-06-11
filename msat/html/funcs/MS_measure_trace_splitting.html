@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.6" />
-<title>Example 5: modelling shear-wave splitting variation with backazimuth</title>
+<title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -735,96 +735,78 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>Example 5: modelling shear-wave splitting variation with backazimuth</h1>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_ms_measure_trace_splitting">MS_measure_trace_splitting</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This example script demonstrates simple shear-wave splitting modelling using the MSAT
-toolset. It predicts the SKS splitting variation with backazimuth associated
-with two dipping, partially-aligned olivine layers. The splitting in each layer
-is calculated using the Christoffel equation (MS_phasvels), and combined using
-N-layer effective splitting equations (MS_effective_splitting_N; Silver and
-Savage, GJI, 1994). Straight raypaths through the upper mantle are assumed.</p></div>
-<div class="paragraph"><p>The source code for this
-example are contained in the file
-split_model.m in the examples/splitting
-directory distributed with MSAT.</p></div>
-<div class="paragraph"><p>The first step is to set up the geometrical parameters of the model
-and calcuate the ray distances in the two layers.</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt>%  ** Setup model parameters
-      S_slow = 4.814 ; % (SKS at 100 degrees <strong>from</strong> iasp91) -&gt;
-      aoi = 11.2262 ; % at 100 km depth, angle of incidence
-
-%  ** Layer 1 (upper) parameters
-      L1_depth = 0. ; L1_thick = 100. ; L1_dip = 0.0 ; % layer geometry
-      L1_aaz = 30.0 ; % a-axis azimuth (rel. to down dip direction)
-      L1_faln = 0.3 ; % fraction aligned
-
-%  ** Layer 2 (lower) parameters
-      L2_depth = 150. ; L2_thick = 60. ; L2_dip = 30.0 ; % layer geometry
-      L2_aaz = 0.0 ;  % a-axis azimuth (rel. to down dip direction)
-      L2_faln = 0.3 ; % fraction aligned
-
-      report_model(L1_depth, L1_thick, L1_dip, L1_aaz, L1_faln, ...
-                   L2_depth, L2_thick, L2_dip, L2_aaz, L2_faln) ;
-
-%  ** imaging parameters
-      baz = [0:1:360] ; % 0 <strong>is</strong> down dip direction (perp. to strike)
-      inc = -ones(size(baz)).*90 + aoi ;
-
-%  ** calculate distances
-      [dist1]=distance_in_dipping_layer(L1_dip,aoi,L1_thick,baz) ;
-      [dist2]=distance_in_dipping_layer(L2_dip,aoi,L2_thick,baz) ;</tt></pre>
+<pre><tt>MS_MEASURE_TRACE_SPLITTING - Measure SWS for a pair of orthogonal traces</tt></pre>
 </div></div>
-<div class="paragraph"><p>The example then builds elasticity matricies for the two layers:</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt>%  ** load anisotropy, <strong>and</strong> generate an isotropic version of it.
-      [Cani,rh] = MS_elasticDB('olivine') ;
-      [Ciso] = MS_decomp(MS_axes(Cani)) ;
-      Cani = MS_rot3(Cani,90,0,0) ; % orientation <strong>for</strong> dry upper mantle
-
-%  ** generate layer elasticities:
-%        This <strong>is</strong> a Voigt-Reuss-Hill average of the appropriately rotated olivine
-%        tensor <strong>and</strong> its isotropic equivalent.
-      [L1_C,~] = MS_VRH([L1_faln 1-L1_faln],...
-         MS_rot3(Cani,0,-L1_dip,L1_aaz,'order',[3 2 1]),rh, Ciso, rh) ;
-
-      [L2_C,~] = MS_VRH([L2_faln 2-L2_faln],...
-         MS_rot3(Cani,0,-L2_dip,L2_aaz,'order',[3 2 1]),rh, Ciso, rh) ;</tt></pre>
+<pre><tt>[fast, tlag] = MS_measure_trace_splitting(time, T00, T90, d_fast, ...
+    d_tlag, max_tlag ...)</tt></pre>
 </div></div>
-<div class="paragraph"><p>Finally, the splitting parameters for each layer are calculated, and then
-combined:</p></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="content">
-<pre><tt>%  ** interrogate elasticities to generate splitting parameters <strong>for</strong> each layer.
-      [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( L1_C, rh, inc, baz ) ;
-      fast1 = MS_unwind_pm_90((baz - pol')) ; % geog. reference frame
-      tlag1 = dist1./vs2' - dist1./vs1' ;
-
-      [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( L2_C, rh, inc, baz ) ;
-      fast2 = MS_unwind_pm_90((baz - pol')) ; % geog. reference frame
-      tlag2 = dist2./vs2' - dist2./vs1' ;
-
-%  ** calculate the effective splitting between 2 layers
-      fast_eff = zeros(size(baz)) ;
-      tlag_eff = fast_eff ;
-      <strong>for</strong> i = 1:length(baz)
-         [fast_eff(i),tlag_eff(i)] = ...
-            MS_effective_splitting_N(0.125,baz(i), ...
-            [fast2(i) fast1(i)],[tlag2(i) tlag1(i)]) ;
-      end</tt></pre>
+<pre><tt>Inputs:
+   time (vector) : Series of time points where amplitudes are known (s)
+   T00 (vector)  : Series of amplitudes of transverse wave #1 before
+                   splitting applied.
+   T90 (vector)  : Series of amplitudes of transverse wave #2 before
+                   splitting applied.
+   d_fast (scalar) : Spacing of grid search for fast direction (degrees)
+   d_tlag (scalar) : Spacing of grid search lag time (s)
+   max_tlag (scalar) : Maximum lag time in grid search</tt></pre>
 </div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Outputs:
+   fast (vector)  : Optimum fast direction (degrees).
+   tlag (vector)  : Optimum lag tim</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Given a two traces (T00 and T90) on a common time axis (time) find
+the splitting operator (fast and tlag) that minimises the second
+eigenvalue of the covariance matrix. This is done in two steps. First
+using an approximate grid search (spacing and time limits set by
+d_fast, d_tlag and max_tlag) then by using the Matlab built
+in simplex optimiser from the best grid point.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Options:</tt></pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+MS_measure_trace_splitting( &#8230; <em>errorsurf</em>)
+     Draw a contour plot of the error surface generated during the grid
+     search for the best splitting parameters.
+</p>
+</li>
+<li>
+<p>
+MS_measure_trace_splitting( &#8230; <em>optimoptions</em>, options)
+      Provide a structure of optimisation options to pass into the simplex
+      optimiser. Use optimist to generate this. e.g. for looser tolerances
+      use MS_measure_trace_splitting( &#8230; <em>optimoptions</em>, &#8230;
+      optimset(<em>TolFun</em>, 1.0e-3, <em>TolX</em>, 1.0e-3)).
+      Default options are: optimset(<em>Display</em>,<em>none</em>,<em>TolFun</em>,1.0e-5, &#8230;
+     <em>TolX</em>, 1.0e-5).
+</p>
+</li>
+</ul></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-11 10:03:18 BST
+Last updated 2013-06-11 16:58:45 BST
 </div>
 </div>
 </body>
