@@ -101,8 +101,21 @@ model that best fits SWS results.
 From a misfit to a model
 ------------------------
 
-The file does
+The file `examples/splitting_misfit/fit_TTI_orientation.m` shows how the splitting
+misfit described above can be used to find an elastic model that matches a set 
+of SWS measurements. In the following example an elastic model with tilted
+transverse anisotropy (TTI) is generated and used to calculate three splitting parameters
+that would correspond to observations of rays arriving from different azimuths and 
+inclinations. A grid search over different orientations of the TTI medium is then 
+performed and at each orientation the model's predicted splitting parameters are 
+calculated. These are then compared with the "observations" and the orientation that
+minimises the sum of the misfit found. This orientation is then reported (along with 
+the resulting misfit surface. Key parts of the code for this example are 
+described below
 
+The first step is to generate an elasticity matrix describing the "observed"
+TTI medium and calculate the "observed" splitting parameters. The model is set up 
+as follows: 
 [code, python]
 ----
    %% set the raypath parameters. ---------------------------------------------
@@ -120,10 +133,16 @@ The file does
    
    [Craw]=MS_VTI(vpi,vsi,rh,0.05,0.05,0.05) ;
 ----
-   
+and we note that (as is commonly the case for SWS) there is no way to distinguish 
+a thin layer of strong anisotropy from a thick layer of weak anisotropy. We thus
+assume a 50 km thick layer of fixed strength of anisotropy throughout and only solve
+for the orientation of this layer. The "observed" parameters are returned by a 
+the function call `[fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;`,
+which makes use of MS_phasevels`.
 
-`[fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;`
-
+The second stage of the calculation is to compute the misfit between `fast` and
+`tlag` and the calculated splitting parameters for a range of TTI orientations.
+This is done in the loop over strikes and dips thus:  
 [code, python]
 ----
    %% calculate a grid of misfits over a range of strikes and dips. -----------
@@ -139,14 +158,44 @@ The file does
       end
    end
 ----
+with the misfit stored in `GMIS`. Calculation of the misfit for each orientation 
+is performed by the `orientation_misfit` function with the body of the calculation
+involving the use of `MS_phasevels` and `MS_splitting_misfit` for each "observed"
+splitting function:
+[code, python]
+----
+   % rotate the test matrix
+   [Ctest]=MS_rot3(Cbase,0,-str_dip(2),str_dip(1)) ;
+   
+   % calculate associated splitting
+   [pol,avs,vs1,vs2,~,~,~] = MS_phasevels(Ctest,rh,rinc,razi) ;
+   fast = pol ;
+   tlag = dist./vs2 - dist./vs1 ;
+   
+   
+   % calculate the misfit (the average over all raypaths)
+   misfit=0 ;
+   for i=1:length(data_fast)
+      misfit = misfit + MS_splitting_misfit(data_fast(i),data_tlag(i),...
+                           fast(i),tlag(i),data_spol,data_dfreq,'mode','lam2') ;
+   end
+   misfit = misfit ./ length(data_fast) ;
+----
 
+The final step is to report and plot the best fitting model and misfit surface. The 
+model and "observations" are plotted together using the "sdata" option in `MS_plot`:
 [code, python]
 ----
    fprintf('Plotting model and observations\n')
    Cbest = MS_rot3(Craw, 0, -GDIP(imin,jmin), GSTR(imin,jmin));
    MS_plot(Cbest,rh,'sdata',razi,rinc,fast',ravs','plotmap', {'avspol'}) ;
 ----
+which produces the diagnostic pole figure below. In this figure "observed" SWS data 
+(white lines, coloured spots refer to strength of anisotropy) and the best fitting 
+model (black lines, coloured contours refer to strength of anisotropy) are both shown.
 
-
+image:splitting_fit.png[Pole figure of "observed" SWS data (white lines, coloured 
+spots refer to strength of anisotropy) and model (black lines, coloured contours 
+refer to strength of anisotropy).]
     
 
