@@ -1,4 +1,4 @@
-Example 5: modelling shear-wave splitting variation with backazimuth
+Example 5: Modelling shear-wave splitting variation with backazimuth
 ====================================================================
 
 This example script demonstrates simple shear-wave splitting modelling using the MSAT
@@ -43,7 +43,7 @@ and calculate the ray distances in the two layers.
       [dist2]=distance_in_dipping_layer(L2_dip,aoi,L2_thick,baz) ;
 ----
 
-The example then builds elasticity matricies for the two layers:
+The example then builds elasticity matrices for the two layers:
 [code, python]
 ----
 %  ** load anisotropy, and generate an isotropic version of it. 
@@ -83,4 +83,21 @@ combined:
             [fast2(i) fast1(i)],[tlag2(i) tlag1(i)]) ;
       end
 ----
+
+Results for this calculation are shown in the graph below. For these parameters the delay time
+becomes very large when the fast polarisation direction in the upper layer becomes close to 
+parallel or perpendicular to the source polarisation (i.e. around 30 and 120 degrees).
+
+image:SS.png[Effective SWS parameters for Silver and Savage method]
+
+Using optional arguments, the example can be modified to examine if this effect is an artefact
+of the Silver and Savage method. Adding the arguments "mode" and "GaussianWavelet" changes from
+the analytical approach to a computation where a wavelet is split by each layer in turn and the 
+resulting splitting parameters measured. Results of this computation ate shown below.
+
+image:gw.png[Effective SWS parameters for wavelet method]
+
+It can be seen that the overall pattern is the same but the very large lag times are reduced.
+
+
 
