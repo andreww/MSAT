@@ -25,7 +25,8 @@
             <tocitem target="./examples/diopside_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 2: Analysis of single crystal elasticity</tocitem>
             <tocitem target="./examples/texture_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 3: Texture analysis and MTEX</tocitem>
             <tocitem target="./examples/lmm_anisotropy_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 4: Lowermost mantle anisotropy</tocitem>
-            <tocitem target="./examples/split_model_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 5: modelling shear-wave splitting variation with backazimuth</tocitem>
+            <tocitem target="./examples/splitting_model_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 5: Modelling shear-wave splitting variation with backazimuth</tocitem>
+            <tocitem target="./examples/splitting_misfit_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 6: Measuring and using shear-wave splitting misfit</tocitem>
         </tocitem>
         <tocitem target="MSATrelease_notes.html" image="$toolbox/matlab/icons/notesicon.gif">Release notes</tocitem>
 	<tocitem target="./funcs/index.html" image="$toolbox/matlab/icons/help_fx.png">Functions 
