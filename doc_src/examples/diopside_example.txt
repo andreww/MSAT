@@ -13,12 +13,12 @@ using density functional theory stored in the file diopside_P.txt - see
 link:http://dx.doi.org/10.1016/j.pepi.2011.10.002[Walker 2012]. From this data the
 the properties of an aggregate, along with some measures of anisotropy 
 are calculated and the anisotropy plotted as a function of wave
-propogation direction.
+propagation direction.
 
 The first task is to load the input data (1D arrays of pressure, `P`,
 and density, `r`, and a 3D size 6x6xn array of elasticity matrices). 
 Note that MS_load_list allows multiple sets of elasticity data 
-(in thes case, each representing a different pressure point) to 
+(in this case, each representing a different pressure point) to 
 be loaded in one go:
 [code,python]
 ----

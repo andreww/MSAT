@@ -25,7 +25,9 @@
             <tocitem target="./examples/diopside_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 2: Analysis of single crystal elasticity</tocitem>
             <tocitem target="./examples/texture_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 3: Texture analysis and MTEX</tocitem>
             <tocitem target="./examples/lmm_anisotropy_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 4: Lowermost mantle anisotropy</tocitem>
-            <tocitem target="./examples/split_model_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 5: modelling shear-wave splitting variation with backazimuth</tocitem>
+            <tocitem target="./examples/splitting_model_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 5: Modelling shear-wave splitting variation with backazimuth</tocitem>
+            <tocitem target="./examples/splitting_misfit_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 6: Measuring and using shear-wave splitting misfit</tocitem>
+            <tocitem target="./examples/topotaxy_example.html" image="$toolbox/matlab/icons/demoicon.gif">Example 7: Modelling texture inheritance between post-perovskite and perovskite</tocitem>
         </tocitem>
         <tocitem target="MSATrelease_notes.html" image="$toolbox/matlab/icons/notesicon.gif">Release notes</tocitem>
 	<tocitem target="./funcs/index.html" image="$toolbox/matlab/icons/help_fx.png">Functions 
@@ -53,16 +55,22 @@
         <tocitem target="./funcs/MS_list.html" image="$toolbox/matlab/icons/help_fx.png">MS_list</tocitem>
         <tocitem target="./funcs/MS_load.html" image="$toolbox/matlab/icons/help_fx.png">MS_load</tocitem>
         <tocitem target="./funcs/MS_load_list.html" image="$toolbox/matlab/icons/help_fx.png">MS_load_list</tocitem>
+        <tocitem target="./funcs/MS_make_trace.html" image="$toolbox/matlab/icons/help_fx.png">MS_make_trace</tocitem>
+        <tocitem target="./funcs/MS_measure_trace_splitting.html" image="$toolbox/matlab/icons/help_fx.png">MS_measure_trace_splitting</tocitem>
         <tocitem target="./funcs/MS_norms.html" image="$toolbox/matlab/icons/help_fx.png">MS_norms</tocitem>
         <tocitem target="./funcs/MS_phasevels.html" image="$toolbox/matlab/icons/help_fx.png">MS_phasevels</tocitem>
         <tocitem target="./funcs/MS_plot.html" image="$toolbox/matlab/icons/help_fx.png">MS_plot</tocitem>
+        <tocitem target="./funcs/MS_plot_trace.html" image="$toolbox/matlab/icons/help_fx.png">MS_plot_trace</tocitem>
         <tocitem target="./funcs/MS_poisson.html" image="$toolbox/matlab/icons/help_fx.png">MS_poisson</tocitem>
         <tocitem target="./funcs/MS_polyaverage.html" image="$toolbox/matlab/icons/help_fx.png">MS_polyaverage</tocitem>
         <tocitem target="./funcs/MS_rot3.html" image="$toolbox/matlab/icons/help_fx.png">MS_rot3</tocitem>
         <tocitem target="./funcs/MS_rotEuler.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotEuler</tocitem>
         <tocitem target="./funcs/MS_rotM.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotM</tocitem>
         <tocitem target="./funcs/MS_rotR.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotR</tocitem>
+        <tocitem target="./funcs/MS_save.html" image="$toolbox/matlab/icons/help_fx.png">MS_save</tocitem>
         <tocitem target="./funcs/MS_sphere.html" image="$toolbox/matlab/icons/help_fx.png">MS_sphere</tocitem>
+        <tocitem target="./funcs/MS_split_trace.html" image="$toolbox/matlab/icons/help_fx.png">MS_split_trace</tocitem>
+        <tocitem target="./funcs/MS_splitting_misfit.html" image="$toolbox/matlab/icons/help_fx.png">MS_splitting_misfit</tocitem>
         <tocitem target="./funcs/MS_unwind_pm_90.html" image="$toolbox/matlab/icons/help_fx.png">MS_unwind_pm_90</tocitem>
 	</tocitem>
        
