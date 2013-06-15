@@ -263,7 +263,7 @@ path.
 |Function|Purpose
 | link:funcs/MS_make_trace.html[MS_make_trace] | Create simple wavelet for splitting calculation
 | link:funcs/MS_split_trace.html[MS_split_trace] | Apply splitting operators to wavelet
-| link:funcs/MS_effective_spltting_N.html[MS_effective_splitting_N]  | N-layer effective splitting operator calculation
+| link:funcs/MS_effective_splitting_N.html[MS_effective_splitting_N]  | N-layer effective splitting operator calculation
 | link:funcs/MS_measure_trace_splitting.html[MS_measure_trace_splitting] | Measure splitting from wavelet
 | link:funcs/MS_splitting_misfit.html[MS_splitting_misfit] | Calculate misfit between two splitting operators
 | link:funcs/MS_plot_trace.html[MS_plot_trace] | Plot wavelet and splitting measurement results

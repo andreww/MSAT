@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.5" />
-<title></title>
+<title>Example 7: Modelling texture inheritance between post-perovskite and perovskite</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -1939,154 +1939,192 @@ else
 </head>
 <body class="article">
 <div id="header">
+<h1>Example 7: Modelling texture inheritance between post-perovskite and perovskite</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_msat_quick_start_guide">MSAT quick start guide.</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_installation">Installation</h3>
-<div class="paragraph"><p>Installation of the MATLAB toolbox is described <a href="http://www1.gly.bris.ac.uk/MSAT/installing.html">here</a>.</p></div>
+<div class="paragraph"><p>This example shows how to simulate the effect of a texture preserving phase
+transition (topotaxy) between MgSiO3 post-perovskite and MgSiO3
+perovskite on increasing temperature or decreasing pressure in
+the lowermost mantle. Post-perovskite is assumed to deform by
+simple shear in its stability field and this is modelled using
+the VPSC code. The output of this modelling (a collection of
+Euler angles) is the input to this script. The Euler angles
+are first used to generate a model of the elasticity of textured
+post-perovskite just before the phase transition. A rotation matrix
+is built to describe the topotaxy and, together with the Euler angles,
+this is used to generate a model of the elasticity of the perovskite
+following the phase transition. Finally, a set of Euler angles
+representing the transformed perovskite is generated and these
+can be used to begin a further VPSC calculation of the deformation
+of pre-textured perovskite.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="title">MTEX and optional arguments</div>
+<div class="paragraph"><p>The example is packaged as a function taking a number of optional
+arguments to give the source of the VPSC output and restart files
+but these are not needed. The script can most simply be run as
+<tt>topotaxy_model()</tt> on the command line. The MTEX toolkit (Bachmann
+et al. 2010) can be used to produce pole figures of the textures
+but this is not required. The function can take one, two, or four
+optional arguments:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The first optional argument in the file name of a non-default
+  input file to read the post-perovskite texture from. This
+  defaults  to "TEX_PH1.OUT" in the local directory.
+</p>
+</li>
+<li>
+<p>
+The second is a file to be used to write the transformed
+  perovskite texture in a format that can be read by the VPSC code.
+  If no argument is provided no file is produced.
+</p>
+</li>
+<li>
+<p>
+The third and fourth arguments allow the post-perovskite
+  and perovskite elasticity to be written in a file for later reuse.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>These can be used to examine how different assumptions for the active
+slip systems in perovskite and post-perovskite alter the results.</p></div>
+</td>
+</tr></table>
 </div>
-<div class="sect2">
-<h3 id="_seismic_anisotropy_in_msat">Seismic anisotropy in MSAT</h3>
-<div class="paragraph"><p>Seismic anisotropy - the variation of seismic wavespeed with direction, is a fundamental property of most solid Earth materials. This variation is encapsulated in the elasticity tensor <strong>C</strong> (sometimes called the <em>stiffness</em>), which describes the relationship between stress and strain in a material:</p></div>
-<div class="paragraph"><p>$\sigma_{ij} = C_{ijkl}\epsilon_{kl}$</p></div>
-<div class="paragraph"><p>This is, in general, a 4th rank tensor (3x3x3x3). However, it can be represented as a more convenient symmetric 6x6 matrix (usually called <em>Voigt</em> notation) with no loss of information. This 6x6 notation is the default used by MSAT (though utilities for conversion to and from the 4th rank form are provided). The 6x6 <strong>C</strong> matrix (along with the density for some functions) are the main data used in MSAT, which provides functionality to load, manipulate, analyse and plot elasticities.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_default_units">Default units</h3>
-<div class="paragraph"><p>We adopt unit conventions which should be familiar to most people conversant with the current literature:</p></div>
-<div class="tableblock">
-<table rules="all"
-width="40%"
-frame="hsides"
-cellspacing="0" cellpadding="4">
-<caption class="title">Table 1. MSAT default units</caption>
-<col width="50%" />
-<col width="50%" />
-<thead>
-<tr>
-<th align="center" valign="top">Quantity</th>
-<th align="center" valign="top">Unit</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center" valign="top"><p class="table">Elasticity</p></td>
-<td align="center" valign="top"><p class="table">gigapascals</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table">Density</p></td>
-<td align="center" valign="top"><p class="table">kg/m<sup>3</sup></p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table">Velocity</p></td>
-<td align="center" valign="top"><p class="table">km/s</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="paragraph"><p>Option exist to import elasticities in other units, however (see <a href="funcs/MS_load.html">MS_load</a> for details).</p></div>
-</div>
-<div class="sect2">
-<h3 id="_loading_elastic_constants">Loading elastic constants.</h3>
-<div class="paragraph"><p>Elastic constants can be sourced from MSATs own built-in database (see <a href="funcs/MS_elasticDB.html">MS_elasticDB</a> for details) which contains a number of useful minerals, or from an ascii file. The available formats of the files are given in the documentation to <a href="funcs/MS_load.html">MS_load</a>, and examples are available in the msat/examples/loading.</p></div>
-<div class="paragraph"><p>To get elastic constants for olivine (from REF) for example:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; [C,rho] = MS_elasticDB('Olivine')</tt></pre>
-</div></div>
-<div class="paragraph"><p>returns</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>C =
-
-  320.5000   68.1000   71.6000         0         0         0
-   68.1000  196.5000   76.8000         0         0         0
-   71.6000   76.8000  233.5000         0         0         0
-         0         0         0   64.0000         0         0
-         0         0         0         0   77.0000         0
-         0         0         0         0         0   78.7000
-
-
-rho =
-
-        3355</tt></pre>
-</div></div>
-</div>
-<div class="sect2">
-<h3 id="_manipulating_elastic_constants">Manipulating elastic constants</h3>
-<div class="paragraph"><p>Once the stiffness matrix (and density) are laoded MSAT provides a set of routines for performing various manipulations and transforms of them (see <a href="MSATguide.html">the user guide</a> for full list). For example, the function <a href="funcs/MS_rot3.html">MS_rot3</a> applies rotations about the principle cartesian axes to an elastic tensor. So, for example:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; C = MS_elasticDB('Olivine')
-
-C =
-
-  320.5000   68.1000   71.6000         0         0         0
-   68.1000  196.5000   76.8000         0         0         0
-   71.6000   76.8000  233.5000         0         0         0
-         0         0         0   64.0000         0         0
-         0         0         0         0   77.0000         0
-         0         0         0         0         0   78.7000
-
-&gt;&gt; CR = MS_rot3(C,90,0,0)</tt></pre>
-</div></div>
-<div class="paragraph"><p>returns</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>CR =
-
-  320.5000   71.6000   68.1000    0.0000         0         0
-   71.6000  233.5000   76.8000    0.0000         0         0
-   68.1000   76.8000  196.5000    0.0000         0         0
-    0.0000    0.0000    0.0000   64.0000         0         0
-         0         0         0         0   78.7000   -0.0000
-         0         0         0         0   -0.0000   77.0000</tt></pre>
-</div></div>
-<div class="paragraph"><p>which is the expected orientation of horizontally-strained olivine under dry upper mantle conditions.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_analysis">Analysis</h3>
-<div class="paragraph"><p>As well as transformations, MSAT provides routines for analysing various aspects of stiffness tensors. For example, <a href="funcs/MS_anisotropy.html">MS_anisotropy</a> calculates a variety of simple measures of the anisotropy of an input elastic tensor:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; C = MS_elasticDB('Albite') ;
-&gt;&gt; uA = MS_anisotropy(C)
-
-uA =
-
-    2.0694</tt></pre>
-</div></div>
-<div class="paragraph"><p>where <strong>uA</strong> is the Universal Elastic Anisotropy Index of Ranganathan and Ostoja-Starzewski (<a href="http://dx.doi.org/10.1103/PhysRevLett.101.055504">2008</a>).</p></div>
-</div>
-<div class="sect2">
-<h3 id="_visualisation">Visualisation</h3>
-<div class="paragraph"><p>Finally, MSAT can be used to create various kinds of visualisations of elasticity matrices. For example:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>&gt;&gt; [C,rh] = MS_elasticDB('Albite') ;
-&gt;&gt; MS_sphere(C,rh,'S')</tt></pre>
-</div></div>
-<div class="paragraph"><p>produces:</p></div>
+<div class="paragraph"><p>The code for this example can be found in <tt>/examples/topotaxy/topotaxy_model.m</tt> which,
+after parsing the optional arguments described above, performs a number of operations
+on the Euler angles read in from the input file.</p></div>
+<div class="paragraph"><p>The input (post-perovskite) Euler angles are read into the
+array <tt>eulers</tt> using the included function <tt>read_VPSC_file()</tt>, which
+takes a file name as an argument. Pole figures of the input texture
+are shown below. These are only produced if MTEX is installed (see
+<tt>plot_pole_figure()</tt> for details.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="albite.png" alt="albite" />
+<img src="ppv_tex.png" alt="Post-perovskite texture pole figures" />
 </span></p></div>
-<div class="paragraph"><p>which shows the variation of shear-wave anisotropy (and fast-shear wave orientation) for single crystal albite.</p></div>
+<div class="paragraph"><p>The elasticity of the input polycrystalline aggregate can then be
+calculated using <tt>MS_rotEuler()</tt> and <tt>MS_VRH()</tt>.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>% Elasticity of textured ppv pre-transformeation
+    Cs = zeros(6,6,nxtls);
+    <strong>for</strong> i = 1:nxtls
+        Cs(:,:,i) = MS_rotEuler(C_ppv, eulers(1,i), eulers(2,i), eulers(3,i));
+    end
+    rhos = ones(nxtls,1)*rh_ppv; % All crystals have the same density.
+    vfs = ones(nxtls,1);         % Same volume fraction <strong>for</strong> each point
+                                 % - normalised by MS_VRH.
+    [C_ppv_av, rh_ppv_av] = MS_VRH(vfs, Cs, rhos);
+    report_elasticity(C_ppv_av, rh_ppv_av, ...
+        'post-perovskite before transformation');
+    <strong>if</strong> write_elastic
+        % Save Cij <strong>in</strong> format <strong>for</strong> reflectivity calc.
+        MS_save(ppv_elastic_name, C_ppv_av, rh_ppv_av, 'Aij', 'eunit', ...
+            'Pa');
+    end</tt></pre>
+</div></div>
+<div class="paragraph"><p>The function <tt>report_elasticity</tt> prints the resulting elasticity matrix
+and draws the phase velocity pole figures shown below.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="ppv_seis.png" alt="Post-perovskite phase velocities" />
+</span></p></div>
+<div class="paragraph"><p>Experiments suggest that the perovskite to post-perovskite phase transition
+exhibits topotaxy with the relations $[001]_{pv}=[001]_{ppv}$
+and either $[100]_{pv}=[1\bar{1}0]_{ppv}$ or
+$[100]_{pv}=[110]_{ppv}$. This relationship is expressed as
+a rotation matrix by the function <tt>getTopotaxyRotations()</tt>, which
+calculates unit vectors along the crystallographic axes and then
+builds the rotation matrix to go from one to the other.
+For ease of manipulation the Euler angle triples describing the
+texture are also converted
+into rotation matrices using the <tt>rot_from_Euler()</tt> function:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>function [ g ] = rot_from_Euler(phi1, theta, phi2)
+    % Given three Euler angles phi1, Phi, phi2 (Bunge notation,
+    % <strong>in</strong> degrees) <strong>return</strong> a rotation matrix, g, representing the
+    % rotation. This <strong>is</strong> the 'passive' rotation.
+
+    % Pre-compute trig functions.
+    cp1 = cos(phi1*pi/180.0);
+    sp1 = sin(phi1*pi/180.0);
+    cp2 = cos(phi2*pi/180.0);
+    sp2 = sin(phi2*pi/180.0);
+    cth = cos(theta*pi/180.0);
+    sth = sin(theta*pi/180.0);
+
+    % Form rotation matrix <strong>for</strong> Bunge convention of
+    % Euler angles, see eq 24 (pg81) of "Preferred
+    % orientation <strong>in</strong> deformed meals <strong>and</strong> rocks... H-K Wenk (ed)"
+    g = [cp1*cp2 - sp1*sp2*cth, sp1*cp2 + cp1*sp2*cth, sp2*sth ; ...
+        -1*cp1*sp2 - sp1*cp2*cth, -1*sp1*sp2 + cp1*cp2*cth, cp2*sth; ...
+        sp1*sth, -1*cp1*sth, cth];
+end</tt></pre>
+</div></div>
+<div class="paragraph"><p>This allows the Euler angles of the aggregate after the phase transition to be
+calculated:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    % Texture of transformed material
+    % ===============================
+
+        transformed_eulers = zeros(size(eulers));
+        % Only do this <strong>if</strong> we need to <strong>for</strong> output <strong>or</strong> plotting
+        <strong>for</strong> x = 1:nxtls
+            <strong>if</strong> (chooser(x) &lt; 0.5)
+                g = rot_from_Euler(eulers(1,x), eulers(2,x), eulers(3,x));
+                g = g*transA';
+                [phi1, Phi, phi2] = rot_to_Euler(g);
+            <strong>else</strong>
+                g = rot_from_Euler(eulers(1,x), eulers(2,x), eulers(3,x));
+                g = g*transB';
+                [phi1, Phi, phi2] = rot_to_Euler(g);
+            end
+            transformed_eulers(1,x) = phi1;
+            transformed_eulers(2,x) = Phi;
+            transformed_eulers(3,x) = phi2;
+        end</tt></pre>
+</div></div>
+<div class="paragraph"><p>along with its elasticity. Pole figures for the transformed texture and
+phase velocity are shown below.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="pv_tex.png" alt="Perovskite texture pole figures" />
+</span></p></div>
+<div class="paragraph"><p><span class="image">
+<img src="pv_seis.png" alt="Perovskite phase velocities" />
+</span></p></div>
+<div class="paragraph"><p>The resulting texture and elasticity is then optionally written out for further use. The
+file <tt>/examples/topotaxy/extract_pv_def_results.m</tt> is a cut down version of the example
+described above which focuses on only the analysis of elasticity allowing the output
+perovskite texture to be further deformed using the VPSC code and the results examined.</p></div>
 </div>
-<div class="sect2">
-<h3 id="_more_help">More help</h3>
-<div class="paragraph"><p>A more in-depth guide to MSAT is provided by the  <a href="MSATguide.html">user guide</a>. Further information
-(upgrades, reporting bugs, how to install) can be found at the MSAT website (<a href="http://www1.gly.bris.ac.uk/msat">http://www1.gly.bris.ac.uk/msat</a>). There is also a paper published in Computers and Geosciences (volume 49, pages 81 - 90) describing MSAT. This is available online as a <a href="http://www1.gly.bris.ac.uk/~walker/pubs/msat.pdf">preprint</a> or from <a href="http://dx.doi.org/10.1016/j.cageo.2012.05.031">Elsevier</a>.</p></div>
 </div>
+<div class="sect1">
+<h2 id="_references">References</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+F. Bachmann, R. Hielscher and H. Schaeben (2010) "Texture analysis with MTEX&#8201;&#8212;&#8201;free and open source software toolbox". Solid State Phenomena 160:63-68. 10.4028/www.scientific.net/SSP.160.63
+</p>
+</li>
+</ul></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-07 20:12:19 GMT
+Last updated 2013-06-15 10:33:02 BST
 </div>
 </div>
 </body>
