@@ -2,9 +2,9 @@
 % 
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-% [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
-%  
-%  Inputs:
+% [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...)
+%
+%  Common Inputs:
 %     f (scalar) : Dominant frequency of wave (Hz)
 %     spol (scalar) : initial source polarisation (degrees)
 %     fast (scalar/vector) : fast direction(s) of layer(s) to be 
@@ -12,18 +12,47 @@
 %     tlag (scalar/vector) : lag time(s) of layer(s) to be included
 %                            (degrees)
 %
-%  Fast and tlag can be scalars or vectors but must all be the same length.  
+%  Fast and tlag can be scalars or vectors but must all be the same length.
+% 
+%  Usage:
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag)
+%     or 
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+%   'mode', 'S&S')
 %
-%  CAUTION! The method gives unstable results when
-%  the source polarisation is near the effective fast direction. This would,
-%  however probably be seen as a null result anyway.
+%     Calculate effective splitting parameters using the method of Silver
+%     and Savage (1994). CAUTION! This is quick but is known to fail if the delay
+%     time becomes large compared to the dominant frequency of the wave. It
+%     also gives unstable results when the source polarisation is near the 
+%     effective fast direction. This would, however probably be seen as a 
+%     null result anyway.
+% 
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+%   'mode', 'GaussianWavelet')
 %
-%  Reference: 
+%     Calculate effective splitting parameters by first applying the 
+%     splitting operators in sequence to an unsplit first-derivative 
+%     Gaussian wavelet then searching for the effective splitting operator 
+%     that minimises the second eigenvalue of the covariance matrix 
+%     of the result. This is the ray theory approach described by 
+%     Bonnin et al. (2012). 
+%
+%   [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+%   'mode', 'GaussianWavelet', 'PlotWavelet')
+%
+%     Plot the resulting wavelet when in GaussianWavelet mode.
+%
+%  References: 
+%      M. Bonnin, A. Tommasi, R. Hassani, S. Chevrot, J. Wookey, G. Barruol
+%        (2012) "Numerical modelling of the upper-mantle anisotropy beneath
+%        a migrating strike-slip plate boundary: the San Andreas Fault 
+%        system" Geophysical Journal International, v191 pp 436-458.
+%        http://dx.doi.org/10.1111/j.1365-246X.2012.05650.x
 %      Silver, P. G. and Savage, M. K. 1994 "The interpretation of shear-wave
-%      splitting parameters in the presence of two anisotropic layers" 
-%      Geophysical Journal International, v119 pp 949-963.  
+%        splitting parameters in the presence of two anisotropic layers" 
+%        Geophysical Journal International, v119 pp 949-963. 
 
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011-2013 James Wookey and Andrew Walker
 % Copyright (c) 2005-2011, James Wookey
 % All rights reserved.
 % 
@@ -60,14 +89,45 @@
 
 
 %===============================================================================
-function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
+function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag, varargin)
 %===============================================================================
 %  check inputs are the same size   
    if ~isequal(length(fast),length(tlag))
       error('MS:ListsMustMatch', ...
           'Input fast and tlag vectors must be of the same length')            
    end
+   
+   mode = 's&s';
+   plotwave = 0;
+   
+   iarg = 1 ;
+   while iarg <= (length(varargin))
+       switch lower(varargin{iarg})
+           case 'mode'
+              mode = lower(varargin{iarg+1}) ; 
+              iarg = iarg + 2;
+           case 'plotwavelet'
+               plotwave = 1;
+               iarg = iarg + 1;
+           otherwise
+               error('MS:effective_splitting_N', ...
+                   ['Unknown option: ' varargin{iarg}]) ;
+       end
+   end
+   
+   if strcmp(mode, 's&s') 
+       [fast_eff,tlag_eff]=MS_effective_splitting_N_SS(f,spol,fast,tlag);
+   elseif strcmp(mode, 'gaussianwavelet')
+       [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f,spol,...
+           fast,tlag,plotwave);
+   else
+       error('MS:effectiveUnkownMode', ...
+           ['unknown mode in MS_effective_splitting_N: ', mode])
+   end
+end
 
+function [fast_eff,tlag_eff]=MS_effective_splitting_N_SS(f,spol,fast,tlag)
+   
 %  check for just one layer
    if length(fast)==1
       fast_eff = fast ;
@@ -133,9 +193,42 @@ function [fast_eff,tlag_eff]=MS_effective_splitting_N(f,spol,fast,tlag)
    end   
 
 end
-%===============================================================================
 
-%===============================================================================
+
+function [fast_eff,tlag_eff]=MS_effective_splitting_N_GW(f, spol, fast, ...
+    tlag, plotwave)
+
+    [time,T00,T90] = MS_make_trace(spol,f, sum(tlag)) ;
+
+    if length(fast)==1
+        % So we can test - should get [fast_eff,tlag_eff] == [fast, tlag]
+        [T00,T90] = MS_split_trace(time,T00,T90,fast,tlag);
+    else
+        for i =1:length(fast)
+            % Split by each op in turn...
+            [T00,T90] = MS_split_trace(time,T00,T90,fast(i),tlag(i));
+        end
+    end
+    
+    [fast_eff, tlag_eff] = MS_measure_trace_splitting(time, T00, T90, ...
+        15, 0.5.*min(tlag), sum(tlag));
+ 
+    fast_eff = MS_unwind_pm_90(fast_eff) ;
+    if (tlag_eff < 0)
+       fast_eff = MS_unwind_pm_90(fast_eff+90) ;
+       tlag_eff = abs(tlag_eff) ;
+    end   
+    
+    if plotwave
+        [~, T00or, T90or] = MS_make_trace(spol,f, sum(tlag));
+        [T00us, T90us] = MS_split_trace(time,T00,T90,fast_eff,-tlag_eff);
+        MS_plot_trace(time, [T00or; T00; T00us], [T90or; T90; T90us],...
+            'headings', {'Probe trace'; 'Split trace'; ...
+            'Recovered trace'}, 'plots', 'wd');
+    end
+end
+
+
 function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
 %  Agglomerate splitting operators which are (near) parallel or
 %  perpendicular. 
@@ -203,3 +296,5 @@ function [ fastA , tlagA ] = aggregate( fast , tlag, varargin )
    fastA(ind) = fastA(ind)+90 ; 
    
 end
+
+ 
