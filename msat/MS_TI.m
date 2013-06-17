@@ -41,7 +41,7 @@
 %
 %   Calculates the elastic tensor for a VTI medium from average Vp and Vs,
 %   and anisotropic parameters xi, phi and eta (see, e.g., Panning and 
-%   Romanowicz, 2006)
+%   Romanowicz, 2006). Derivation only valid if eta = 1 and phi = 1.
 %
 %'global'
 %~~~~~~~~~
@@ -211,6 +211,18 @@ function [C]=MS_panning(vp,vs,rh,xi,phi,eta)
    vp=vp*1e3;
    vs=vs*1e3;
 
+   if eta ~= 1.0
+       warning('MS:TIeta', ['Warning, the derivation of the ' ...
+           '"panning" mode in MS_TI assumes eta = 1. Use "global" for ' ...
+           'correct general treatment']);
+   end
+   
+   if phi ~= 1.0
+       warning('MS:TIphi', ['Warning, the derivation of the ' ...
+           '"panning" mode in MS_TI assumes phi = 1. Use "global" for ' ...
+           'correct general treatment']);
+   end
+   
 %  note: xi and phi are defined oppositely; i.e.: 
 %  xi = vsv^2/vsh^2 and phi = vph^2/vpv^2
    vsv = sqrt((3.*vs.^2)./(2+xi)) ;
@@ -228,7 +240,6 @@ function [C]=MS_panning(vp,vs,rh,xi,phi,eta)
    C13 = eta.*(C11-2.*C44) ; % F
    
    C22 = C11 ;
-   C23 = C13 ;
    C55 = C44 ;
    
    C = [C11 C12 C13  0   0   0  ; ...
@@ -257,8 +268,6 @@ function [Cglobal]=MS_global(vp,vs,rho,xi,phi,eta)
 % convert to m/s
    vp=vp*1e3;
    vs=vs*1e3;
-
-   Cglobal = zeros(6,6) ;
 
    L = 15.*rho.*((3.*phi + 8. + 4.*eta).*vs.^2 - (phi + 1. - 2.*eta).*vp.^2) ...
          ./ ((6. + 4.*eta + 5.*xi).*(3.*phi + 8. + 4.*eta) ...

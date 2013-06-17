@@ -153,5 +153,5 @@ perovskite texture to be further deformed using the VPSC code and the results ex
 References
 ----------
 
-* D. P. Dobson, N. Miyajima, F. Nestola, M. Alvaro, N. Casati, C. Liebske, I. G. Wood and A. M. Walker (2013) "Strong texture inheritance between perovskite and post-perovskite in the Dlatexmath:[$^{\prime\prime} layer". Nature Geoscience. 10.1038/NGEO1844 
+* D. P. Dobson, N. Miyajima, F. Nestola, M. Alvaro, N. Casati, C. Liebske, I. G. Wood and A. M. Walker (2013) "Strong texture inheritance between perovskite and post-perovskite in the Dlatexmath:[$^{\prime\prime}$] layer". Nature Geoscience. 10.1038/NGEO1844 
 * F. Bachmann, R. Hielscher and H. Schaeben (2010) "Texture analysis with MTEX -- free and open source software toolbox". Solid State Phenomena 160:63-68. 10.4028/www.scientific.net/SSP.160.63

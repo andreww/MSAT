@@ -25,6 +25,9 @@ function test_MS_TI_crosscheck
    phi = vpv.^2 / vph.^2 ; 
    eta = C(1,3) ./ (C(1,1) - 2.*C(4,4)) ;
    
+   % Calc above assumes panning model and it's foibles.
+   warning('OFF', 'MS:TIphi')
+   warning('OFF', 'MS:TIeta')
    Cl = MS_TI(vpa,vsa,rh,xi,phi,eta,'panning') ;
    
    assertElementsAlmostEqual(C, Cl) ;
@@ -57,7 +60,7 @@ function test_MS_TI_parameters_1
    C2 = MS_TI(loveA, loveC, loveL, loveN, loveF,'love') ;
    assertElementsAlmostEqual(C, C2);
    
-   C3 = MS_TI(vpa, vsa, rh_in, xi, phi, eta,'panning') ;
+   C3 = MS_TI(vpa, vsa, rh_in, xi, phi, eta,'global') ;
    assertElementsAlmostEqual(C, C3);
 
 end
@@ -86,7 +89,7 @@ function test_MS_TI_apatite
     
     C1 = MS_TI(vpv, vsv, rh, eps, gam, del,'thomsen');
     C2 = MS_TI(loveA, loveC, loveL, loveN, loveF,'love') ;
-    C3 = MS_TI(vpa, vsa, rh, xi, phi, eta,'panning') ;
+    C3 = MS_TI(vpa, vsa, rh, xi, phi, eta,'global') ;
     
     assertElementsAlmostEqual(C, C1);
     assertElementsAlmostEqual(C, C2);

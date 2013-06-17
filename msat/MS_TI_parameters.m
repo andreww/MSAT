@@ -9,9 +9,9 @@
 %             vpa, vsa, xi, phi, eta] = MS_TI_parameters(C, rho)
 %
 %  Output:
-%       vpa                               : isotropic average P-wave 
+%       vpa                               : isotropic Voigt average P-wave 
 %                                           velocity, km/s 
-%       vsa                               : isotropic average S-wave 
+%       vsa                               : isotropic Voigt average S-wave 
 %                                           velocity, km/s
 %       vpv                               : vertical P-wave velocity, km/s
 %       vsv                               : vertical S-wave velocity, km/s
@@ -30,7 +30,9 @@
 %   change the units for the Love parameters and velocities but not the 
 %   dimensionless parameters. Choosing an arbitrary value for the density
 %   will not alter the dimensionless parameters or Love parameters, but the 
-%   velocities will be meaningless. 
+%   velocities will be meaningless. The values reported for xi, phi and eta
+%   do not assume eta=1 or A=C (as assumed by Panning and Romanowicz,
+%   2006). Compare 'Panning' and 'global' modes in MS_TI.
 %
 %References
 %~~~~~~~~~~
@@ -98,14 +100,14 @@ function [loveA, loveC, loveL, loveN, loveF, vpv, vsv, eps, gam, del ...
 
 end
 
-function [vpa, vsa, xi, phi, eta, vpv, vsv]=MS_panning_params(C, rho)
+function [vpa, vsa, xi, phi, eta, vpv, vsv]=MS_panning_params(CC, rho)
 
    % Convert to Pa
-   C = C.*1e9 ;
+   CC = CC.*1e9 ;
 
    % Love params in Pa and density in Kg/m^3 give 
    % velocites in m/s
-   [A, C, L, N, F] = MS_love_params(C);
+   [A, C, L, N, F] = MS_love_params(CC);
    vph = sqrt(A/rho);
    vpv = sqrt(C/rho); % Thom VP
    vsv = sqrt(L/rho); % Thom VS
@@ -116,11 +118,17 @@ function [vpa, vsa, xi, phi, eta, vpv, vsv]=MS_panning_params(C, rho)
    xi = vsh^2 / vsv^2;
    phi = vpv^2 / vph^2;
    
-   vpa = sqrt((vpv^2 + 4.0*vph.^2)/5.0) ;
-   vsa = sqrt((2.0*vsv.^2 + vsh.^2)/3.0) ;
-   
    eta = F/(A-2.0*L);
    
+   % These avarages are only valid if A=C and eta=1 
+   % which is the approximation used in Panning model
+   % but general hexagonal symmetry does not have this
+   % condition. So use the full form (c.f. MS_TI):
+   % vpa = sqrt((vpv^2 + 4.0*vph.^2)/5.0) ;
+   % vsa = sqrt((2.0*vsv.^2 + vsh.^2)/3.0) ;
+   vpa = sqrt((3*C+(8+4*eta)*A+8*(1-eta)*L)/(rho*15.0));
+   vsa = sqrt((C+(1-2*eta)*A+(6+4*eta)*L+5*N)/(rho*15.0));
+
    %  convert to km/s
    vpa = vpa/1e3;
    vsa = vsa/1e3;
