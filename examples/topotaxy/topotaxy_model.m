@@ -14,7 +14,9 @@
 % following the phase transition. Finally, a set of Euler angles 
 % representing the transformed perovskite is generated and these 
 % can be used to begin a further VPSC calculation of the deformation 
-% of pre-textured perovskite. 
+% of pre-textured perovskite. This is the program used to generate
+% the results in Figure 2 of Dobson et al. (2013). Further information 
+% can be found in the supplementary information of that paper. 
 % 
 % The script is packaged as a function taking a number of optional
 % arguments to give the source of the VPSC output and restart files
@@ -33,6 +35,10 @@
 %     and perovskite elasticity to be written in a file for later reuse.
 % 
 % References:
+%     D. P. Dobson, N. Miyajima, F. Nestola, M. Alvaro, N. Casati, 
+%        C. Liebske, I. G. Wood and A. M. Walker (2013) "Strong texture 
+%        inheritance between perovskite and post-perovskite in the D''
+%        layer". Nature Geoscience. 10.1038/NGEO1844
 %     F. Bachmann, R. Hielscher and H. Schaeben (2010) "Texture analysis 
 %        with MTEX -- free and open source software toolbox". Solid State
 %        Phenomena 160:63-68. 10.4028/www.scientific.net/SSP.160.63
