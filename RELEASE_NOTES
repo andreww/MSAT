@@ -4,27 +4,55 @@ MSAT Release Notes
 Version 1.0.2 - unreleased / in progress
 ----------------------------------------
 
-This version of MSAT includes several minor improvements, 
-pieces of new functionality and bug fixes. Changes from 
+This version of MSAT focuses on the addition of new
+functionality to enable the simple calculations involving
+shear wave splitting. It also includes several minor improvements,
+ pieces of new functionality and bug fixes. Changes from 
 1.0.1 are:
 
-* Allow MS_expand to handle 9-element orthorhombic 
+* New functions for simple analysis of shear wave splitting:
+
+** Splitting misfit calculation (see MS_splitting_misfit and 
+the new splitting_misfit example).
+
+** Functions to generate a test wavelet, apply shear wave splitting 
+operator(s), measure the resulting splitting, and plot the resulting 
+waveforms (See MS_make_trace, MS_split_trace, 
+MS_measure_trace_splitting and MS_plot_trace).
+
+** Add a new mode for MS_effective_splitting_N to use the above
+functions instead of the default Silver and Savage (1994) method.
+
+** Include the ability to plot measured splitting observations or 
+velocities alongside phase velocities from elasticity in MS_plot 
+and MS_sphere.
+
+* Add a new function, MS_save, to write files in the formats
+supported by MS_load.
+
+* Allow MS_expand to handle the 9-element orthorhombic 
 case.
 
-* Add MS_save to write files in the formats supported 
-by MS_load.
-
-* Add a new TI parameterization 'global', which is like
-'panning' but without the approximation of eta=1.
+* Add a new TI parameterization "global", which is like
+"panning" but without the approximation of eta=1.
 
 * Add options to produce nicer looking plots in MS_plot and 
-allow contour limits to be set in MS_sphere.
+allow contour limits to be set in MS_sphere. Allow MS_plot to 
+show S1 and S2 phase velocity and allow user to select which
+subplots to include.
 
 * Include proper treatment of exactly parallel or perpendicular
 layers in the stack of operators in MS_effective_splitting_N.
 
 * Add new example showing the simulation of texture inheritance 
 in the lowermost mantle.
+
+* Numerous minor improvements to the documentation.
+
+
+We thank Andy Nowacki (Bristol), Alan Baird (Bristol), 
+Jenny Di Leo (Bristol), Nagaya Takayoshi (University of Nagoya)
+for suggestions, ideas and bug fixes and reports.
 
 Version 1.0.1 - 5 November 2012
 -------------------------------

@@ -68,6 +68,8 @@ function split_model(varargin)
            case 'del_azi'
                del_azi = varargin{iarg+1};
                iarg = iarg + 2;
+           otherwise
+               error(['Unknown option']);
        end
    end
 

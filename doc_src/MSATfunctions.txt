@@ -4,7 +4,7 @@ Matlab Seismic Anisotropy Toolkit - using the functions
 This section of the user guide includes some information on the functions provided in, and 
 theory implemented by, the MSAT toolkit.
 The functions provided by MSAT can be classified into groups according to how they are used. These groups 
-broadly correspond to how elasticity matricies appear in the input and output arguments lists. In all 
+broadly correspond to how elasticity matrices appear in the input and output arguments lists. In all 
 cases function names begin with "MS_" and argument lists typically begin with the elasticity
 followed, where needed, by the density. Units are always GPa for the elasticity, 
 km/s for phase velocities and kg/m^3 for densities.
@@ -35,7 +35,7 @@ $]
 In the MSAT documentation we call the Voigt representation of 
 the elastic constants tensor the elasticity matrix (in an attempt to 
 avoid confusion) and note that, if the matrix is to make physical sense,
-it must be symmetric, consist of real numbers, and be positive definate.
+it must be symmetric, consist of real numbers, and be positive definite.
 Conversion and validation functions are described in the section 
 "Other functions", below. Functions are otherwise classified as follows.
 
@@ -46,7 +46,7 @@ The first group of functions generate elasticity matrices from input
 arguments (see the table below). MS_load and MS_load_list
 read data from input files 
 while MS_elasticDB extracts elasticity information from a
-builtin database. Other functions create elasticity matrices 
+built-in database. Other functions create elasticity matrices 
 from summary information and a knowledge of the symmetry. 
 
 In the most general case 21 elastic constants are required to represent minerals and materials
@@ -67,12 +67,12 @@ several of these.
 
 It is also possible to model the effective anisotropic elasticity caused by particular
 rock fabrics; an effect that can be important even if all the components of the rock are isotropic
-on a short length scale compared to the seismic wavelength. Several effecive medium models are 
+on a short length scale compared to the seismic wavelength. Several effective medium models are 
 supported by the MS_effective_medum function. These include the case of an
 elastically isotropic medium contains aligned ellipsoidal 
-inclusions filled with an elastically isotropic material of a different stiffnes,
+inclusions filled with an elastically isotropic material of a different stiffness,
 the case of layering of isotropic materials of different stiffness, and the effect of 
-alligned cracks.
+aligned cracks.
 
 .MSAT Input / generation of elastic constants. 
 [width="80%",cols="3,10",frame="topbot",options="header"]
@@ -239,14 +239,53 @@ spherical representation, respectively.
 | link:funcs/MS_poisson.html[MS_poisson]                             | Poisson's ratio in anisotropic media.
 | link:funcs/MS_norms.html[MS_norms]                                 | Browaeys and Chevrot analysis of the elasticity matrix.
 | link:funcs/MS_sphere.html[MS_sphere]                               | Plot a spherical plot of phasevels/anisotropy from a set of elastic constants.
-| link:funcs/MS_effective_spltting_N.html[MS_effective_splitting_N]  | N-layer effective splitting operator calculation
 | link:funcs/MS_TI_parameters.html[MS_TI_parameters]                 | Calculate Thomsen and other parameters for a vertically transverse isotropic medium given the elasticity matrix. Symmetry is in the 3-axis. 
 |======================                                                
+
+Shear wave splitting
+--------------------
+
+Alongside the functions designed to analyse aspects of elasticity, MSAT also contains functions to 
+deal with simple aspects of modelling one of the most common seismological observations related to 
+elastic anisotropy, shear wave splitting. As discussed above, seismic waves can propagate at
+three velocities through an anisotropy body and two of these velocities correspond to shear waves. 
+If a shear wave passes through an anisotropic region it is split into two shear waves with 
+particle motion polarised at 90 degrees to each other (and approximately perpendicular to the 
+direction of wave propagation. As the two shear waves have different velocities they will emerge
+from the anisotropic region at different times and with particle motion direction imposed by the 
+elastic anisotropy of the medium. This process is known as shear wave splitting (SWS) and its 
+observation in seismic data is considered strong evidence for anisotropy somewhere along the ray 
+path.
+
+.MSAT Shear wave splitting                                                         
+[width="80%",cols="3,10",frame="topbot",options="header"]              
+|======================                                                
+|Function|Purpose
+| link:funcs/MS_make_trace.html[MS_make_trace] | Create simple wavelet for splitting calculation
+| link:funcs/MS_split_trace.html[MS_split_trace] | Apply splitting operators to wavelet
+| link:funcs/MS_effective_splitting_N.html[MS_effective_splitting_N]  | N-layer effective splitting operator calculation
+| link:funcs/MS_measure_trace_splitting.html[MS_measure_trace_splitting] | Measure splitting from wavelet
+| link:funcs/MS_splitting_misfit.html[MS_splitting_misfit] | Calculate misfit between two splitting operators
+| link:funcs/MS_plot_trace.html[MS_plot_trace] | Plot wavelet and splitting measurement results
+|======================  
+
+In MSAT we only implement functions to handle the simplest aspects of SWS. Time series of particle displacements are described by 
+three arrays we call `time`, `T00` and `T90`. `T00(i)` and `T90(i)` relate to the particle position of two perpendicular traces at
+time `time(i)`. The function `MS_make_trace` generates these assuming a first derivative Gaussian shape for a given dominant frequency 
+making space in the arrays for a user selected maximum amount of splitting. `MS_phasevels` can calculate splitting parameters from 
+an elasticity matrix and this can be used with `MS_split_trace` to apply splitting parameters. The effective splitting generated
+by a wave passing through multiple layers can be found by combing splitting operators using `MS_effective_spltting_N`. This either
+implements an analytic approach to calculating the resulting splitting parameters or uses `MS_split_trace` multiple times and then
+makes a measurement of the resulting effective splitting using `MS_measure_trace_splitting`. `MS_splitting_misfit` allows 
+two splitting operators to be compared (allowing the best fitting elasticity to be found, see the
+link:examples/splitting_misfit_example.html[Splitting misfit example]) and `MS_plot_trace` can be used to visualise
+`time`, `T00` and `T90`. For complex applications these three arrays can be converted to and from SAC records using the functions 
+available from link:http://www1.gly.bris.ac.uk/~wookey/codes/index.htm[MSAC]. 
 
 Other functions 
 ---------------
 
-Finally, range of misellaneous and utility functions are provided to, for example, convert between different ways of representing elasticity or check that
+Finally, range of miscellaneous and utility functions are provided to, for example, convert between different ways of representing elasticity or check that
 a particular Matlab array is a valid elasticity matrix.
                                                                        
 .MSAT Miscellaneous / utility                                          

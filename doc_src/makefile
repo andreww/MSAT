@@ -23,10 +23,11 @@ install: html_funcs html_docs example-docs
 	cp MSATdevelop.html MSATrelease_notes.html MSATreadme.html MSATfunctions.html  MSATstart.html MSATguide.html albite.png MSATfunctions.html ../msat/html
 	cp ./funcs/*.html ../msat/html/funcs
 	cp ./examples/*.html ../msat/html/examples
+	cp ./examples/*.png ../msat/html/examples
 	$(MAKE) clean
 
-example-docs: examples/diopside_example.txt examples/index.txt examples/lmm_anisotropy_example.txt examples/loading_examples.txt examples/split_model_example.txt examples/texture_example.txt
-	(cd examples; $(AD) diopside_example.txt; $(AD) index.txt ; $(AD) lmm_anisotropy_example.txt ; $(AD) loading_examples.txt ; $(AD) split_model_example.txt ; $(AD) texture_example.txt)
+example-docs: examples/diopside_example.txt examples/index.txt examples/lmm_anisotropy_example.txt examples/loading_examples.txt examples/splitting_model_example.txt examples/texture_example.txt examples/splitting_misfit_example.txt examples/splitting_misfit_pol0.png examples/topotaxy_example.txt
+	(cd examples; $(AD) diopside_example.txt; $(AD) index.txt ; $(AD) lmm_anisotropy_example.txt ; $(AD) loading_examples.txt ; $(AD) splitting_model_example.txt ; $(AD) texture_example.txt; $(AD) -a latexmath splitting_misfit_example.txt; $(AD) -a latexmath topotaxy_example.txt)
 
 external-install: html_funcs html_docs
 	# NB - $(TARGET) must be set on the command line 
@@ -36,6 +37,7 @@ external-install: html_funcs html_docs
 	cp MSATstart.html MSATdevelop.html MSATguide.html MSATreadme.html MSATrelease_notes.html MSATfunctions.html albite.png $(TARGET)
 	cp ./funcs/*.html $(TARGET)/funcs
 	cp ./examples/*.html $(TARGET)/examples
+	cp ./examples/*.png $(TARGET)/examples
 	$(MAKE) clean
 
 clean:

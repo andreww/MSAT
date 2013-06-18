@@ -2,13 +2,13 @@ Example 3: Texture analysis and MTEX
 ====================================
 
 This example demonstrates how to combine MTEX and MSAT to calculate the
-composite elastic constants of a rock consisiting of two phases where the
-crystals are partially alligned. Based on the MTEX Aachen EBSD example we
+composite elastic constants of a rock consisting of two phases where the
+crystals are partially aligned. Based on the MTEX Aachen EBSD example we
 read the EBSD data and assume that each data point represents a equal
-volume of the rock. MTEX is used to convert the EBSD measurment into a
+volume of the rock. MTEX is used to convert the EBSD measurement into a
 list of Euler angles. The MSAT function MS_rotEuler is then used to build
 a list of elastic constants tensors aligned with each measured crystal 
-orentation. Finally the tensors are averaged using MS_VRH and the seismic 
+orientation. Finally the tensors are averaged using MS_VRH and the seismic 
 properties of the sample reported. 
 
 For this example script to work both MSAT and MTEX must be installed. It is worth
@@ -16,7 +16,7 @@ noting that recent version of MTEX are able to calculate the composite
 elastic constants from an orientation distribution function (ODF) without
 having to sample a finite number of orientations. If the source data is
 from an EBSD run this implies the need to first create an ODF from the
-discrete orientation measurments. 
+discrete orientation measurements. 
 
 The source code for this 
 example are contained in the file
@@ -70,9 +70,9 @@ and KCl data ends up in ebsd(2).
     telap = toc; fprintf(' done (%4.2f secs)\n',telap);
 ----
 
-Third, for each EBSD measurment, create an elastic matrix with the measured 
-orentation. Work on NaCl, then KCl before joining the elastic
-matricies together.
+Third, for each EBSD measurement, create an elastic matrix with the measured 
+orientation. Work on NaCl, then KCl before joining the elastic
+matrices together.
 [code, python]
 ----
     tic; fprintf('Extracting Euler angles ...');
@@ -105,7 +105,7 @@ matricies together.
 
     
     % Build the input arguments for MS_VRH and calculate the
-    % avarage.
+    % average.
     
     tic; fprintf('Calculating VRH average matrix ...');
     Cs = zeros(6,6,num_xtals);
