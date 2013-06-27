@@ -138,7 +138,7 @@ a thin layer of strong anisotropy from a thick layer of weak anisotropy. We thus
 assume a 50 km thick layer of fixed strength of anisotropy throughout and only solve
 for the orientation of this layer. The "observed" parameters are returned by a 
 the function call `[fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;`,
-which makes use of MS_phasevels`.
+which makes use of `MS_phasevels`.
 
 The second stage of the calculation is to compute the misfit between `fast` and
 `tlag` and the calculated splitting parameters for a range of TTI orientations.
