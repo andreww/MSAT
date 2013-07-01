@@ -1,13 +1,13 @@
 MSAT Release Notes
 ==================
 
-Version 1.0.2 - unreleased / in progress
-----------------------------------------
+Version 1.1.0 - 1 July 2013
+---------------------------
 
 This version of MSAT focuses on the addition of new
-functionality to enable the simple calculations involving
+functionality to enable simple calculations involving
 shear wave splitting. It also includes several minor improvements,
- pieces of new functionality and bug fixes. Changes from 
+pieces of new functionality and bug fixes. Changes from 
 1.0.1 are:
 
 * New functions for simple analysis of shear wave splitting:
@@ -17,14 +17,14 @@ the new splitting_misfit example).
 
 ** Functions to generate a test wavelet, apply shear wave splitting 
 operator(s), measure the resulting splitting, and plot the resulting 
-waveforms (See MS_make_trace, MS_split_trace, 
-MS_measure_trace_splitting and MS_plot_trace).
+waveforms (See MS_make_trace, MS_split_trace, MS_measure_trace_splitting 
+and MS_plot_trace).
 
 ** Add a new mode for MS_effective_splitting_N to use the above
 functions instead of the default Silver and Savage (1994) method.
 
 ** Include the ability to plot measured splitting observations or 
-velocities alongside phase velocities from elasticity in MS_plot 
+velocities alongside phase velocities from the elasticity in MS_plot 
 and MS_sphere.
 
 * Add a new function, MS_save, to write files in the formats
@@ -51,7 +51,7 @@ in the lowermost mantle.
 
 
 We thank Andy Nowacki (Bristol), Alan Baird (Bristol), 
-Jenny Di Leo (Bristol), Nagaya Takayoshi (University of Nagoya)
+Jenny Di Leo (Bristol) and Nagaya Takayoshi (University of Nagoya)
 for suggestions, ideas and bug fixes and reports.
 
 Version 1.0.1 - 5 November 2012

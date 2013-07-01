@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.5" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>MSAT Release Notes</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -179,7 +179,7 @@ div.quoteblock, div.verseblock {
   margin-left: 1.0em;
   margin-right: 10%;
   border-left: 5px solid #f0f0f0;
-  color: #777777;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -514,6 +514,29 @@ th.tableblock.valign-middle, td.tableblock.valign-middle {
 th.tableblock.valign-bottom, td.tableblock.valign-bottom {
   vertical-align: bottom;
 }
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -587,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'DIV'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -633,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'DIV' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -716,34 +739,72 @@ asciidoc.install();
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_version_1_0_2_unreleased_in_progress">Version 1.0.2 - unreleased / in progress</h2>
+<h2 id="_version_1_1_0_1_july_2013">Version 1.1.0 - 1 July 2013</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This version of MSAT includes several minor improvements,
+<div class="paragraph"><p>This version of MSAT focuses on the addition of new
+functionality to enable simple calculations involving
+shear wave splitting. It also includes several minor improvements,
 pieces of new functionality and bug fixes. Changes from
 1.0.1 are:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Allow MS_expand to handle 9-element orthorhombic
+New functions for simple analysis of shear wave splitting:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Splitting misfit calculation (see MS_splitting_misfit and
+the new splitting_misfit example).
+</p>
+</li>
+<li>
+<p>
+Functions to generate a test wavelet, apply shear wave splitting
+operator(s), measure the resulting splitting, and plot the resulting
+waveforms (See MS_make_trace, MS_split_trace, MS_measure_trace_splitting
+and MS_plot_trace).
+</p>
+</li>
+<li>
+<p>
+Add a new mode for MS_effective_splitting_N to use the above
+functions instead of the default Silver and Savage (1994) method.
+</p>
+</li>
+<li>
+<p>
+Include the ability to plot measured splitting observations or
+velocities alongside phase velocities from the elasticity in MS_plot
+and MS_sphere.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Add a new function, MS_save, to write files in the formats
+supported by MS_load.
+</p>
+</li>
+<li>
+<p>
+Allow MS_expand to handle the 9-element orthorhombic
 case.
 </p>
 </li>
 <li>
 <p>
-Add MS_save to write files in the formats supported
-by MS_load.
-</p>
-</li>
-<li>
-<p>
-Add a new TI parameterization <em>global</em>, which is like
-<em>panning</em> but without the approximation of eta=1.
+Add a new TI parameterization "global", which is like
+"panning" but without the approximation of eta=1.
 </p>
 </li>
 <li>
 <p>
 Add options to produce nicer looking plots in MS_plot and
-allow contour limits to be set in MS_sphere.
+allow contour limits to be set in MS_sphere. Allow MS_plot to
+show S1 and S2 phase velocity and allow user to select which
+subplots to include.
 </p>
 </li>
 <li>
@@ -758,7 +819,15 @@ Add new example showing the simulation of texture inheritance
 in the lowermost mantle.
 </p>
 </li>
+<li>
+<p>
+Numerous minor improvements to the documentation.
+</p>
+</li>
 </ul></div>
+<div class="paragraph"><p>We thank Andy Nowacki (Bristol), Alan Baird (Bristol),
+Jenny Di Leo (Bristol) and Nagaya Takayoshi (University of Nagoya)
+for suggestions, ideas and bug fixes and reports.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -968,7 +1037,7 @@ Many of the functions are derived from
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-05-16 20:09:47 BST
+Last updated 2013-07-01 10:21:26 BST
 </div>
 </div>
 </body>
