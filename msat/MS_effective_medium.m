@@ -141,123 +141,125 @@
 function [Ceff,rh]=MS_effective_medium(theory, varargin) ;
 
 if ~ischar(theory)
-   error('MS:EFFECTIVE_MEDIUM:BadTString', ...
-   'A string specifying the theory to use is required.') ;
+    error('MS:EFFECTIVE_MEDIUM:BadTString', ...
+        'A string specifying the theory to use is required.') ;
 end
 
 switch lower(theory)
-%-------------------------------------------------------------------------------
-   case {'tandon', 't&w'}
-      if length(varargin)~=8 & length(varargin)~=6
-         error('MS:EFFECTIVE_MEDIUM:TWWrongArgs', ...
-         'Tandon and Weng (1984) requires 6 or 8 input parameters.') ;
-      end
-      if length(varargin)==6 % elasticity matrix form
-         Cm = varargin{1} ; rhm = varargin{2} ; 
-         Ci = varargin{3} ; rhi = varargin{4} ;
-         del = varargin{5} ; f = varargin{6} ;
-%     ** check the matrices
-         MS_checkC(Cm) ;
-         if MS_anisotropy( Cm) > 10*sqrt(eps) % not isotropic           
-            error('MS:EFFECTIVE_MEDIUM:TWBadC', ...
-               'Tandon and Weng (1984) requires isotropic inputs matrices.') ;
-         end
-         MS_checkC(Ci) ;
-         if MS_anisotropy( Ci ) > 10*sqrt(eps) % not isotropic           
-            error('MS:EFFECTIVE_MEDIUM:TWBadC', ...
-               'Tandon and Weng (1984) requires isotropic input matrices.') ;
-         end
-%     ** unload the 
-         vpm = sqrt(Cm(3,3)*1e3./rhm) ;  vsm = sqrt(Cm(6,6)*1e3./rhm) ;
-         vpi = sqrt(Ci(3,3)*1e3./rhi) ;  vsi = sqrt(Ci(6,6)*1e3./rhi) ;
-      else % velocity form
-         vpm = varargin{1} ; vsm = varargin{2} ; rhm = varargin{3} ; 
-         vpi = varargin{4} ; vsi = varargin{5} ; rhi = varargin{6} ;
-         del = varargin{7} ; f = varargin{8} ;
-      end
-      [Ceff,rh]=MS_tandon_and_weng(vpm,vsm,rhm,vpi,vsi,rhi,del,f) ;
-%-------------------------------------------------------------------------------
-   case {'hudson', 'crack'}
-      if length(varargin)~=8 & length(varargin)~=6
-         error('MS:EFFECTIVE_MEDIUM:HuWrongArgs', ...
-         'Hudson (1981,1982) cracks require 6 or 8 input parameters.') ;
-      end
-      if length(varargin)==6 % elasticity matrix form
-         Cm = varargin{1} ; rhm = varargin{2} ; 
-         Cc = varargin{3} ; rhc = varargin{4} ;
-         aspr = varargin{5} ; cden = varargin{6} ;
-%     ** check the matrices
-         MS_checkC(Cm) ;
-         if MS_anisotropy( Cm) > 10*sqrt(eps) % not isotropic           
-            error('MS:EFFECTIVE_MEDIUM:HuBadC', ...
-               'Hudson (1981,1982) cracks require isotropic inputs matrices.') ;
-         end
-         MS_checkC(Cc) ;
-         if MS_anisotropy( Cc ) > 10*sqrt(eps) % not isotropic           
-            error('MS:EFFECTIVE_MEDIUM:HuBadC', ...
-               'Hudson (1981,1982) cracks require isotropic input matrices.') ;
-         end
-%     ** unload the velocities
-         vpm = sqrt(Cm(3,3)*1e3./rhm) ;  vsm = sqrt(Cm(6,6)*1e3./rhm) ;
-         vpc = sqrt(Cc(3,3)*1e3./rhc) ;  vsc = sqrt(Cc(6,6)*1e3./rhc) ;
-      else % velocity form
-         vpm = varargin{1} ; vsm = varargin{2} ; rhm = varargin{3} ; 
-         vpc = varargin{4} ; vsc = varargin{5} ; rhc = varargin{6} ;
-         aspr = varargin{7} ; cden = varargin{8} ; 
-      end
-      [Ceff,rh]=MS_hudson_cracks(vpm,vsm,rhm,vpc,vsc,rhc,aspr,cden) ;
-%-------------------------------------------------------------------------------
-   case {'backus'}
-      if length(varargin)~=3 & length(varargin)~=4
-         error('MS:EFFECTIVE_MEDIUM:BaWrongArgs', ...
-         'Backus (1962) layering requires 3 or 4 input parameters.') ;
-      end
-      if length(varargin)==3 % elasticity matrix form
-         h = varargin{1} ; C = varargin{2} ; rh = varargin{3} ; 
-         
-%     ** check the matrices
-         [dum dum nC] = size(C) ; 
-         
-         if length(rh)~=nC
-            error('MS:EFFECTIVE_MEDIUM:BaVectorLengths', ...
-                  'Backus (1962) layering requires equal length vectors.') ;
-         end         
-         
-         for iC = 1:nC
-            Ctmp = C(:,:,iC) ;
-            MS_checkC(Ctmp) ;
-            if MS_anisotropy(Ctmp) > 10*sqrt(eps) % not isotropic           
-               error('MS:EFFECTIVE_MEDIUM:BaBadC', ...
-                  'Backus (1962) layering requires isotropic input matrices.') ;
+    
+    case {'tandon', 't&w'}
+        if length(varargin)~=8 & length(varargin)~=6
+            error('MS:EFFECTIVE_MEDIUM:TWWrongArgs', ...
+                'Tandon and Weng (1984) requires 6 or 8 input parameters.') ;
+        end
+        if length(varargin)==6 % elasticity matrix form
+            Cm = varargin{1} ; rhm = varargin{2} ;
+            Ci = varargin{3} ; rhi = varargin{4} ;
+            del = varargin{5} ; f = varargin{6} ;
+            %     ** check the matrices
+            MS_checkC(Cm) ;
+            if MS_anisotropy( Cm) > 10*sqrt(eps) % not isotropic
+                error('MS:EFFECTIVE_MEDIUM:TWBadC', ...
+                    'Tandon and Weng (1984) requires isotropic inputs matrices.') ;
             end
-         end   
-
-%     ** unload the velocities
-
-         vp = zeros(1,nC) ;
-         vs = zeros(1,nC) ;
-         vp = sqrt(squeeze(C(3,3,:)).*1e3./rh)  ;
-         vs = sqrt(squeeze(C(6,6,:)).*1e3./rh)  ;
-      else % velocity form
-         h = varargin{1} ; vp = varargin{2} ; 
-         vs = varargin{3} ; rh = varargin{4} ; 
-      end
-%  ** TODO: check vector lengths
-
-%  ** reshape so all vectors are the same orientation      
-      nl = length(h) ;
-      h =  reshape(h,1,nl) ;
-      vp = reshape(vp,1,nl) ;
-      vs = reshape(vs,1,nl) ;
-      rh = reshape(rh,1,nl) ;
-
-      
-      [Ceff,rh]=MS_backus_average(h,vp,vs,rh) ;
-%-------------------------------------------------------------------------------
-   otherwise
-      error('MS:EFFECTIVE_MEDIUM:UnknownTheory', ...
-         'Specified theory is not supported.') ;
-%-------------------------------------------------------------------------------
+            MS_checkC(Ci) ;
+            if MS_anisotropy( Ci ) > 10*sqrt(eps) % not isotropic
+                error('MS:EFFECTIVE_MEDIUM:TWBadC', ...
+                    'Tandon and Weng (1984) requires isotropic input matrices.') ;
+            end
+            %     ** unload the
+            vpm = sqrt(Cm(3,3)*1e3./rhm) ;  vsm = sqrt(Cm(6,6)*1e3./rhm) ;
+            vpi = sqrt(Ci(3,3)*1e3./rhi) ;  vsi = sqrt(Ci(6,6)*1e3./rhi) ;
+        else % velocity form
+            vpm = varargin{1} ; vsm = varargin{2} ; rhm = varargin{3} ;
+            vpi = varargin{4} ; vsi = varargin{5} ; rhi = varargin{6} ;
+            del = varargin{7} ; f = varargin{8} ;
+        end
+        [Ceff,rh]=MS_tandon_and_weng(vpm,vsm,rhm,vpi,vsi,rhi,del,f) ;
+        
+        
+    case {'hudson', 'crack'}
+        if length(varargin)~=8 & length(varargin)~=6
+            error('MS:EFFECTIVE_MEDIUM:HuWrongArgs', ...
+                'Hudson (1981,1982) cracks require 6 or 8 input parameters.') ;
+        end
+        if length(varargin)==6 % elasticity matrix form
+            Cm = varargin{1} ; rhm = varargin{2} ;
+            Cc = varargin{3} ; rhc = varargin{4} ;
+            aspr = varargin{5} ; cden = varargin{6} ;
+            %     ** check the matrices
+            MS_checkC(Cm) ;
+            if MS_anisotropy( Cm) > 10*sqrt(eps) % not isotropic
+                error('MS:EFFECTIVE_MEDIUM:HuBadC', ...
+                    'Hudson (1981,1982) cracks require isotropic inputs matrices.') ;
+            end
+            MS_checkC(Cc) ;
+            if MS_anisotropy( Cc ) > 10*sqrt(eps) % not isotropic
+                error('MS:EFFECTIVE_MEDIUM:HuBadC', ...
+                    'Hudson (1981,1982) cracks require isotropic input matrices.') ;
+            end
+            %     ** unload the velocities
+            vpm = sqrt(Cm(3,3)*1e3./rhm) ;  vsm = sqrt(Cm(6,6)*1e3./rhm) ;
+            vpc = sqrt(Cc(3,3)*1e3./rhc) ;  vsc = sqrt(Cc(6,6)*1e3./rhc) ;
+        else % velocity form
+            vpm = varargin{1} ; vsm = varargin{2} ; rhm = varargin{3} ;
+            vpc = varargin{4} ; vsc = varargin{5} ; rhc = varargin{6} ;
+            aspr = varargin{7} ; cden = varargin{8} ;
+        end
+        [Ceff,rh]=MS_hudson_cracks(vpm,vsm,rhm,vpc,vsc,rhc,aspr,cden) ;
+        
+        
+    case {'backus'}
+        if length(varargin)~=3 & length(varargin)~=4
+            error('MS:EFFECTIVE_MEDIUM:BaWrongArgs', ...
+                'Backus (1962) layering requires 3 or 4 input parameters.') ;
+        end
+        if length(varargin)==3 % elasticity matrix form
+            h = varargin{1} ; C = varargin{2} ; rh = varargin{3} ;
+            
+            %     ** check the matrices
+            [dum dum nC] = size(C) ;
+            
+            if length(rh)~=nC
+                error('MS:EFFECTIVE_MEDIUM:BaVectorLengths', ...
+                    'Backus (1962) layering requires equal length vectors.') ;
+            end
+            
+            for iC = 1:nC
+                Ctmp = C(:,:,iC) ;
+                MS_checkC(Ctmp) ;
+                if MS_anisotropy(Ctmp) > 10*sqrt(eps) % not isotropic
+                    error('MS:EFFECTIVE_MEDIUM:BaBadC', ...
+                        'Backus (1962) layering requires isotropic input matrices.') ;
+                end
+            end
+            
+            %     ** unload the velocities
+            
+            vp = zeros(1,nC) ;
+            vs = zeros(1,nC) ;
+            vp = sqrt(squeeze(C(3,3,:)).*1e3./rh)  ;
+            vs = sqrt(squeeze(C(6,6,:)).*1e3./rh)  ;
+        else % velocity form
+            h = varargin{1} ; vp = varargin{2} ;
+            vs = varargin{3} ; rh = varargin{4} ;
+        end
+        %  ** TODO: check vector lengths
+        
+        %  ** reshape so all vectors are the same orientation
+        nl = length(h) ;
+        h =  reshape(h,1,nl) ;
+        vp = reshape(vp,1,nl) ;
+        vs = reshape(vs,1,nl) ;
+        rh = reshape(rh,1,nl) ;
+        
+        [Ceff,rh]=MS_backus_average(h,vp,vs,rh) ;
+        
+        
+    otherwise
+        error('MS:EFFECTIVE_MEDIUM:UnknownTheory', ...
+            'Specified theory is not supported.') ;
+        
 end % of switch
 
 end
