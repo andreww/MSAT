@@ -84,6 +84,13 @@
 %          direction is also shown. Each argument (azimuth, inclination, 
 %          vp, polarisation and avs) is an array and each must be the 
 %          same length.
+%
+%     MS_plot(..., 'band', axis, angle)
+%          Draw a circle onto the sphere constant angle around the 
+%          specified axis (1,2 or 3). iaxis and angle can be a scalar 
+%          or vector and must have an equal number of entries. 
+%          For example, [1 1 1] [20 30 40] will draw circles on the
+%          sphere at a constant 20, 30 and 40 degrees from the 1-axis. 
 % 
 %     MS_plot(..., 'quiet')
 %          Don't write isotropic velocities to the terminal. 
