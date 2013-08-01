@@ -256,6 +256,48 @@ switch lower(theory)
         [Ceff,rh]=MS_backus_average(h,vp,vs,rh) ;
         
         
+    case {'insaff'}
+        if length(varargin)~=9
+            error('MS:EFFECTIVE_MEDIUM:insaffWrongArgs', ...
+                'Insaff needs 9 input parameters.');
+        end
+        vp = varargin{1};
+        vs = varargin{2};
+        rho = varargin{3};
+        znh = varargin{4};
+        zth = varargin{5};
+        alp = varargin{6};
+        teps = varargin{7};
+        tgam = varargin{8};
+        tdel = varargin{9};
+        
+        % Get isotropic base tensor
+        [Ciso]=MS_iso(vp,vs,rho);
+        Siso = inv(Ciso);
+        
+        % We need Gueguen h
+        nu = MS_poisson( Ciso, [1 0 0], [0 1 0]);
+        h = (3.0*(1.0/Siso(1,1))*(2.0 - nu)) / ...
+            (32.0*(1-nu^2.0));
+        
+        % Unnormalise zn and zt
+        zn = znh/h;
+        zt = zth/h;
+        
+        % Base VTI tensor
+        [C] = MS_TI(vp,vs,rho,teps,tgam,tdel,'thomsen');
+        
+        % Add zn and zt
+        S = inv(C);
+        S(1,1) = S(1,1)+zn;
+        S(5,5) = S(5,5)+zt;
+        S(6,6) = S(6,6)+zt;
+        C = inv(S);
+        
+        % Rotate into strike (vertical fractures)
+        Ceff = MS_rot3(C,0,0,alp-90);
+        rh = rho;
+        
     otherwise
         error('MS:EFFECTIVE_MEDIUM:UnknownTheory', ...
             'Specified theory is not supported.') ;
