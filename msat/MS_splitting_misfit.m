@@ -70,7 +70,7 @@
 
 %===============================================================================
 function [varargout] = MS_splitting_misfit(fast1,tlag1,...
-                                        fast2,tlag2,spol,dfreq,varargin) ;
+                                        fast2,tlag2,spol,dfreq,varargin)
 %===============================================================================
 
    % default mode
@@ -101,12 +101,20 @@ function [varargout] = MS_splitting_misfit(fast1,tlag1,...
    if nargout>1
       error('MS:SPLITTING_MISFIT:TooManyOutputs','Too many outputs specified')
    end
-   
 
    % call the appropriate mode function
    switch lower(modeStr)
    case 'simple'
-      [misfit]=MS_splitting_misfit_simple(fast1,tlag1,fast2,tlag2,spol,dfreq) ;      
+       if isscalar(fast1)
+           misfit = MS_splitting_misfit_simple(...
+               fast1,tlag1,fast2,tlag2,spol,dfreq) ;
+       else
+           misfit = 0.0;
+           for i = 1:length(fast1)
+               misfit = misfit + MS_splitting_misfit_simple(...
+                   fast1(i),tlag1(i),fast2(i),tlag2(i),spol,dfreq) ; 
+           end
+       end
    case 'intensity'
       [misfit]=MS_splitting_misfit_intensity(fast1,tlag1,fast2,tlag2,spol,dfreq) ;      
    case 'lam2'
