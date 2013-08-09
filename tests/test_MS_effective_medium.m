@@ -173,3 +173,51 @@ function test_MS_effective_splitting_insaff
     assertElementsAlmostEqual(C, Cexpect, 'relative', 0.04, 0.2)
             
 end
+
+function test_MS_effective_splitting_insaff_HTI
+
+    % From ice inversion with units into GPa - calculated with fortran code
+    Cexpect = [  9.481    4.391  4.447 0.0       0.0       -0.292547 ; ...
+                 4.391   11.131  4.976 0.0       0.0       -0.313082 ; ...
+                 4.447    4.976 11.337 0.0       0.0       -0.194151 ; ...
+                 0.0      0.0    0.0   3.129    -0.060700   0.0      ; ...
+                 0.0      0.0    0.0  -0.060700  2.963      0.0      ; ...
+                -0.292547 -0.313082 -0.194151 0.0 0.0       2.951];
+    
+    % Do we get the same result
+    [C, ~] = MS_effective_medium('insaff', 3.600, 1.850, 920.0, ...
+        1.074*0.032*1.45932557, 0.032*1.45932557, ...
+        71.860, 0.0, 0.0, 0.0);
+    
+    %[Ciso,Chex,Ctet,Cort,Cmon,Ctri] = MS_decomp(C)
+    %[Ciso,Chex,Ctet,Cort,Cmon,Ctri] = MS_decomp(Cexpect)
+    % Allow 5% error or 0.2GPa, whichever is larger.
+    assertElementsAlmostEqual(C, Cexpect, 'relative', 0.04, 0.2)
+            
+end
+
+function test_MS_effective_splitting_insaff_VTI
+
+    % FIXME: better test needed.
+    % NB: The 'correct' output matrix is not positive definate. But if 
+    % we comment out the checks (the MS_checkC at the end of MS_TI and 
+    % the rotation at the end of the insaff routine we get this matrix...
+    %
+    % From ice inversion with units into GPa - calculated with fortran code
+    Cexpect = [  11.923    0.587903  9.136 0.0       0.0       0.0 ; ...
+                 0.587903   11.923  9.136 0.0       0.0        0.0 ; ...
+                 9.136     9.136 11.923 0.0       0.0        0.0 ; ...
+                 0.0      0.0    0.0   3.149     0.0        0.0      ; ...
+                 0.0      0.0    0.0   0.0       3.149      0.0      ; ...
+                 0.0      0.0    0.0   0.0       0.0       5.668];
+    
+    % Do we get the same result
+    [C, ~] = MS_effective_medium('insaff', 3.600, 1.850, 920.0, ...
+        0.0, 0.0, 0.0, 0.0, 0.400, 0.353);
+    
+    %[Ciso,Chex,Ctet,Cort,Cmon,Ctri] = MS_decomp(C)
+    %[Ciso,Chex,Ctet,Cort,Cmon,Ctri] = MS_decomp(Cexpect)
+    % Allow 5% error or 0.2GPa, whichever is larger.
+    assertElementsAlmostEqual(C, Cexpect, 'relative', 0.04, 0.2)
+            
+end
