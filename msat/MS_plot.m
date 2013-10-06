@@ -35,14 +35,15 @@
 %          colorscales. Setting this option results in red being fast/high.
 %
 %     MS_plot(..., 'pcontours', pcvect)
+%     MS_plot(..., 'avscontours', ascvect)
 %     MS_plot(..., 'scontours', scvect)
-%          Set the contour levels for the P-wave velocity and S-wave
-%          anisotropy plots. The values of pcvect and scvect can be scalars
-%          indicating the number of contour lines to use or vectors, where
-%          each value represents a different contour line. Thus, the
-%          minimum, maximum values and spacing of contours can easily be
-%          set using the syntax [minval:spacing:maxval] for pcvect and
-%          scvect.
+%          Set the contour levels for the P-wave velocity, S-wave
+%          anisotropy and (optional) S-wave velocity plots. The values of 
+%          pcvect, ascvect and scvect can be scalars indicating the number 
+%          of contour lines to use or vectors, where each value represents 
+%          a different contour line. Thus, the minimum, maximum values and 
+%          spacing of contours can easily be set using the syntax 
+%          [minval:spacing:maxval] for pcvect ascvect or scvect.
 %
 %     MS_plot(..., 'limitsonpol')
 %          Include markers for the maximum and minimum values of S-wave
@@ -186,7 +187,7 @@ function MS_plot(C,rh,varargin)
             case 'avscontours'
                AVScvect = varargin{iarg+1} ;
                iarg = iarg + 2 ;
-            case 'vscontours'
+            case 'scontours'
                VScvect = varargin{iarg+1} ;
                iarg = iarg + 2 ;
             case 'limitsonpol'
