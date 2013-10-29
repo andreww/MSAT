@@ -1,5 +1,5 @@
 % MS_TI - generate elastic constants for a vertically transverse isotropic
-%             medium from specified parameter sets. Symmetry is in the 3-axis. 
+%          medium from specified parameter sets. Symmetry is in the 3-axis. 
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
@@ -74,8 +74,33 @@
 %
 %   Calculates the elastic tensor for a VTI medium from Love (1927) parameters.
 %
+%'anderson'
+%~~~~~~~~~~
+%
+%   [C]=MS_TI(Vpv, Vph, Vp45, Vsv, Vsh, rho, 'anderson')
+%
+%   Inputs:
+%        Vpv    : Velocity of P-wave along 3-axis
+%        Vph    : Velocity of P-wave normal to 3-axis
+%        Vp45   : Velocity of P-wave at 45 degrees to 3-axis
+%        Vsv    : Velocity of S-wave along 3-axis (or normal to 3-axis
+%                 polarised normal to 1-2 plane)
+%        Vsh    : Velocity of S-wave normal 3-axis polarised
+%                 parallel to 1-2 plane
+%        rho    : Density
+%
+%   Output:
+%        C : Stiffness tensor (6x6 notation, GPa)
+%
+%   Calculates the elastic tensor for a VTI medium from Anderson's (1961)
+%   parameters. Velocities in km/s, density in kg/m^3.
+%
 %References
 %~~~~~~~~~~
+%
+%     Anderson, D. L. (1961) "Elastic wave propagation in layered
+%         anisotropic media" Journal of Geophysical Research 66:2953 - 2963
+%
 %     Thomsen, L. (1986) "Weak elastic anisotropy" Geophysics 
 %         vol.51 pp.1954-1966
 %
@@ -92,7 +117,7 @@
 %
 % See also: MS_iso, MS_elasticDB
 
-% Copyright (c) 2011-2012, James Wookey and Andrew Walker
+% Copyright (c) 2011-2013, James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
@@ -185,6 +210,15 @@ switch lower(pset)
       N = varargin{4} ; F = varargin{5} ; 
       [C]=MS_love(A,C_love,L,N,F) ;
 %-------------------------------------------------------------------------------
+   case {'anderson'}
+      if length(varargin)~=7 % need to check 
+         error('MS:TI:AndersonWrongArgs', ...
+         'Anderson (1961) requires 6 input parameters.') ;
+      end
+      Vpv = varargin{1} ; Vph = varargin{2}; Vp45 = varargin{3};
+      Vsv = varargin{4} ; Vsh = varargin{5}; rho = varargin{6};
+      [C]=MS_anderson(Vpv, Vph, Vp45, Vsv, Vsh, rho);
+%--------------------------------------------------------------------------
    otherwise
       error('MS:TI:UnknownParSet', ...
          'Specified parameter set is not supported.') ;
@@ -298,10 +332,10 @@ function [C]=MS_thomsen(vp,vs,rh,eps,gam,del)
    vs=vs*1e3;
 
    C=zeros(6,6) ;
-   C(3,3) = vp*vp ;
-   C(4,4) = vs*vs ;
-   C(6,6) = C(4,4)*(2.0*gam +1.0) ;
-   C(1,1) = C(3,3)*(2.0*eps +1.0) ;
+   C(3,3) = vp*vp ; % Eq 9a in Thomsen paper.
+   C(4,4) = vs*vs ; % 9b
+   C(6,6) = C(4,4)*(2.0*gam +1.0) ; % 8b
+   C(1,1) = C(3,3)*(2.0*eps +1.0) ; % 8a
    
    btm = 2.0*C(4,4) ;
    term = C(3,3) - C(4,4) ;
@@ -329,5 +363,31 @@ function [C]=MS_thomsen(vp,vs,rh,eps,gam,del)
 
 %  convert to GPa
    C = C.*rh./1e9 ;
+
+end
+
+function [C]=MS_anderson(Vpv, Vph, Vp45, Vsv, Vsh, rho)
+
+    % Convert V to m/s
+    Vpv = Vpv*1e3;
+    Vph = Vph*1e3;
+    Vp45 = Vp45*1e3;
+    Vsv = Vsv*1e3;
+    Vsh = Vsh*1e3;
+    
+    C = zeros(6);
+    C(1,1) = Vph^2 * rho;
+    C(3,3) = Vpv^2 * rho;
+    C(4,4) = Vsv^2 * rho;
+    C(1,2) = C(1,1) - (Vsh^2 * 2.0 * rho);
+    C(6,6) = 0.5*(C(1,1)-C(1,2));
+    C(1,3) = sqrt( ((2.0 * rho * Vp45^2) - ...
+                   (0.5*(C(1,1)+C(3,3)+2*C(4,4))))^2 - ...
+                   (0.5*(C(1,1)-C(3,3))^2)) - C(4,4);
+    % Fill in the gaps.
+    C(1,2) = 0.0 ; % So we can expand
+    C = MS_expand(C, 'vti');        
+    % Convert C from Pa to GPa
+    C = C./1e9;
 
 end
