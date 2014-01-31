@@ -33,7 +33,7 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function [Cs,rhos,thickness] = glacial_splitting()
+function [Cs,rhos,thickness,fast,tlag] = glacial_splitting()
 
     all_data = get_data(); % This should be optional - argument needed
     
@@ -63,9 +63,13 @@ function [Cs,rhos,thickness] = glacial_splitting()
         
         
         % Set up inclination and azimuth
-        % inc=90.0
-        % azi=0.0
+        inc=90.0
+        azi=0.0
         % MS_phasevels()
+        
+        [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), rhos(j), inc, azi );
+        fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
+        tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
         
     end
 end
@@ -77,7 +81,7 @@ function [C_poly, rho_poly] = Cs_from_EBSD_file(C_single, ...
     % TODO Read Eulers from file...
     % For now
     nxtls = 2;
-    eulers = zeros(3,2);
+    eulers = ones(3,2);
                                             
     Cs = zeros(6,6,nxtls);
     for i = 1:nxtls
