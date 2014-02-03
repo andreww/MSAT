@@ -80,20 +80,27 @@ end
 
 function [C_poly, rho_poly] = Cs_from_EBSD_file(C_single, ...
                                                 rho_single, filename)
-                                            
-    % TODO Read Eulers from file...
-    % For now
-    nxtls = 2;
-    eulers = ones(3,2);
-                                            
+    % Calculate poly-xtal elasticity of ice 
+    % sample from EBSD data and single crystal 
+    % elasticity
+    
+    % Read Eulers from data file
+    [eulers, nxtls] = read_EBSD_txt(filename);
+          
+    % List of elasticities and densities for each crystal 
     Cs = zeros(6,6,nxtls);
+    rhos = zeros(1,nxtls);
     for i = 1:nxtls
-        Cs(:,:,i) = MS_rotEuler(C_single, eulers(1,i), eulers(2,i), eulers(3,i));
+       Cs(:,:,i) = C_single(:,:);
+       rhos(i) = rho_single;
     end
-    rhos = ones(nxtls,1)*rho_single; % All crystals have the same density.
-    vfs = ones(nxtls,1);             % Same volume fraction for each point 
-                                     % - normalised by MS_VRH.
-    [C_poly, rho_poly] = MS_VRH(vfs, Cs, rhos);
+
+    % Rotate the Cs to give texture
+    Cs = MS_rotEuler(Cs, eulers(1,:)', eulers(2,:)', eulers(3,:)', ...
+        'sense', 'passive');
+  
+    % Form VRH mean - each grain has the same volume.
+    [C_poly, rho_poly] = MS_VRH(ones(nxtls,1), Cs, rhos);
 end
 
     
@@ -117,16 +124,40 @@ function [data] = get_data()
     % elements run from surface to base
     % (i.e. they need reversing for 
     % MS_effective_splitting_N)
-    data(1) = struct('tex_file', 'some_file_name', ...
-                     'dtb', 10, ... % depth to base of layer m
+    
+    % Deal with file seperators in a cross platform way.
+    dat_dir = fullfile('~andreww', 'Science', 'Ice_EBSD_data');
+    
+    data(1) = struct('tex_file', fullfile(dat_dir, 'V97-248R.txt'), ...
+                     'dtb', 2850, ... % depth to base of layer m
                      'Tav', -10, ... % Average temperature (deg. C)
                      'azi', 0); % Horizonal rotation for texture
-    data(2) = struct('tex_file', 'some_file_name', ...
-                     'dtb', 100, ... 
+    data(2) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ...
+                     'dtb', 3100, ... 
                      'Tav', -20, ... 
                      'azi', 10);             
-    data(3) = struct('tex_file', 'some_file_name', ...
-                     'dtb', 400, ... 
+    data(3) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ...
+                     'dtb', 3600, ... 
                      'Tav', -1, ... 
                      'azi', 0); 
+end
+
+function [eulers, nxtl] = read_EBSD_txt(filename)
+    % Given a file name, read the Euler angles 
+    % given in the format used by the ice data
+    % files. Output is a (3,nxtl) array of 
+    % Euler angles (hopefully in Bunge convention
+    % and degrees) and the number of crystals, nxtl.
+
+    fid = fopen(filename); % Read - the default
+    assert((fid~=-1), 'Could not open file %s', filename);
+    fgetl(fid); % Header line - ignore
+    data = fscanf(fid, '%f', [12 inf]);
+    nxtl = length(data(1,:));
+    eulers = zeros(3,nxtl);
+    eulers(1,:) = data(3,:); % phi1
+    eulers(2,:) = data(4,:); % phi1
+    eulers(3,:) = data(5,:); % phi1
+    fclose(fid);
+   
 end
