@@ -57,7 +57,7 @@ function [fast_eff,tlag_eff] = glacial_splitting()
         end
         
         % Single crystal elasticity of this layer
-        [C, rho] = ice_cij(all_data(i).Tav);
+        [C, rho] = ice_cij(all_data(i).Tav)
         
         % Calculate poly xtal elasticity of this layer 
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C,rho,all_data(i).tex_file);
@@ -124,15 +124,21 @@ end
 function [C, r] = ice_cij(T)
     % Return the single crystal elasticity and 
     % density as a function of temperature in deg. C
-    % FIXME: Do we need to use P too?
-    % results are in GPa and kg/m^3
+    % results are in GPa and kg/m^3. 
+    % We ignore pressure. 3 km of ice is ~0.03 GPa. Void
+    % space is a much bigger approximation.
+        
+    % Get C at -16C
+    [C0, ~] = MS_elasticDB('ice');
     
-    % For now, just use one elasticty 
-    % FIXME: add a sensible parameterisation
-    % AMW to fix this.
+    % Correction to T from e.q. 9 of 
+    % Gammon et al 1983.
+    C = C0*(1-1.42E-3*(T+16.0));
     
-    [C, r] = MS_elasticDB('ice');
-    
+    % Density from e.g. 2 of above paper: Note T in deg C!
+    fac = 1 + 1.576E-4*T - 2.778E-7*T^2 + 8.850E-9*T^3 - 1.778E-10*T^4;
+    r = (1.0/999.840)*fac; %table 2.3 of physics of ice. In useful units
+    r = 1/r;
 end
 
 function [data] = get_data()
@@ -186,7 +192,7 @@ function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav)
         filename, dtt, dtb, dtb-dtt, tav); 
     
     MS_plot(Cvrh, rho, 'wtitle', filename, 'fontsize', 11, ...
-        'avscontours', 0:0.2:10.16, 'pcontours', 3.8:0.01:3.99, ...
+        'avscontours', 0:0.2:10.16, 'pcontours', 3.60:0.01:3.80, ...
         'polsize', 0.18, 0.16, 2.0, 1.0, 'limitsonpol');
 
 end
