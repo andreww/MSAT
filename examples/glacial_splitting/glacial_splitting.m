@@ -41,16 +41,18 @@ function [fast_eff,tlag_eff] = glacial_splitting()
     thickness = zeros(1,length(all_data));
     Cs = zeros(6,6,length(all_data));
     rhos = zeros(1,length(all_data));
+    fast = zeros(1,length(all_data));
+    tlag = zeros(1,length(all_data));
     j = 0;
     for i=length(all_data):-1:1
         j = j + 1; % switch array order
         
         % Thickness of this layer
         if (i==1) 
-            thickness(j) = all_data(i).dtb;
+            thickness(j) = (all_data(i).dtb)/1000.0; % In km!
             dtt = 0;
         else
-            thickness(j) = all_data(i).dtb - all_data(i-1).dtb;
+            thickness(j) = (all_data(i).dtb - all_data(i-1).dtb)/1000.0;%km
             dtt = all_data(i-1).dtb;
         end
         
@@ -67,8 +69,9 @@ function [fast_eff,tlag_eff] = glacial_splitting()
         inc=90.0;
         azi=0.0;
         
-        [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), rhos(j), inc, azi );
-        fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
+        [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), ...
+            rhos(j), inc, azi );
+        fast(j) = pol; % FIXME: do we need to convert to geog ref? 
         tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
         
     end
@@ -77,9 +80,17 @@ function [fast_eff,tlag_eff] = glacial_splitting()
     freq = 30; % 30 Hz
     spol = 45;
     
-    [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag);
-    %[fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag,'mode','GaussianWavelet','PlotWavelet');
+    %[fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag);
+    [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
+        tlag,'mode','GaussianWavelet','PlotWavelet');
     
+    % FIXME: do we need to correct fast_eff here? We are working in
+    % ray frame at the momenet.
+    % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
+    
+    fprintf('\n');
+    fprintf('Effective fast direction: %f (deg)\n', fast_eff);
+    fprintf('Effective delay time:     %f (s)\n', tlag_eff);
 end
 
 
