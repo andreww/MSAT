@@ -148,7 +148,7 @@ function [data] = get_data()
     % MS_effective_splitting_N)
     
     % Deal with file seperators in a cross platform way.
-    dat_dir = fullfile('~andreww', 'Science', 'Ice_EBSD_data');
+    dat_dir = fullfile('~', 'Dropbox', 'Ice_EBSD_data');
     
     data(1) = struct('tex_file', fullfile(dat_dir, 'V97-248R.txt'), ...
                      'dtb', 2850, ... % depth to base of layer m
