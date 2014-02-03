@@ -33,7 +33,7 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function [Cs,rhos,thickness,fast,tlag] = glacial_splitting()
+function [fast_eff,tlag_eff] = glacial_splitting()
 
     all_data = get_data(); % This should be optional - argument needed
     
@@ -59,19 +59,22 @@ function [Cs,rhos,thickness,fast,tlag] = glacial_splitting()
         % TODO  
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C,rho,all_data(i).tex_file);
         
-        
-        
-        
         % Set up inclination and azimuth
-        inc=90.0
-        azi=0.0
-        % MS_phasevels()
+        inc=90.0;
+        azi=0.0;
         
         [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), rhos(j), inc, azi );
         fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
         tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
         
     end
+    
+    % Calculate effective splitting
+    freq = 30; % 30 Hz
+    spol = 0;
+    
+    [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag,'mode','GaussianWavelet','PlotWavelet');
+    
 end
 
 
