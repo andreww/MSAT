@@ -71,7 +71,7 @@ function [fast_eff,tlag_eff] = glacial_splitting()
     
     % Calculate effective splitting
     freq = 30; % 30 Hz
-    spol = 0;
+    spol = 45;
     
     [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag,'mode','GaussianWavelet','PlotWavelet');
     
