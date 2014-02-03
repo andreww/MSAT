@@ -48,16 +48,20 @@ function [fast_eff,tlag_eff] = glacial_splitting()
         % Thickness of this layer
         if (i==1) 
             thickness(j) = all_data(i).dtb;
+            dtt = 0;
         else
             thickness(j) = all_data(i).dtb - all_data(i-1).dtb;
+            dtt = all_data(i-1).dtb;
         end
         
         % Single crystal elasticity of this layer
         [C, rho] = ice_cij(all_data(i).Tav);
         
-        % Calculate poly xtal elasticity of this layer
-        % TODO  
+        % Calculate poly xtal elasticity of this layer 
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C,rho,all_data(i).tex_file);
+        
+        report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
+            all_data(i).dtb, dtt, all_data(i).Tav)
         
         % Set up inclination and azimuth
         inc=90.0;
@@ -73,7 +77,8 @@ function [fast_eff,tlag_eff] = glacial_splitting()
     freq = 30; % 30 Hz
     spol = 45;
     
-    [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag,'mode','GaussianWavelet','PlotWavelet');
+    [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag);
+    %[fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag,'mode','GaussianWavelet','PlotWavelet');
     
 end
 
@@ -160,4 +165,17 @@ function [eulers, nxtl] = read_EBSD_txt(filename)
     eulers(3,:) = data(5,:); % phi1
     fclose(fid);
    
+end
+
+function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav)
+
+    fprintf('Layer: %i\n', layernum);
+    fprintf(['data file: %s, \ntop: %f m, base: %f m, \n'...
+        'thickness: %f m, teperature: %f C\n'], ...
+        filename, dtt, dtb, dtb-dtt, tav); 
+    
+    MS_plot(Cvrh, rho, 'wtitle', filename, 'fontsize', 11, ...
+        'avscontours', 0:0.2:10.16, 'pcontours', 3.8:0.01:3.99, ...
+        'polsize', 0.18, 0.16, 2.0, 1.0, 'limitsonpol');
+
 end
