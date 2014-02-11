@@ -16,6 +16,10 @@
 %       Generate phase velocity / splitting pole figures
 %   glacial_splitting(..., 'splittingplot')
 %       Plot the wavelets for each effective splitting calc
+%   glacial_splitting(..., 'mode', eff_split_mode)
+%       String passed into the mode argument of MS_effective_splitting_N.
+%       Note that setting this to 'GaussianWavelet' results in a much 
+%       longer execution time.
 
 % (C) Alan Baird and Andrew Walker, 2014
 % 
@@ -55,15 +59,19 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Setup defaults for options
     plot_pole = 0; % Phase velocity plot
     plot_waves = 0; % Gaussian wavelemt plot
+    eff_split_mode = 's&s';
     % Process those optional arguments
     iarg = 1;
     while iarg <= (length(varargin))
         switch lower(varargin{iarg})
             case 'phasepole'
                 plot_pole = 1;
-                iarg = iarg + 2;
+                iarg = iarg + 1;
             case 'splittingplot'
                 plot_waves = 1;
+                iarg = iarg + 1;
+            case 'mode'
+                eff_split_mode = lower(varargin{iarg+1});
                 iarg = iarg + 2;
             otherwise
                 warning(['Unknown option: ' varargin{iarg}]) ;
@@ -117,7 +125,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     
             [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
                      rhos, thickness, inc, azi, freq(f), spol(s), ...
-                     plot_waves); 
+                     plot_waves, eff_split_mode); 
     
             % FIXME: do we need to correct fast_eff here? We are working in
             % ray frame at the momenet.
@@ -156,7 +164,7 @@ end
 
 
 function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
-             thickness, inc, azi, freq, spol, plot_waves)
+             thickness, inc, azi, freq, spol, plot_waves, eff_split_mode)
 
         % Header line for table...
         fprintf('\n    time lag (s)     fast direction (deg)\n');
@@ -178,10 +186,10 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
         % Calculate effective splitting
         if plot_waves
             [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
-                tlag,'mode','GaussianWavelet','PlotWavelet');
+                tlag,'mode',eff_split_mode,'PlotWavelet');
         else 
             [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
-                tlag,'mode','GaussianWavelet');
+                tlag,'mode',eff_split_mode);
         end
 end
 
