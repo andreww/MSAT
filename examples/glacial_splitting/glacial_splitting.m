@@ -73,17 +73,24 @@ function [fast_eff,tlag_eff] = glacial_splitting()
     azi=0.0;
     freq = 30; % 30 Hz
     % spol=45;
-    spol = 90;
-    [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, thickness, ...
-                 inc, azi, freq, spol) 
+    % Loop over source polarizations
+    spol = 0:15:180;
+    fast_eff = zeros(1,length(spol));
+    tlag_eff = zeros(1,length(spol));
+    for s = 1:length(spol)
     
-    % FIXME: do we need to correct fast_eff here? We are working in
-    % ray frame at the momenet.
-    % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
+        [fast_eff(s), tlag_eff(s)] = do_effective_splitting(Cs, rhos, thickness, ...
+                     inc, azi, freq, spol(s)); 
     
-    fprintf('\n');
-    fprintf('Effective fast direction: %f (deg)\n', fast_eff);
-    fprintf('Effective delay time:     %f (s)\n', tlag_eff);
+        % FIXME: do we need to correct fast_eff here? We are working in
+        % ray frame at the momenet.
+        % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
+    
+        fprintf('\n');
+        fprintf('For source polarization of: %f (deg)\n', spol(s));
+        fprintf('Effective fast direction: %f (deg)\n', fast_eff(s));
+        fprintf('Effective delay time:     %f (s)\n', tlag_eff(s));
+    end 
 end
 
 
