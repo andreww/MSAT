@@ -37,6 +37,13 @@ function [fast_eff,tlag_eff] = glacial_splitting()
 
     all_data = get_data(); % This should be optional - argument needed
     
+    % Set up inclination and azimuth
+    inc=90.0;
+    azi=0.0;
+    freq = 30; % 30 Hz
+    % spol=45;
+    spol = 90;
+    
     % Build Cij and thickness arrays - bottom to top
     thickness = zeros(1,length(all_data));
     Cs = zeros(6,6,length(all_data));
@@ -45,7 +52,7 @@ function [fast_eff,tlag_eff] = glacial_splitting()
     tlag = zeros(1,length(all_data));
     j = 0;
     for i=length(all_data):-1:1
-        j = j + 1; % switch array order
+        j = j + 1; % switch array order (read i, write j)
         
         % Thickness of this layer
         if (i==1) 
@@ -57,30 +64,23 @@ function [fast_eff,tlag_eff] = glacial_splitting()
         end
         
         % Single crystal elasticity of this layer
-        [C, rho] = ice_cij(all_data(i).Tav)
+        [C, rho] = ice_cij(all_data(i).Tav);
         
         % Calculate poly xtal elasticity of this layer 
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C,rho,all_data(i).tex_file);
-        
-        report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
-            all_data(i).dtb, dtt, all_data(i).Tav)
-        
-        % Set up inclination and azimuth
-        inc=90.0;
-        azi=0.0;
-        
+ 
+        % Calculate the splitting parameters for this layer
         [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), ...
             rhos(j), inc, azi );
         fast(j) = pol; % FIXME: do we need to convert to geog ref? 
         tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
         
+        report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
+            all_data(i).dtb, dtt, all_data(i).Tav, fast(j), tlag(j))
+            
     end
     
     % Calculate effective splitting
-    freq = 30; % 30 Hz
-    %spol = 45;
-    spol = 90;
-    
     %[fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag);
     [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
         tlag,'mode','GaussianWavelet','PlotWavelet');
@@ -205,12 +205,14 @@ function [eulers, nxtl] = read_EBSD_txt(filename)
    
 end
 
-function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav)
+function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav, ...
+    fast, tlag)
 
-    fprintf('Layer: %i\n', layernum);
+    fprintf('\nLayer: %i\n', layernum);
     fprintf(['data file: %s, \ntop: %f m, base: %f m, \n'...
         'thickness: %f m, teperature: %f C\n'], ...
-        filename, dtt, dtb, dtb-dtt, tav); 
+        filename, dtt, dtb, dtb-dtt, tav);
+    fprintf('time lag: %f (s), fast direction: %f (deg)\n', tlag, fast);
     
     %MS_plot(Cvrh, rho, 'wtitle', filename, 'fontsize', 11, ...
     %    'avscontours', 0:0.2:10.16, 'pcontours', 3.60:0.01:3.80, ...
