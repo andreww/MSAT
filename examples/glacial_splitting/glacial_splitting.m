@@ -68,28 +68,31 @@ function [fast_eff,tlag_eff] = glacial_splitting()
 
 
     % Set up inclination and azimuth and effective splitting
-    % params
+    % params. These two could be functions of spol, for eg.
     inc=90.0;
     azi=0.0;
-    freq = 30; % 30 Hz
-    % spol=45;
     % Loop over source polarizations
-    spol = 0:15:180;
-    fast_eff = zeros(1,length(spol));
-    tlag_eff = zeros(1,length(spol));
-    for s = 1:length(spol)
+    % and frequencies
+    spol = 0:15:180; % Deg
+    freq = [0.3, 3.0, 30.0]; % Hz
+    fast_eff = zeros(length(freq),length(spol));
+    tlag_eff = zeros(length(freq),length(spol));
+    for f = 1:length(freq)
+        for s = 1:length(spol)
     
-        [fast_eff(s), tlag_eff(s)] = do_effective_splitting(Cs, rhos, thickness, ...
-                     inc, azi, freq, spol(s)); 
+            [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
+                     rhos, thickness, inc, azi, freq(f), spol(s)); 
     
-        % FIXME: do we need to correct fast_eff here? We are working in
-        % ray frame at the momenet.
-        % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
+            % FIXME: do we need to correct fast_eff here? We are working in
+            % ray frame at the momenet.
+            % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
     
-        fprintf('\n');
-        fprintf('For source polarization of: %f (deg)\n', spol(s));
-        fprintf('Effective fast direction: %f (deg)\n', fast_eff(s));
-        fprintf('Effective delay time:     %f (s)\n', tlag_eff(s));
+            fprintf('\n');
+            fprintf('For source polarization of: %f (deg)', spol(s));
+            fprintf(' and frequency: %f (Hz)\n', freq(f));
+            fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
+            fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
+        end
     end 
 end
 
