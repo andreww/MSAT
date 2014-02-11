@@ -37,20 +37,12 @@ function [fast_eff,tlag_eff] = glacial_splitting()
 
     all_data = get_data(); % This should be optional - argument needed
     
-    % Set up inclination and azimuth
-    inc=90.0;
-    azi=0.0;
-    freq = 30; % 30 Hz
-    % spol=45;
-    spol = 90;
-    
     % Build Cij and thickness arrays - bottom to top
     thickness = zeros(1,length(all_data));
     Cs = zeros(6,6,length(all_data));
     rhos = zeros(1,length(all_data));
-    fast = zeros(1,length(all_data));
-    tlag = zeros(1,length(all_data));
     j = 0;
+    fprintf('\nLayer data (bottom to top) \n');
     for i=length(all_data):-1:1
         j = j + 1; % switch array order (read i, write j)
         
@@ -69,21 +61,21 @@ function [fast_eff,tlag_eff] = glacial_splitting()
         % Calculate poly xtal elasticity of this layer 
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C,rho,all_data(i).tex_file);
  
-        % Calculate the splitting parameters for this layer
-        [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), ...
-            rhos(j), inc, azi );
-        fast(j) = pol; % FIXME: do we need to convert to geog ref? 
-        tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
-        
         report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
-            all_data(i).dtb, dtt, all_data(i).Tav, fast(j), tlag(j))
+            all_data(i).dtb, dtt, all_data(i).Tav)
             
     end
-    
-    % Calculate effective splitting
-    %[fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag);
-    [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
-        tlag,'mode','GaussianWavelet','PlotWavelet');
+
+
+    % Set up inclination and azimuth and effective splitting
+    % params
+    inc=90.0;
+    azi=0.0;
+    freq = 30; % 30 Hz
+    % spol=45;
+    spol = 90;
+    [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, thickness, ...
+                 inc, azi, freq, spol) 
     
     % FIXME: do we need to correct fast_eff here? We are working in
     % ray frame at the momenet.
@@ -92,6 +84,33 @@ function [fast_eff,tlag_eff] = glacial_splitting()
     fprintf('\n');
     fprintf('Effective fast direction: %f (deg)\n', fast_eff);
     fprintf('Effective delay time:     %f (s)\n', tlag_eff);
+end
+
+
+function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
+             thickness, inc, azi, freq, spol)
+
+        % Header line for table...
+        fprintf('\n    time lag (s)     fast direction (deg)\n');
+        fprintf('    =====================================\n');
+        % Loop over layers and calculate splitting parameters 
+        fast = zeros(1,length(rhos));
+        tlag = zeros(1,length(rhos));
+        for j = 1:length(rhos)
+
+            % Calculate the splitting parameters for this layer
+            [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), ...
+                rhos(j), inc, azi );
+            fast(j) = pol; % FIXME: do we need to convert to geog ref? 
+            tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
+
+            fprintf('    %7f        %7f \n', tlag(j), fast(j));
+        end
+    
+        % Calculate effective splitting
+        %[fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag);
+        [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
+            tlag,'mode','GaussianWavelet','PlotWavelet');
 end
 
 
@@ -120,8 +139,7 @@ function [C_poly, rho_poly] = Cs_from_EBSD_file(C_single, ...
     [C_poly, rho_poly] = MS_VRH(ones(nxtls,1), Cs, rhos);
 end
 
-    
-    
+
 function [C, r] = ice_cij(T)
     % Return the single crystal elasticity and 
     % density as a function of temperature in deg. C
@@ -142,6 +160,7 @@ function [C, r] = ice_cij(T)
     r = 1/r;
 end
 
+
 function [data] = get_data()
     % Return default data structure
     % elements run from surface to base
@@ -150,7 +169,9 @@ function [data] = get_data()
     
     % Deal with file seperators in a cross platform way.
     dat_dir = fullfile('~', 'Dropbox', 'Ice_EBSD_data');
-    
+
+    % FIXME: AFB - A comment here as to where these layers 
+    % come from is critical
     data(1) = struct('tex_file', fullfile(dat_dir, 'V97-248R.txt'), ...
                      'dtb', 450, ... % depth to base of layer m
                      'Tav', -25, ... % Average temperature (deg. C)
@@ -202,8 +223,8 @@ function [eulers, nxtl] = read_EBSD_txt(filename)
     eulers(2,:) = data(4,:); % phi1
     eulers(3,:) = data(5,:); % phi1
     fclose(fid);
-   
 end
+
 
 function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav, ...
     fast, tlag)
@@ -212,7 +233,6 @@ function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav, ...
     fprintf(['data file: %s, \ntop: %f m, base: %f m, \n'...
         'thickness: %f m, teperature: %f C\n'], ...
         filename, dtt, dtb, dtb-dtt, tav);
-    fprintf('time lag: %f (s), fast direction: %f (deg)\n', tlag, fast);
     
     %MS_plot(Cvrh, rho, 'wtitle', filename, 'fontsize', 11, ...
     %    'avscontours', 0:0.2:10.16, 'pcontours', 3.60:0.01:3.80, ...
