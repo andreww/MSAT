@@ -1,4 +1,21 @@
-% Comments
+% GLACIAL_SPLITTING.M - and example script for modelling glacial anisotropy
+% 
+% This script allows textural data measured from samples recovered
+% from an ice sheet core to be used to calculate the expected 
+% shear wave splitting parameters for a various possible observations.
+% Input data is in the form of measured LPOs of ice and layer information.
+% This is converted into the polycrystal elasticity and then into layer
+% by layer splitting parameters. These parameters are combined to form
+% the effective splitting.
+% 
+% The script is packaged as a function taking a number of optional
+% arguments but it can be run without arguments. The arguments can
+% be given in any order and are:
+% 
+%   glacial_splitting(..., 'phasepole')
+%       Generate phase velocity / splitting pole figures
+%   glacial_splitting(..., 'splittingplot')
+%       Plot the wavelets for each effective splitting calc
 
 % (C) Alan Baird and Andrew Walker, 2014
 % 
@@ -33,8 +50,27 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function [fast_eff,tlag_eff] = glacial_splitting()
+function [fast_eff,tlag_eff] = glacial_splitting(varargin)
 
+    % Setup defaults for options
+    plot_pole = 0; % Phase velocity plot
+    plot_waves = 0; % Gaussian wavelemt plot
+    % Process those optional arguments
+    iarg = 1;
+    while iarg <= (length(varargin))
+        switch lower(varargin{iarg})
+            case 'phasepole'
+                plot_pole = 1;
+                iarg = iarg + 2;
+            case 'splittingplot'
+                plot_waves = 1;
+                iarg = iarg + 2;
+            otherwise
+                warning(['Unknown option: ' varargin{iarg}]) ;
+                iarg = iarg + 1;
+        end
+    end
+    
     all_data = get_data(); % This should be optional - argument needed
     
     % Build Cij and thickness arrays - bottom to top
@@ -60,12 +96,11 @@ function [fast_eff,tlag_eff] = glacial_splitting()
         
         % Calculate poly xtal elasticity of this layer 
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C,rho,all_data(i).tex_file);
- 
+
         report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
-            all_data(i).dtb, dtt, all_data(i).Tav)
+            all_data(i).dtb, dtt, all_data(i).Tav, plot_pole)
             
     end
-
 
     % Set up inclination and azimuth and effective splitting
     % params. These two could be functions of spol, for eg.
@@ -81,7 +116,8 @@ function [fast_eff,tlag_eff] = glacial_splitting()
         for s = 1:length(spol)
     
             [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
-                     rhos, thickness, inc, azi, freq(f), spol(s)); 
+                     rhos, thickness, inc, azi, freq(f), spol(s), ...
+                     plot_waves); 
     
             % FIXME: do we need to correct fast_eff here? We are working in
             % ray frame at the momenet.
@@ -98,7 +134,7 @@ end
 
 
 function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
-             thickness, inc, azi, freq, spol)
+             thickness, inc, azi, freq, spol, plot_waves)
 
         % Header line for table...
         fprintf('\n    time lag (s)     fast direction (deg)\n');
@@ -118,9 +154,13 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
         end
     
         % Calculate effective splitting
-        %[fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,tlag);
-        [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
-            tlag,'mode','GaussianWavelet','PlotWavelet');
+        if plot_waves
+            [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
+                tlag,'mode','GaussianWavelet','PlotWavelet');
+        else 
+            [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
+                tlag,'mode','GaussianWavelet');
+        end
 end
 
 
@@ -216,6 +256,7 @@ function [data] = get_data()
                      'azi', 0);   
 end
 
+
 function [eulers, nxtl] = read_EBSD_txt(filename)
     % Given a file name, read the Euler angles 
     % given in the format used by the ice data
@@ -237,15 +278,17 @@ end
 
 
 function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav, ...
-    fast, tlag)
+    plot_pole)
 
     fprintf('\nLayer: %i\n', layernum);
     fprintf(['data file: %s, \ntop: %f m, base: %f m, \n'...
         'thickness: %f m, teperature: %f C\n'], ...
         filename, dtt, dtb, dtb-dtt, tav);
-    
-    %MS_plot(Cvrh, rho, 'wtitle', filename, 'fontsize', 11, ...
-    %    'avscontours', 0:0.2:10.16, 'pcontours', 3.60:0.01:3.80, ...
-    %    'polsize', 0.18, 0.16, 2.0, 1.0, 'limitsonpol');
-
+   
+    if plot_pole
+        MS_plot(Cvrh, rho, 'wtitle', filename, 'fontsize', 11, ...
+            'avscontours', 0:0.2:10.16, 'pcontours', 3.60:0.01:3.80, ...
+            'polsize', 0.18, 0.16, 2.0, 1.0, 'limitsonpol', 'silent');
+    end
 end
+
