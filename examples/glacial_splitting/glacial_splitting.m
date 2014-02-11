@@ -130,6 +130,28 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
             fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
         end
     end 
+
+    % Make a figure to plot the results
+    scrsz = get(0,'ScreenSize');
+    figure('Position',[1 scrsz(4) scrsz(3)/3 scrsz(4)*0.9]) ;
+
+    % Plot lag times
+    subplot(2,1,1)
+    for f = 1:length(freq)
+        plot(spol,tlag_eff(f,:))
+        hold on
+    end
+    xlabel('Initial polarisation (deg)')
+    ylabel('Lag time (s)')
+
+    % Plot fast directions
+    subplot(2,1,2)
+    for f = 1:length(freq)
+        plot(spol,fast_eff(f,:))
+        hold on
+    end
+    xlabel('Initial polarisation (deg)')
+    ylabel('Fast directions (deg)')
 end
 
 
