@@ -78,6 +78,22 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
                 iarg = iarg + 1;
         end
     end
+
+    % Report all run conditions
+    tf{1} = 'false';
+    tf{2} = 'true';
+    fprintf('\n\n');
+    fprintf('GLACIAL SPLITTING\n');
+    fprintf('+++++++++++++++++\n');
+    fprintf('\n');
+    fprintf('Run conditions\n');
+    fprintf('--------------\n');
+    fprintf('Ice texture data from: %s\n', 'internal function');
+    fprintf('Will plot pole figures: %s\n', tf{plot_pole+1});
+    fprintf('Effective splitting mode: %s\n', eff_split_mode);
+    fprintf('Will plot particle motion in splitting calc: %s\n', ...
+        tf{plot_waves+1});
+    
     
     all_data = get_data(); % This should be optional - argument needed
     
@@ -87,15 +103,16 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     rhos = zeros(1,length(all_data));
     j = 0;
     fprintf('\nLayer data (bottom to top) \n');
-    for i=length(all_data):-1:1
+    fprintf('---------------------------\n');
+    for i = length(all_data):-1:1
         j = j + 1; % switch array order (read i, write j)
         
         % Thickness of this layer
         if (i==1) 
-            thickness(j) = (all_data(i).dtb)/1000.0; % In km!
+            thickness(j) = (all_data(i).dtb) / 1000.0; % In km!
             dtt = 0;
         else
-            thickness(j) = (all_data(i).dtb - all_data(i-1).dtb)/1000.0;%km
+            thickness(j) = (all_data(i).dtb - all_data(i-1).dtb) / 1000.0;
             dtt = all_data(i-1).dtb;
         end
         
@@ -103,17 +120,20 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
         [C, rho] = ice_cij(all_data(i).Tav);
         
         % Calculate poly xtal elasticity of this layer 
-        [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C,rho,all_data(i).tex_file);
+        [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C, rho, ...
+                                             all_data(i).tex_file);
 
         report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
             all_data(i).dtb, dtt, all_data(i).Tav, plot_pole)
-            
     end
 
+    % The effective splitting calculation
+    fprintf('\nEffective splitting calculation \n');
+    fprintf('--------------------------------\n');
     % Set up inclination and azimuth and effective splitting
     % params. These two could be functions of spol, for eg.
-    inc=90.0;
-    azi=0.0;
+    inc = 90.0;
+    azi = 0.0;
     % Loop over source polarizations
     % and frequencies
     spol = 0:15:180; % Deg
@@ -123,17 +143,17 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     for f = 1:length(freq)
         for s = 1:length(spol)
     
+            fprintf('\n');
+            fprintf('For source polarization: %f (deg)\n', spol(s));
+            fprintf('and frequency: %f (Hz)\n', freq(f));
+
             [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
                      rhos, thickness, inc, azi, freq(f), spol(s), ...
                      plot_waves, eff_split_mode); 
     
             % FIXME: do we need to correct fast_eff here? We are working in
             % ray frame at the momenet.
-            % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. reference frame
-    
-            fprintf('\n');
-            fprintf('For source polarization of: %f (deg)', spol(s));
-            fprintf(' and frequency: %f (Hz)\n', freq(f));
+            % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. ref frame
             fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
             fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
         end
@@ -167,8 +187,7 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
              thickness, inc, azi, freq, spol, plot_waves, eff_split_mode)
 
         % Header line for table...
-        fprintf('\n    time lag (s)     fast direction (deg)\n');
-        fprintf('    =====================================\n');
+        fprintf('time lag (s)     fast direction (deg)\n');
         % Loop over layers and calculate splitting parameters 
         fast = zeros(1,length(rhos));
         tlag = zeros(1,length(rhos));
@@ -180,7 +199,7 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
             fast(j) = pol; % FIXME: do we need to convert to geog ref? 
             tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
 
-            fprintf('    %7f        %7f \n', tlag(j), fast(j));
+            fprintf('  %7f        %7f \n', tlag(j), fast(j));
         end
     
         % Calculate effective splitting
