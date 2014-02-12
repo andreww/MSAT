@@ -60,6 +60,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     plot_pole = 0; % Phase velocity plot
     plot_waves = 0; % Gaussian wavelemt plot
     eff_split_mode = 's&s';
+    min_azi = 0.0;
+    max_azi = 180.0;
+    del_azi = 5.0;
+
     % Process those optional arguments
     iarg = 1;
     while iarg <= (length(varargin))
@@ -72,6 +76,15 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
                 iarg = iarg + 1;
             case 'mode'
                 eff_split_mode = lower(varargin{iarg+1});
+                iarg = iarg + 2;
+            case 'min_azi'
+                min_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'max_azi'
+                max_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'del_azi'
+                del_azi = varargin{iarg+1};
                 iarg = iarg + 2;
             otherwise
                 warning(['Unknown option: ' varargin{iarg}]) ;
@@ -90,6 +103,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     fprintf('--------------\n');
     fprintf('Ice texture data from: %s\n', 'internal function');
     fprintf('Will plot pole figures: %s\n', tf{plot_pole+1});
+    fprintf(['Effective splitting for azimuths between \n%4f and %4f '...
+        'degrees with a step size \nof %4f degrees\n'], ...
+        min_azi, max_azi, del_azi);
+    fprintf('Source polarization equal to azimuth...\n');
     fprintf('Effective splitting mode: %s\n', eff_split_mode);
     fprintf('Will plot particle motion in splitting calc: %s\n', ...
         tf{plot_waves+1});
@@ -137,6 +154,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Loop over source polarizations
     % and frequencies
     spol = 0:15:180; % Deg
+    spol = min_azi:del_azi:max_azi; % Deg
     freq = [0.3, 3.0, 30.0]; % Hz
     fast_eff = zeros(length(freq),length(spol));
     tlag_eff = zeros(length(freq),length(spol));
