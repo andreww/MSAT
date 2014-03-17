@@ -1,17 +1,18 @@
-% MS_UNWIND_PM_90 - Unwind an angle until it is between 0 and 360 degrees
+% MS_UNWIND_PM_90 - Unwind an angle until it is between -90 and 90 degrees
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
-% Utility function to find the equivelent angle between 0 and 360 degrees. 
+% Utility function to find the equivelent angle between -90 and 90 degrees
+% assuming 180 defgree periodicity. 
 %
 %  % [angle] = unwind_pm_90(angle_in)
 %
 % Usage: 
 %     for a given value of angle_in return a value greater than 
-%     -90 and less than or equal to 900 by repetedly adding or subtracting
+%     -90 and less than or equal to +90 by repetedly adding or subtracting
 %     180. Angle can be a scalar or a vector.
 
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011, 2014 James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
