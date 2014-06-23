@@ -63,6 +63,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     min_azi = 0.0;
     max_azi = 180.0;
     del_azi = 5.0;
+    quiet = 0;
 
     % Process those optional arguments
     iarg = 1;
@@ -86,6 +87,9 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
             case 'del_azi'
                 del_azi = varargin{iarg+1};
                 iarg = iarg + 2;
+            case 'quiet'
+                quiet = 1;
+                iarg = iarg + 1;
             otherwise
                 warning(['Unknown option: ' varargin{iarg}]) ;
                 iarg = iarg + 1;
@@ -153,7 +157,6 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     azi = 0.0;
     % Loop over source polarizations
     % and frequencies
-    spol = 0:15:180; % Deg
     spol = min_azi:del_azi:max_azi; % Deg
     freq = [0.3, 3.0, 30.0]; % Hz
     fast_eff = zeros(length(freq),length(spol));
@@ -161,19 +164,23 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     for f = 1:length(freq)
         for s = 1:length(spol)
     
-            fprintf('\n');
-            fprintf('For source polarization: %f (deg)\n', spol(s));
-            fprintf('and frequency: %f (Hz)\n', freq(f));
-
+            if ~quiet
+                fprintf('\n');
+                fprintf('For source polarization: %f (deg)\n', spol(s));
+                fprintf('and frequency: %f (Hz)\n', freq(f));
+            end
+            
             [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
                      rhos, thickness, inc, azi, freq(f), spol(s), ...
-                     plot_waves, eff_split_mode); 
+                     plot_waves, eff_split_mode, quiet); 
     
             % FIXME: do we need to correct fast_eff here? We are working in
             % ray frame at the momenet.
             % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. ref frame
-            fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
-            fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
+            if ~quiet
+                fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
+                fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
+            end
         end
     end 
 
@@ -202,10 +209,13 @@ end
 
 
 function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
-             thickness, inc, azi, freq, spol, plot_waves, eff_split_mode)
+             thickness, inc, azi, freq, spol, plot_waves, eff_split_mode,...
+             quiet)
 
         % Header line for table...
-        fprintf('time lag (s)     fast direction (deg)\n');
+        if ~quiet
+            fprintf('time lag (s)     fast direction (deg)\n');
+        end
         % Loop over layers and calculate splitting parameters 
         fast = zeros(1,length(rhos));
         tlag = zeros(1,length(rhos));
@@ -216,8 +226,9 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
                 rhos(j), inc, azi );
             fast(j) = pol; % FIXME: do we need to convert to geog ref? 
             tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
-
-            fprintf('  %7f        %7f \n', tlag(j), fast(j));
+            if ~quiet
+                fprintf('  %7f        %7f \n', tlag(j), fast(j));
+            end
         end
     
         % Calculate effective splitting
