@@ -60,6 +60,11 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     plot_pole = 0; % Phase velocity plot
     plot_waves = 0; % Gaussian wavelemt plot
     eff_split_mode = 's&s';
+    min_azi = 0.0;
+    max_azi = 180.0;
+    del_azi = 5.0;
+    quiet = 0;
+
     % Process those optional arguments
     iarg = 1;
     while iarg <= (length(varargin))
@@ -73,6 +78,18 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
             case 'mode'
                 eff_split_mode = lower(varargin{iarg+1});
                 iarg = iarg + 2;
+            case 'min_azi'
+                min_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'max_azi'
+                max_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'del_azi'
+                del_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'quiet'
+                quiet = 1;
+                iarg = iarg + 1;
             otherwise
                 warning(['Unknown option: ' varargin{iarg}]) ;
                 iarg = iarg + 1;
@@ -90,6 +107,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     fprintf('--------------\n');
     fprintf('Ice texture data from: %s\n', 'internal function');
     fprintf('Will plot pole figures: %s\n', tf{plot_pole+1});
+    fprintf(['Effective splitting for azimuths between \n%4f and %4f '...
+        'degrees with a step size \nof %4f degrees\n'], ...
+        min_azi, max_azi, del_azi);
+    fprintf('Source polarization equal to azimuth...\n');
     fprintf('Effective splitting mode: %s\n', eff_split_mode);
     fprintf('Will plot particle motion in splitting calc: %s\n', ...
         tf{plot_waves+1});
@@ -136,28 +157,32 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     azi = 0.0;
     % Loop over source polarizations
     % and frequencies
-    %spol = 0:15:180; % Deg
-    spol = 0:1:180; % Deg
+    spol = min_azi:del_azi:max_azi; % Deg
     freq = [0.3, 3.0, 30.0]; % Hz
-    linS = {'-','--',':'}; % Line styles for plots
+    freq_c = ['r', 'g', 'b'];
+    freq_names = {'0.3 Hz', '3.0 Hz', '30.0 Hz'};
     fast_eff = zeros(length(freq),length(spol));
     tlag_eff = zeros(length(freq),length(spol));
     for f = 1:length(freq)
         for s = 1:length(spol)
     
-            fprintf('\n');
-            fprintf('For source polarization: %f (deg)\n', spol(s));
-            fprintf('and frequency: %f (Hz)\n', freq(f));
-
+            if ~quiet
+                fprintf('\n');
+                fprintf('For source polarization: %f (deg)\n', spol(s));
+                fprintf('and frequency: %f (Hz)\n', freq(f));
+            end
+            
             [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
                      rhos, thickness, inc, azi, freq(f), spol(s), ...
-                     plot_waves, eff_split_mode); 
+                     plot_waves, eff_split_mode, quiet); 
     
             % FIXME: do we need to correct fast_eff here? We are working in
             % ray frame at the momenet.
             % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. ref frame
-            fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
-            fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
+            if ~quiet
+                fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
+                fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
+            end
         end
     end 
 
@@ -168,7 +193,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Plot lag times
     subplot(2,1,1)
     for f = 1:length(freq)
-        plot(spol,tlag_eff(f,:),'linestyle',linS{f})
+        plot(spol,tlag_eff(f,:), freq_c(f))
         hold on
     end
     xlabel('Initial polarisation (deg)')
@@ -177,19 +202,23 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Plot fast directions
     subplot(2,1,2)
     for f = 1:length(freq)
-        plot(spol,fast_eff(f,:),'linestyle',linS{f})
+        plot(spol,fast_eff(f,:), freq_c(f))
         hold on
     end
+    legend(freq_names)
     xlabel('Initial polarisation (deg)')
     ylabel('Fast directions (deg)')
 end
 
 
 function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
-             thickness, inc, azi, freq, spol, plot_waves, eff_split_mode)
+             thickness, inc, azi, freq, spol, plot_waves, eff_split_mode,...
+             quiet)
 
         % Header line for table...
-        fprintf('time lag (s)     fast direction (deg)\n');
+        if ~quiet
+            fprintf('time lag (s)     fast direction (deg)\n');
+        end
         % Loop over layers and calculate splitting parameters 
         fast = zeros(1,length(rhos));
         tlag = zeros(1,length(rhos));
@@ -200,8 +229,9 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
                 rhos(j), inc, azi );
             fast(j) = pol; % FIXME: do we need to convert to geog ref? 
             tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
-
-            fprintf('  %7f        %7f \n', tlag(j), fast(j));
+            if ~quiet
+                fprintf('  %7f        %7f \n', tlag(j), fast(j));
+            end
         end
     
         % Calculate effective splitting
