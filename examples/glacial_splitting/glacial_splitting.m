@@ -136,8 +136,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     azi = 0.0;
     % Loop over source polarizations
     % and frequencies
-    spol = 0:15:180; % Deg
+    %spol = 0:15:180; % Deg
+    spol = 0:1:180; % Deg
     freq = [0.3, 3.0, 30.0]; % Hz
+    linS = {'-','--',':'}; % Line styles for plots
     fast_eff = zeros(length(freq),length(spol));
     tlag_eff = zeros(length(freq),length(spol));
     for f = 1:length(freq)
@@ -166,7 +168,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Plot lag times
     subplot(2,1,1)
     for f = 1:length(freq)
-        plot(spol,tlag_eff(f,:))
+        plot(spol,tlag_eff(f,:),'linestyle',linS{f})
         hold on
     end
     xlabel('Initial polarisation (deg)')
@@ -175,7 +177,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Plot fast directions
     subplot(2,1,2)
     for f = 1:length(freq)
-        plot(spol,fast_eff(f,:))
+        plot(spol,fast_eff(f,:),'linestyle',linS{f})
         hold on
     end
     xlabel('Initial polarisation (deg)')
