@@ -122,6 +122,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     thickness = zeros(1,length(all_data));
     Cs = zeros(6,6,length(all_data));
     rhos = zeros(1,length(all_data));
+    ddts = zeros(1,length(all_data));
+    ddbs = zeros(1,length(all_data));
+    Vpiso = zeros(1,length(all_data));
+    Vsiso = zeros(1,length(all_data));
     j = 0;
     fprintf('\nLayer data (bottom to top) \n');
     fprintf('---------------------------\n');
@@ -137,28 +141,60 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
             dtt = all_data(i-1).dtb;
         end
         
+        dtts(j) = dtt;
+        dtbs(j) = all_data(i).dtb;
+        temps(j) = all_data(i).Tav;
+        
+        
+        
+        
         % Single crystal elasticity of this layer
         [C, rho] = ice_cij(all_data(i).Tav);
         
         % Calculate poly xtal elasticity of this layer 
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C, rho, ...
                                              all_data(i).tex_file);
+        
+        % Calculate average isotropic velocities
+        CR = MS_axes(Cs(:,:,j), 'nowarn') ;
+        [Ciso] = MS_decomp(CR) ;
+        Vpiso(j) = 1e-3.*sqrt((Ciso(3,3)*1e9)./rhos(j));
+        Vsiso(j) = 1e-3.*sqrt((Ciso(4,4)*1e9)./rhos(j));
 
         report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
             all_data(i).dtb, dtt, all_data(i).Tav, plot_pole)
     end
     
+    Vpiso
+    Vsiso
+    
     % Plot stratigraphic column
     
     figure();
-    bar([fliplr(thickness);nan(size(thickness))],'stack');xlim([0.5,1.5]);
+    subplot(1,3,1);
+    bar([fliplr(thickness);nan(size(thickness))],'stack');xlim([0.5,1.5]);ylim([0,4]);
     set(gca,'YDir','Reverse');
     hold on;
     samples=[97 248 399 650 1201 1500 1849 2082 2749 2874 3300 3311 3321 3329 3399 3416]./1000.0;
     %scatter(ones(size(samples)),samples,'MarkerEdgeColor','k','MarkerFaceColor','w')
     scatter(linspace(0.7,1.3,max(size(samples))),samples,'MarkerEdgeColor','k','MarkerFaceColor','w')
+    ylabel('depth')
     hold off;
     
+    subplot(1,3,2);
+    stairs(temps,dtts./1000);xlim([-25,0]);ylim([0,4]);
+    ylabel('depth');
+    xlabel('Temperature');
+    set(gca,'YDir','Reverse');
+    
+    subplot(1,3,3);
+    scatter(Vpiso,dtts./1000);ylim([0,4]);
+    hold on;
+    stairs(Vsiso,dtts./1000);ylim([0,4]);
+    ylabel('depth');
+    xlabel('Velocity');
+    set(gca,'YDir','Reverse');
+    hold off;
     
 
     % The effective splitting calculation
@@ -317,7 +353,7 @@ function [data] = get_data()
     % EBSD data from Obbard and Baker (2007). Depths to deeper layers from Lipenkov and Barkov (1998)
     data(1) = struct('tex_file', fullfile(dat_dir, 'V97.txt'), ... % R-A
                      'dtb', 200, ... % depth to base of layer m
-                     'Tav', -25, ... % Average temperature (deg. C)
+                     'Tav', -24, ... % Average temperature (deg. C)
                      'azi', 0); % Horizonal rotation for texture
     data(2) = struct('tex_file', fullfile(dat_dir, 'V248.txt'), ... % R-B
                      'dtb', 300, ...
@@ -393,7 +429,7 @@ function [data] = get_data()
                      'azi', 0);     
     data(20) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ... % ?
                      'dtb', 3750, ... 
-                     'Tav', -1, ... 
+                     'Tav', 0, ... 
                      'azi', 0); 
 end
 
@@ -411,9 +447,9 @@ function [eulers, nxtl] = read_EBSD_txt(filename)
     data = fscanf(fid, '%f', [12 inf]);
     nxtl = length(data(1,:));
     eulers = zeros(3,nxtl);
-    eulers(1,:) = data(3,:); % phi1
-    eulers(2,:) = data(4,:); % phi1
-    eulers(3,:) = data(5,:); % phi1
+    eulers(1,:) = data(5,:); % phi1
+    eulers(2,:) = data(6,:); % phi1
+    eulers(3,:) = data(7,:); % phi1
     fclose(fid);
 end
 
@@ -423,7 +459,7 @@ function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav, ...
 
     fprintf('\nLayer: %i\n', layernum);
     fprintf(['data file: %s, \ntop: %f m, base: %f m, \n'...
-        'thickness: %f m, teperature: %f C\n'], ...
+        'thickness: %f m, temperature: %f C\n'], ...
         filename, dtt, dtb, dtb-dtt, tav);
    
     if plot_pole
