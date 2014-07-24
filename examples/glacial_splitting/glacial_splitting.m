@@ -196,7 +196,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     set(gca,'YDir','Reverse');
 
 
-    % The effective splitting calculation
+    % The effective splitting calculation for vertical ray path
     fprintf('\nEffective splitting calculation \n');
     fprintf('--------------------------------\n');
     % Set up inclination and azimuth and effective splitting
@@ -222,11 +222,8 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
             
             [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
                      rhos, thickness, inc, azi, freq(f), spol(s), ...
-                     plot_waves, eff_split_mode, quiet); 
-    
-            % FIXME: do we need to correct fast_eff here? We are working in
-            % ray frame at the momenet.
-            % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. ref frame
+                     plot_waves, eff_split_mode, quiet);           
+
             if ~quiet
                 fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
                 fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
@@ -256,6 +253,114 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     legend(freq_names)
     xlabel('Initial polarisation (deg)')
     ylabel('Fast directions (deg)')
+    
+    
+    % The effective splitting calculation for inclined rays
+    fprintf('\nEffective splitting calculation - inclined rays\n');
+    fprintf('------------------------------------------------\n');
+    % Set up inclination and azimuth and effective splitting
+    % params. These two could be functions of spol, for eg.
+    inc = [60 70 80] ;
+    azi = [0 45 90] ;
+    % Loop over source polarizations
+    % and frequencies
+    spol = 0:1:180; % Deg
+    freq = 30.0; % Hz - no point looking lower for SWS
+    inc_c = ['r', 'g', 'b'];
+    inc_names = {'60 degrees', '70 degrees', '80 degrees'};
+    fast_eff_2 = zeros(length(spol), length(inc), length(azi));
+    tlag_eff_2 = zeros(length(spol), length(inc), length(azi));
+    for i = 1:length(inc)
+        for a = 1:length(azi)
+            for s = 1:length(spol)
+            
+                if ~quiet
+                    fprintf('\n');
+                    fprintf('For source polarization: %f (deg)\n', spol(s));
+                    fprintf('azimuth: %f (deg)\n', azi(a));
+                    fprintf('inclination: %f (deg)\n', inc(i));
+                end
+            
+                % Recalculate thickness etc
+                
+                [fast_eff_2(s,i,a), tlag_eff_2(s,i,a)] = do_effective_splitting(Cs, ...
+                        rhos, thickness, inc(i), azi(a), freq, spol(s), ...
+                         plot_waves, eff_split_mode, quiet); 
+           
+
+                if ~quiet
+                    fprintf('Effective fast direction geographical frame: %f (deg)\n', fast_eff_2(s,i,a));
+                    fprintf('Effective delay time:     %f (s)\n', tlag_eff_2(s,i,a));
+                end
+            end
+        end
+    end
+    
+    % Make a figure to plot the results
+    scrsz = get(0,'ScreenSize');
+    figure('Position',[1 scrsz(4) scrsz(3)/3 scrsz(4)*0.9]) ;
+    % Plot lag times
+    subplot(2,3,1)
+    for i = 1:length(inc)
+        plot(spol, tlag_eff_2(:,i,1), inc_c(i))
+        hold on
+    end
+    xlabel('Source polarization (deg)')
+    ylabel('Lag time (s)')
+    thetitle = sprintf('Splitting as a function of source polarization and inclination, azi = %f (deg)', azi(1));
+    title(thetitle);
+    
+    % Plot fast directions
+    subplot(2,3,4)
+    for i = 1:length(inc)
+        plot(spol ,fast_eff_2(:,i,1), inc_c(i))
+        hold on
+    end
+    legend(inc_names)
+    xlabel('Source polarization (deg)')
+    ylabel('Fast directions (deg)')
+
+    
+    subplot(2,3,2)
+    for i = 1:length(inc)
+        plot(spol, tlag_eff_2(:,i,2), inc_c(i))
+        hold on
+    end
+    xlabel('Source polarization (deg)')
+    ylabel('Lag time (s)')
+    thetitle = sprintf('Splitting as a function of source polarization and inclination, azi = %f (deg)', azi(2));
+    title(thetitle);
+
+    % Plot fast directions
+    subplot(2,3,5)
+    for i = 1:length(inc)
+        plot(spol ,fast_eff_2(:,i,2), inc_c(i))
+        hold on
+    end
+    legend(inc_names)
+    xlabel('Source polarization (deg)')
+    ylabel('Fast directions (deg)')
+    
+    subplot(2,3,3)
+    for i = 1:length(inc)
+        plot(spol, tlag_eff_2(:,i,3), inc_c(i))
+        hold on
+    end
+    xlabel('Source polarization (deg)')
+    ylabel('Lag time (s)')
+    thetitle = sprintf('Splitting as a function of source polarization and inclination, azi = %f (deg)', azi(3));
+    title(thetitle);
+
+    % Plot fast directions
+    subplot(2,3,6)
+    for i = 1:length(inc)
+        plot(spol ,fast_eff_2(:,i,3), inc_c(i))
+        hold on
+    end
+    legend(inc_names)
+    xlabel('Source polarization (deg)')
+    ylabel('Fast directions (deg)')
+    
 end
 
 
@@ -265,7 +370,7 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
 
         % Header line for table...
         if ~quiet
-            fprintf('time lag (s)     fast direction (deg)\n');
+            fprintf('time lag (s)     fast direction in ray frame (deg)\n');
         end
         % Loop over layers and calculate splitting parameters 
         fast = zeros(1,length(rhos));
@@ -275,8 +380,13 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
             % Calculate the splitting parameters for this layer
             [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( Cs(:,:,j), ...
                 rhos(j), inc, azi );
-            fast(j) = pol; % FIXME: do we need to convert to geog ref? 
-            tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
+            fast(j) = pol; 
+            % Calculate tlag, ajusting for inclination (vertical ray has
+            % inc=90, so this is just length = thickness/1. Gets thicker
+            % as ray becomes shallower
+            tlag(j) = (thickness(j)/cosd(90-inc))/vs2 - ...
+                (thickness(j)/cosd(90-inc))/vs1 ; 
+            
             if ~quiet
                 fprintf('  %7f        %7f \n', tlag(j), fast(j));
             end
@@ -290,6 +400,10 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
             [fast_eff,tlag_eff]=MS_effective_splitting_N(freq,spol,fast,...
                 tlag,'mode',eff_split_mode);
         end
+        
+        % Put fast orentation into geographic reference frame. For 
+        % Vertical ray azi = 0, so no change.
+        fast_eff = MS_unwind_pm_90(azi+fast_eff);
 end
 
 
