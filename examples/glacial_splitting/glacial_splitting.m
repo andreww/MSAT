@@ -442,13 +442,28 @@ function [eulers, nxtl] = read_EBSD_txt(filename)
 
     fid = fopen(filename); % Read - the default
     assert((fid~=-1), 'Could not open file %s', filename);
-    fgetl(fid); % Header line - ignore
-    data = fscanf(fid, '%f', [12 inf]);
-    nxtl = length(data(1,:));
-    eulers = zeros(3,nxtl);
-    eulers(1,:) = data(5,:); % phi1
-    eulers(2,:) = data(6,:); % phi1
-    eulers(3,:) = data(7,:); % phi1
+    head = fgetl(fid); % Header line - use to distiguish the two 
+                       % kinds of file (ID as the first word or Index)
+    if all(head(1:6) == '    ID')
+        % First data format - from Geoff                       
+        data = fscanf(fid, '%f', [12 inf]);
+        nxtl = length(data(1,:));
+        eulers = zeros(3,nxtl);
+        eulers(1,:) = data(3,:); % phi1
+        eulers(2,:) = data(4,:); % phi2
+        eulers(3,:) = data(5,:); % phi3
+    elseif all(head(1:5) == 'Index')
+        % New data format - from Rachel                       
+        data = fscanf(fid, '%f', [12 inf]);
+        nxtl = length(data(1,:));
+        eulers = zeros(3,nxtl);
+        eulers(1,:) = data(5,:); % euler1
+        eulers(2,:) = data(6,:); % euler2
+        eulers(3,:) = data(7,:); % euler3
+    else
+        % Don't know what to do
+        error('Could not identify the EBSD data format from the 1st line')
+    end
     fclose(fid);
 end
 
