@@ -145,9 +145,6 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
         dtbs(j) = all_data(i).dtb;
         temps(j) = all_data(i).Tav;
         
-        
-        
-        
         % Single crystal elasticity of this layer
         [C, rho] = ice_cij(all_data(i).Tav);
         
@@ -155,47 +152,49 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C, rho, ...
                                              all_data(i).tex_file);
         
-        % Calculate average isotropic velocities
-        CR = MS_axes(Cs(:,:,j), 'nowarn') ;
-        [Ciso] = MS_decomp(CR) ;
-        Vpiso(j) = 1e-3.*sqrt((Ciso(3,3)*1e9)./rhos(j));
-        Vsiso(j) = 1e-3.*sqrt((Ciso(4,4)*1e9)./rhos(j));
+        % Calculate average isotropic (VRH) velocity for this layer        
+        [ K_vrh, G_vrh ] = MS_polyaverage( C );
+        Vpiso(j) = 1e-3.*sqrt(((K_vrh*1e9)+((4.0/3.0)*G_vrh)*1e9)./rhos(j));
+        Vsiso(j) = 1e-3.*sqrt((G_vrh*1e9)./rhos(j));
+        % We may need the upper and lower bounds (V and R, respectivly)
 
         report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
             all_data(i).dtb, dtt, all_data(i).Tav, plot_pole)
     end
-    
-    Vpiso
-    Vsiso
+
     
     % Plot stratigraphic column
     
     figure();
-    subplot(1,3,1);
+    subplot(1,4,1);
     bar([fliplr(thickness);nan(size(thickness))],'stack');xlim([0.5,1.5]);ylim([0,4]);
     set(gca,'YDir','Reverse');
     hold on;
     samples=[97 248 399 650 1201 1500 1849 2082 2749 2874 3300 3311 3321 3329 3399 3416]./1000.0;
     %scatter(ones(size(samples)),samples,'MarkerEdgeColor','k','MarkerFaceColor','w')
     scatter(linspace(0.7,1.3,max(size(samples))),samples,'MarkerEdgeColor','k','MarkerFaceColor','w')
-    ylabel('depth')
+    ylabel('Depth (km)')
     hold off;
     
-    subplot(1,3,2);
+    subplot(1,4,2);
     stairs(temps,dtts./1000);xlim([-25,0]);ylim([0,4]);
-    ylabel('depth');
-    xlabel('Temperature');
+    ylabel('Depth (km)');
+    xlabel('Temperature (C)');
     set(gca,'YDir','Reverse');
     
-    subplot(1,3,3);
+    subplot(1,4,3);
     scatter(Vpiso,dtts./1000);ylim([0,4]);
-    hold on;
-    stairs(Vsiso,dtts./1000);ylim([0,4]);
-    ylabel('depth');
-    xlabel('Velocity');
+    ylabel('Depth (km)');
+    xlabel('Isotropic p-wave velocity (km/s)');
     set(gca,'YDir','Reverse');
-    hold off;
+
     
+    subplot(1,4,4);
+    scatter(Vsiso,dtts./1000);ylim([0,4]);
+    ylabel('Depth (km)');
+    xlabel('Isotropic s-wave velocity (km/s)');
+    set(gca,'YDir','Reverse');
+
 
     % The effective splitting calculation
     fprintf('\nEffective splitting calculation \n');
