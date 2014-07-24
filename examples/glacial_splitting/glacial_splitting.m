@@ -60,6 +60,11 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     plot_pole = 0; % Phase velocity plot
     plot_waves = 0; % Gaussian wavelemt plot
     eff_split_mode = 's&s';
+    min_azi = 0.0;
+    max_azi = 180.0;
+    del_azi = 5.0;
+    quiet = 0;
+
     % Process those optional arguments
     iarg = 1;
     while iarg <= (length(varargin))
@@ -73,6 +78,18 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
             case 'mode'
                 eff_split_mode = lower(varargin{iarg+1});
                 iarg = iarg + 2;
+            case 'min_azi'
+                min_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'max_azi'
+                max_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'del_azi'
+                del_azi = varargin{iarg+1};
+                iarg = iarg + 2;
+            case 'quiet'
+                quiet = 1;
+                iarg = iarg + 1;
             otherwise
                 warning(['Unknown option: ' varargin{iarg}]) ;
                 iarg = iarg + 1;
@@ -90,6 +107,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     fprintf('--------------\n');
     fprintf('Ice texture data from: %s\n', 'internal function');
     fprintf('Will plot pole figures: %s\n', tf{plot_pole+1});
+    fprintf(['Effective splitting for azimuths between \n%4f and %4f '...
+        'degrees with a step size \nof %4f degrees\n'], ...
+        min_azi, max_azi, del_azi);
+    fprintf('Source polarization equal to azimuth...\n');
     fprintf('Effective splitting mode: %s\n', eff_split_mode);
     fprintf('Will plot particle motion in splitting calc: %s\n', ...
         tf{plot_waves+1});
@@ -101,6 +122,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     thickness = zeros(1,length(all_data));
     Cs = zeros(6,6,length(all_data));
     rhos = zeros(1,length(all_data));
+    ddts = zeros(1,length(all_data));
+    ddbs = zeros(1,length(all_data));
+    Vpiso = zeros(1,length(all_data));
+    Vsiso = zeros(1,length(all_data));
     j = 0;
     fprintf('\nLayer data (bottom to top) \n');
     fprintf('---------------------------\n');
@@ -116,16 +141,61 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
             dtt = all_data(i-1).dtb;
         end
         
+        dtts(j) = dtt;
+        dtbs(j) = all_data(i).dtb;
+        temps(j) = all_data(i).Tav;
+        
+        
+        
+        
         % Single crystal elasticity of this layer
         [C, rho] = ice_cij(all_data(i).Tav);
         
         % Calculate poly xtal elasticity of this layer 
         [Cs(:,:,j), rhos(j)] = Cs_from_EBSD_file(C, rho, ...
                                              all_data(i).tex_file);
+        
+        % Calculate average isotropic velocities
+        CR = MS_axes(Cs(:,:,j), 'nowarn') ;
+        [Ciso] = MS_decomp(CR) ;
+        Vpiso(j) = 1e-3.*sqrt((Ciso(3,3)*1e9)./rhos(j));
+        Vsiso(j) = 1e-3.*sqrt((Ciso(4,4)*1e9)./rhos(j));
 
         report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
             all_data(i).dtb, dtt, all_data(i).Tav, plot_pole)
     end
+    
+    Vpiso
+    Vsiso
+    
+    % Plot stratigraphic column
+    
+    figure();
+    subplot(1,3,1);
+    bar([fliplr(thickness);nan(size(thickness))],'stack');xlim([0.5,1.5]);ylim([0,4]);
+    set(gca,'YDir','Reverse');
+    hold on;
+    samples=[97 248 399 650 1201 1500 1849 2082 2749 2874 3300 3311 3321 3329 3399 3416]./1000.0;
+    %scatter(ones(size(samples)),samples,'MarkerEdgeColor','k','MarkerFaceColor','w')
+    scatter(linspace(0.7,1.3,max(size(samples))),samples,'MarkerEdgeColor','k','MarkerFaceColor','w')
+    ylabel('depth')
+    hold off;
+    
+    subplot(1,3,2);
+    stairs(temps,dtts./1000);xlim([-25,0]);ylim([0,4]);
+    ylabel('depth');
+    xlabel('Temperature');
+    set(gca,'YDir','Reverse');
+    
+    subplot(1,3,3);
+    scatter(Vpiso,dtts./1000);ylim([0,4]);
+    hold on;
+    stairs(Vsiso,dtts./1000);ylim([0,4]);
+    ylabel('depth');
+    xlabel('Velocity');
+    set(gca,'YDir','Reverse');
+    hold off;
+    
 
     % The effective splitting calculation
     fprintf('\nEffective splitting calculation \n');
@@ -136,26 +206,32 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     azi = 0.0;
     % Loop over source polarizations
     % and frequencies
-    spol = 0:15:180; % Deg
+    spol = min_azi:del_azi:max_azi; % Deg
     freq = [0.3, 3.0, 30.0]; % Hz
+    freq_c = ['r', 'g', 'b'];
+    freq_names = {'0.3 Hz', '3.0 Hz', '30.0 Hz'};
     fast_eff = zeros(length(freq),length(spol));
     tlag_eff = zeros(length(freq),length(spol));
     for f = 1:length(freq)
         for s = 1:length(spol)
     
-            fprintf('\n');
-            fprintf('For source polarization: %f (deg)\n', spol(s));
-            fprintf('and frequency: %f (Hz)\n', freq(f));
-
+            if ~quiet
+                fprintf('\n');
+                fprintf('For source polarization: %f (deg)\n', spol(s));
+                fprintf('and frequency: %f (Hz)\n', freq(f));
+            end
+            
             [fast_eff(f,s), tlag_eff(f,s)] = do_effective_splitting(Cs, ...
                      rhos, thickness, inc, azi, freq(f), spol(s), ...
-                     plot_waves, eff_split_mode); 
+                     plot_waves, eff_split_mode, quiet); 
     
             % FIXME: do we need to correct fast_eff here? We are working in
             % ray frame at the momenet.
             % fast(j) = MS_unwind_pm_90((azi+pol')) ; % geog. ref frame
-            fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
-            fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
+            if ~quiet
+                fprintf('Effective fast direction: %f (deg)\n', fast_eff(f,s));
+                fprintf('Effective delay time:     %f (s)\n', tlag_eff(f,s));
+            end
         end
     end 
 
@@ -166,7 +242,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Plot lag times
     subplot(2,1,1)
     for f = 1:length(freq)
-        plot(spol,tlag_eff(f,:))
+        plot(spol,tlag_eff(f,:), freq_c(f))
         hold on
     end
     xlabel('Initial polarisation (deg)')
@@ -175,19 +251,23 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Plot fast directions
     subplot(2,1,2)
     for f = 1:length(freq)
-        plot(spol,fast_eff(f,:))
+        plot(spol,fast_eff(f,:), freq_c(f))
         hold on
     end
+    legend(freq_names)
     xlabel('Initial polarisation (deg)')
     ylabel('Fast directions (deg)')
 end
 
 
 function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
-             thickness, inc, azi, freq, spol, plot_waves, eff_split_mode)
+             thickness, inc, azi, freq, spol, plot_waves, eff_split_mode,...
+             quiet)
 
         % Header line for table...
-        fprintf('time lag (s)     fast direction (deg)\n');
+        if ~quiet
+            fprintf('time lag (s)     fast direction (deg)\n');
+        end
         % Loop over layers and calculate splitting parameters 
         fast = zeros(1,length(rhos));
         tlag = zeros(1,length(rhos));
@@ -198,8 +278,9 @@ function [fast_eff, tlag_eff] = do_effective_splitting(Cs, rhos, ...
                 rhos(j), inc, azi );
             fast(j) = pol; % FIXME: do we need to convert to geog ref? 
             tlag(j) = thickness(j)/vs2 - thickness(j)/vs1 ;
-
-            fprintf('  %7f        %7f \n', tlag(j), fast(j));
+            if ~quiet
+                fprintf('  %7f        %7f \n', tlag(j), fast(j));
+            end
         end
     
         % Calculate effective splitting
@@ -269,40 +350,87 @@ function [data] = get_data()
     % Deal with file seperators in a cross platform way.
     dat_dir = fullfile('~', 'Dropbox', 'Ice_EBSD_data');
 
-    % FIXME: AFB - A comment here as to where these layers 
-    % come from is critical
-    data(1) = struct('tex_file', fullfile(dat_dir, 'V97-248R.txt'), ...
-                     'dtb', 450, ... % depth to base of layer m
-                     'Tav', -25, ... % Average temperature (deg. C)
+    % EBSD data from Obbard and Baker (2007). Depths to deeper layers from Lipenkov and Barkov (1998)
+    data(1) = struct('tex_file', fullfile(dat_dir, 'V97.txt'), ... % R-A
+                     'dtb', 200, ... % depth to base of layer m
+                     'Tav', -24, ... % Average temperature (deg. C)
                      'azi', 0); % Horizonal rotation for texture
-    data(2) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ...
-                     'dtb', 2850, ... 
-                     'Tav', -20, ... 
+    data(2) = struct('tex_file', fullfile(dat_dir, 'V248.txt'), ... % R-B
+                     'dtb', 300, ...
+                     'Tav', -23, ...
+                     'azi', 0);               
+    data(3) = struct('tex_file', fullfile(dat_dir, 'V399-3.txt'), ... % R-C
+                     'dtb', 454, ...
+                     'Tav', -22, ...
+                     'azi', 0);
+    data(4) = struct('tex_file', fullfile(dat_dir, 'V650.txt'), ... % A0-A
+                     'dtb', 900, ... 
+                     'Tav', -19, ... 
                      'azi', 0);    
-    data(3) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ...
-                     'dtb', 2900, ... 
-                     'Tav', -15, ... 
-                     'azi', 0); 
-    data(4) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ...
-                     'dtb', 3150, ... 
-                     'Tav', -10, ... 
+    data(5) = struct('tex_file', fullfile(dat_dir, 'V1201.txt'), ... % A0-B
+                     'dtb', 1300, ... 
+                     'Tav', -16, ... 
                      'azi', 0);    
-    data(5) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ...
-                     'dtb', 3225, ... 
-                     'Tav', -9, ... 
-                     'azi', 0); 
-    data(6) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ...
-                     'dtb', 3300, ... 
+    data(6) = struct('tex_file', fullfile(dat_dir, 'V1500.txt'), ... % A0-C
+                     'dtb', 1700, ... 
+                     'Tav', -14, ... 
+                     'azi', 0);    
+    data(7) = struct('tex_file', fullfile(dat_dir, 'V1849.txt'), ... % A0-D
+                     'dtb', 1900, ... 
+                     'Tav', -12, ... 
+                     'azi', 0);    
+    data(8) = struct('tex_file', fullfile(dat_dir, 'V2082-M.txt'), ... % A0-E
+                     'dtb', 2700, ... 
                      'Tav', -7, ... 
                      'azi', 0);    
-    data(7) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ...
-                     'dtb', 3350, ... 
-                     'Tav', -5, ... 
+    data(9) = struct('tex_file', fullfile(dat_dir, 'V2749-132.txt'), ... % A1
+                     'dtb', 2835, ... 
+                     'Tav', -6, ... 
                      'azi', 0); 
-    data(8) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ...
-                     'dtb', 3450, ... 
+    data(10) = struct('tex_file', fullfile(dat_dir, 'V2874-P9.txt'), ... % B1
+                     'dtb', 2905, ... 
+                     'Tav', -5, ... 
+                     'azi', 0);    
+    data(11) = struct('tex_file', fullfile(dat_dir, 'V2082-M.txt'), ... % A2 ------ girdle
+                     'dtb', 3140, ... 
+                     'Tav', -4, ... 
+                     'azi', 0); 
+    data(12) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ... % B2 ------- cluster
+                     'dtb', 3220, ... 
+                     'Tav', -3.5, ... 
+                     'azi', 0);    
+    data(13) = struct('tex_file', fullfile(dat_dir, 'V3300_M.txt'), ... % A3
+                     'dtb', 3310, ... 
+                     'Tav', -3, ... 
+                     'azi', 0); 
+    data(14) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ... % CA  
+                     'dtb', 3330, ... 
+                     'Tav', -2.8, ... 
+                     'azi', 0);  
+    data(15) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ... % CB
+                     'dtb', 3350, ... 
+                     'Tav', -2.6, ... 
+                     'azi', 0);  
+    data(16) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ... % CA
+                     'dtb', 3370, ... 
+                     'Tav', -2.5, ... 
+                     'azi', 0); 
+    data(17) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ... % A4
+                     'dtb', 3460, ... 
+                     'Tav', -1.9, ... 
+                     'azi', 0); 
+    data(18) = struct('tex_file', fullfile(dat_dir, 'V3311g.txt'), ... % DA+B
+                     'dtb', 3540, ... 
+                     'Tav', -1.4, ... 
+                     'azi', 0); 
+    data(19) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ... % E
+                     'dtb', 3605, ... 
                      'Tav', -1, ... 
-                     'azi', 0);   
+                     'azi', 0);     
+    data(20) = struct('tex_file', fullfile(dat_dir, 'V3321c.txt'), ... % ?
+                     'dtb', 3750, ... 
+                     'Tav', 0, ... 
+                     'azi', 0); 
 end
 
 
@@ -319,9 +447,9 @@ function [eulers, nxtl] = read_EBSD_txt(filename)
     data = fscanf(fid, '%f', [12 inf]);
     nxtl = length(data(1,:));
     eulers = zeros(3,nxtl);
-    eulers(1,:) = data(3,:); % phi1
-    eulers(2,:) = data(4,:); % phi1
-    eulers(3,:) = data(5,:); % phi1
+    eulers(1,:) = data(5,:); % phi1
+    eulers(2,:) = data(6,:); % phi1
+    eulers(3,:) = data(7,:); % phi1
     fclose(fid);
 end
 
@@ -331,7 +459,7 @@ function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav, ...
 
     fprintf('\nLayer: %i\n', layernum);
     fprintf(['data file: %s, \ntop: %f m, base: %f m, \n'...
-        'thickness: %f m, teperature: %f C\n'], ...
+        'thickness: %f m, temperature: %f C\n'], ...
         filename, dtt, dtb, dtb-dtt, tav);
    
     if plot_pole

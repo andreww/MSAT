@@ -1,1 +1,6 @@
 *.m~
+examples/glacial_splitting/gaussian.pdf
+examples/glacial_splitting/gaussian_fine.pdf
+examples/glacial_splitting/gaussian_finer.pdf
+examples/glacial_splitting/s&s.pdf
+examples/glacial_splitting/s&s_fine.pdf
