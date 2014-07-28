@@ -195,6 +195,10 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     xlabel('Isotropic s-wave velocity (km/s)');
     set(gca,'YDir','Reverse');
 
+    
+    % Create model for ATRAK
+    create_modsimple_rsp('modsimple.rsp', dtts, dtbs, Cs, rhos)
+    
 
     % The effective splitting calculation for vertical ray path
     fprintf('\nEffective splitting calculation \n');
@@ -595,5 +599,39 @@ function report_layer(layernum, filename, Cvrh, rho, dtb, dtt, tav, ...
             'avscontours', 0:0.2:10.16, 'pcontours', 3.60:0.01:3.80, ...
             'polsize', 0.18, 0.16, 2.0, 1.0, 'limitsonpol', 'quiet');
     end
+end
+
+
+function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
+
+    model_name = 'icesheet.mod';
+    assert(length(dtts)==length(dtbs), 'Tops and bottoms must agree')
+    assert(length(dtts)==length(rhos), 'Tops and density must agree')
+    assert(length(dtts)==length(Cs), 'Tops and Cijs must agree')
+
+    num_layers = length(dtts);
+    
+    fid = fopen(filename, 'w');
+    fprintf(fid, '%s\n', model_name);
+    fprintf(fid, '%d\n', num_layers);
+
+    % Hard code X, Y and Z nodes here. We could make this
+    % an argument, but I don't know what the rules are.
+    fprintf(fid, '%d %f %f\n', 10, 0.0, 10000.0);
+    fprintf(fid, '%d %f %f\n', 10, -5000.0, -5000.0);
+    fprintf(fid, '%d %f %f\n', 10, 0.0, -dtbs(num_layers)); % Base of hole
+    
+    % Now add each layer in turn (remembering we need to go backwards)
+    j = 0;
+    for i = num_layers:-1:1
+        j = j + 1;
+        fprintf(fid, '%d %s\n', j, 'flat');
+        fprintf(fid, '%f %f\n', -dtts(i), -dtts(i));
+        fprintf(fid, '%s\n', 'ani');
+        fprintf(fid, '%d\n', 0); 
+        fprintf(fid, '%d\n', 21);
+        MS_save(fid, Cs(:,:,i), rhos(i), 'eunit', 'mbar', 'dunit', 'gcc', 'Aij');
+    end
+    fclose(fid);
 end
 
