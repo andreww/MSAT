@@ -2,13 +2,23 @@
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 % 
-% MS_save( fname, C, rho, ... )
+% MS_save( fname, C, rho, ... ) or MS_save( fid, C, rho, ... )
 %
 % Usage: 
 %     MS_save(fname, C, rho)                    
 %          Write the elastic constants, C, and density, rho, to file 
 %          'fname'. C must be provided in GPa and rho must be provided in 
 %          kg/m3. See file format below. 
+%
+%
+%     MS_save(fid, C, rho)                    
+%          Write the elastic constants, C, and density, rho, to already 
+%          open file described by integer valued double 'fid'. Fid is
+%          usually returned by a previous call to fopen. The file is not
+%          closed on exit from this function and no checks are made that
+%          the file is opened and can be used for output. C must be 
+%          provided in GPa and rho must be provided in kg/m3. 
+%          See file format below. 
 %
 %     MS_save(fname, C, rho, ..., 'format',fmt)                    
 %         Specify format for file. See below for descriptions. Available 
@@ -205,7 +215,7 @@ end
 
 function MS_write_simple( fname, C, rho)
 
-    fid = fopen(fname, 'wt'); % Should we use t here?
+    [fid, fid_state] = MS_open_write_fh(fname);
     
     for i = 1:6
         for j = i:6
@@ -214,14 +224,38 @@ function MS_write_simple( fname, C, rho)
     end
     fprintf(fid, '%1i %1i %f\n', 7, 7, rho);
     
-    fclose(fid);
+    MS_close_write_fh(fid, fid_state);
 
 end
 
 function MS_write_ematrix( fname, C, rho)
       error('MS:SAVE:NotImplemented', 'Writing to ematrix format is not implemented')
 end
-      
+
+function [fid, fid_state] = MS_open_write_fh(fname)
+    % Open file handle and remember if it needs to be closed
+    
+    if ischar(fname) 
+        % This is a string - open it and return fid
+        fid = fopen(fname, 'wt'); % Should we use t here?
+        fid_state = 1; % We will need to close this fif
+    elseif isreal(fname) 
+        % Not a string, but a number, so assume this is an fid
+        % we should use, but not close later
+        fid = fname;
+        fid_state = 0; % We will not need to close this one
+    else
+        % This isn't going to work
+        error('Cannot open file for write\n');
+    end
+end
+
+function MS_close_write_fh(fid, fid_state)
+    % If *we* opened the file handle, close it.
+    if fid_state
+        fclose(fid);
+    end
+end
       
       
       
