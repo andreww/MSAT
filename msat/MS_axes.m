@@ -378,11 +378,13 @@ function [i]=veceq(x,y,thresh)
 return
 
 function [nd,i]=ndistinct(x,thresh)
+
 % return the number and indices of distinct entries in a 3 element vector, ignoring a 
 % difference of thresh
    if (abs(x(1)-x(2))<thresh) & (abs(x(1)-x(3))<thresh) % all the same
       nd = 1 ; i = 0 ;
-   elseif (abs(x(1)-x(2))>thresh) & (abs(x(1)-x(3))>thresh) % all different
+   elseif (abs(x(1)-x(2))>thresh) & (abs(x(1)-x(3))>thresh) ...
+           & (abs(x(2)-x(3))>thresh) % all different
       nd = 3 ; i = 0 ;
    else % one is different
       nd = 2 ; 
