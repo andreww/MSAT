@@ -7,21 +7,26 @@
 %
 % Usage:
 %
-%    [ CC ] = MS_rotRandom( C, ... )
+%    [ CC, ... ] = MS_rotRandom( C, ... )
 %
 %     Rotate the elasticity matrix C to a random new orientation. CC is a
 %     6x6 matrix
 %
-%    [ CC ] = MS_rotRandom( C, 'number', n )
+%    [ CC, ... ] = MS_rotRandom( C, 'number', n )
 %
 %     CC is a 6x6xn matrix where each orientation is drawn from a uniform
 %     random distribution of orientations such that, for large n, the 
-%     avarage of the tensors in CC is isotropic.
+%     avarage of the matricies in CC is isotropic.
 %
-%    [ CC ] = MS_rotRandom( C, 'stream', PRNgenerator )
+%    [ CC, ... ] = MS_rotRandom( C, 'stream', PRNgenerator )
 %
 %     As above, but allow the user to specify the random number generator 
 %     to be used.
+%
+%    [ CC, eulers ] = MS_rotRandom( C, ... )
+%
+%     As above, but also output a 3xn array of Euler angles (Bunge notation
+%     and in degrees) used to generate the rotated elasticity matrices.
 %
 % See also: MS_ROT3 MS_ROTR MS_ROTEULER
 
@@ -59,7 +64,7 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function [ CC ] = MS_rotRandom( C, varargin )
+function [CC, eulers] = MS_rotRandom( C, varargin )
 
     % Default PRN stream and number of output tensors
     stream = RandStream.getDefaultStream;
@@ -80,8 +85,7 @@ function [ CC ] = MS_rotRandom( C, varargin )
                 ['Unknown option: ' varargin{iarg}]) ;   
        end   
     end
-
-    
+      
     % Uniform random numbers between 0 and 1. We convert these
     % into the Euler angles.
     eulers = rand(stream,3,number);
@@ -102,5 +106,5 @@ function [ CC ] = MS_rotRandom( C, varargin )
 
     % Annoying transpose - see GitHub issue #7
     CC = MS_rotEuler(C, eulers(1,:)', eulers(2,:)', eulers(3,:)');
-    
+ 
 end
