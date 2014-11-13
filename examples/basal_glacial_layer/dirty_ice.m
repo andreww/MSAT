@@ -45,6 +45,10 @@
 
 function dirty_ice 
 
+%                       +++++++++++++++
+%                         MODEL SETUP
+%                       +++++++++++++++
+
 % Input for model - these are the things that will need to change 
 % between different ATRAK runs.
 
@@ -70,11 +74,33 @@ density_rock = 2600 ; % kg/m^3
 % like cigars. An aspect ratio of 1 gives a sphere, and an isotropic
 % elastic model.
 volume_fraction_rock = 0.1;
-rock_aspect_ratio = 1.1 ;
+rock_aspect_ratio = 1.3 ;
 
 % Geometrical properties - these are just used to set up the 
-% modsimple input file.
+% modsimple input file and get the "dirty ice" in the right 
+% orientation.
+
+% First we need to rotate the dirty ice elasticity into the 
+% correct frame of reference. ATRAK works with X3 vertical, 
+% MS_effective_medium puts the unique axis along X1. Let's 
+% assume that flow is in the X1 direction. If we have cigars, these
+% will be alligned with flow, so we don't need to rotate
+% (set rot_X2 = 0 and rot_X3 = 0). If we have
+% smarties, the short direction could be vertical (in which case set
+% rot_X2 = 90 and rot_X3 = 0) or perpendicular to flow (in which case set
+% rot_X2 = 0 and rot_X3 = 90). It may be worth drawing a figure of this!
+rot_X2 = 0.0; % Degrees
+rot_X3 = 0.0; % Degrees. 
+
+% This is just for modsimple
 depth_to_interface = 1000 ; % m
+depth_to_base = 1100;
+modsimple_filename = 'my_modsinple_file.rsp';
+
+
+%                       +++++++++++++++
+%                         DO THE WORK
+%                       +++++++++++++++
 
 % Now calculate the (isotropic) elastic constants that represent the 
 % ice and the rock (MSAT used GPa for all elasticity).
@@ -82,17 +108,29 @@ depth_to_interface = 1000 ; % m
 [C_rock] = MS_iso(Vp_rock, Vs_rock, density_rock);
 
 % Now we can claculate the elasticity and density of the dirty ice layer.
-[C_dirty_ice,rho_dirty_ice] = MS_effective_medium('tandon', ...
+[C_dirty_ice,desnity_dirty_ice] = MS_effective_medium('tandon', ...
     C_ice, density_ice, C_rock, density_rock,  ...
     rock_aspect_ratio, volume_fraction_rock);
+
+% Rotate C_dirty_ice *note that I'm assuming only 1 non zero rotation 
+% as rotations do no commute*.
+C_dirty_ice = MS_rot3(C_dirty_ice, 0.0, rot_X2, rot_X3);
 
 % Check we have a sensible value - this will throw an error if C_dirty_ice
 % is not physical 
 MS_checkC(C_dirty_ice);
 
 % Write out the result for the dirty ice layer (for the record)
-report_elasticity(C_dirty_ice, rho_dirty_ice, 'dirty ice model')
+report_elasticity(C_dirty_ice, desnity_dirty_ice, 'dirty ice model')
 
+% Now generate a modsimple file. We are reusing old code here - which
+% handles many layers - hence the arrays.
+layer_Cs = zeros(6,6,2);
+layer_Cs(:,:,1) = C_ice;
+layer_Cs(:,:,2) = C_dirty_ice;
+create_modsimple_rsp(modsimple_filename, [0 -depth_to_interface], ...
+    [-depth_to_interface -depth_to_base], layer_Cs, ...
+    [density_ice desnity_dirty_ice]);
 
 end
 
@@ -109,11 +147,14 @@ end
 function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
     % Create a modsimple input file with two layers each with a 
     % thickness, elasticity and density. Write to file "filename"
+    % taking care of odd unit conversion.
 
     model_name = 'icesheet.mod';
+    length_Cs = size(Cs);
+    length_Cs = length_Cs(3);
     assert(length(dtts)==length(dtbs), 'Tops and bottoms must agree')
     assert(length(dtts)==length(rhos), 'Tops and density must agree')
-    assert(length(dtts)==length(Cs), 'Tops and Cijs must agree')
+    assert(length(dtts)==length_Cs, 'Tops and Cijs must agree')
 
     num_layers = length(dtts);
     
@@ -141,6 +182,7 @@ function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
     end
     fclose(fid);
 end
+
 
 function report_elasticity(C, rh, string)
     % Generate text and pole-figure of phase velocities given
