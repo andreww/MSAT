@@ -168,11 +168,10 @@ function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
     fprintf(fid, '%d %f %f\n', 10, -5000.0, -5000.0);
     fprintf(fid, '%d %f %f\n', 10, 0.0, -dtbs(num_layers)); % Base of hole
     
-    % Now add each layer in turn (remembering we need to go backwards)
+    % Now add each layer in turn
     j = 0;
-    for i = num_layers:-1:1
-        j = j + 1;
-        fprintf(fid, '%d %s\n', j, 'flat');
+    for i = 1:num_layers
+        fprintf(fid, '%d %s\n', i, 'flat');
         fprintf(fid, '%f %f\n', -dtts(i), -dtts(i));
         fprintf(fid, '%s\n', 'ani');
         fprintf(fid, '%d\n', 0); 
