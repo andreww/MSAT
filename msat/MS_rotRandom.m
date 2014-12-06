@@ -1,4 +1,4 @@
-% MS_ROTEULER - Randomly rotate an elasticity matrix.
+% MS_ROTRANDOM - Randomly rotate an elasticity matrix.
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
