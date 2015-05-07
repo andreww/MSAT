@@ -1,0 +1,8 @@
+ATRACK setup code for BSc geophyscs project, 2014/15
+
+This folder includes model setup code for Sam's 
+2014/15 BSc research project on reflections from 
+an anisotropic layer at the base of a glacier. See
+the thesis for more details. This may end up being 
+merged into the "glacial" example.
+
