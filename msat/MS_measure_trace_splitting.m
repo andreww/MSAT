@@ -163,6 +163,12 @@ function misfit = splitting_function(split_op, time, T00, T90)
     COVM = cov(T90sp,T00sp) ;
     % take the eigenvalues
     [~,D] = eig(COVM) ;
-    % calculate normalised misfit.
-    misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;     
+    % calculate normalised misfit. 
+    misfit = min([D(1,1) D(2,2)])./ max([D(1,1) D(2,2)]) ;
+    % We should never have a negative minimum eigenvalue - but 
+    % this is seen (only on Matlab 2013a) in one of the test cases
+    % so we set negative values to be zero.
+    if (misfit < 0.0)
+        misfit = 0.0;
+    end
 end
