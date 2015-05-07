@@ -48,7 +48,7 @@
 %            Winterstein D. F. (1990). Velocity anisotropy terminology 
 %            for geophysicists. Geophysics, vol 55, pp1070-1088. 
 
-% Copyright (c) 2011-2012, James Wookey and Andrew Walker
+% Copyright (c) 2011-2015, James Wookey and Andrew Walker
 % Copyright (c) 2007-2011, James Wookey
 % All rights reserved.
 % 
@@ -83,7 +83,7 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
+function [pol,avs,vs1,vs2,vp, S1P, S2P, PP] = MS_phasevels(C,rh,inc,azi)
 
       if (length(inc)~=length(azi))
 			error('MS:ListsMustMatch', ...
@@ -112,6 +112,8 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 		S1 = zeros(length(azi),3) ;
 		S1P = zeros(length(azi),3) ;
       S2P = zeros(length(azi),3) ;
+      
+      PP = zeros(length(azi),3) ;
         
 %   ** Handle isotropic case quickly
      if isIsotropic(C, isotol)
@@ -159,6 +161,9 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       S1P(ipair,:) = V_cross(XI,S1N);
       S2N = V_cross(XI,S2) ;
       S2P(ipair,:) = V_cross(XI,S2N);
+      
+      PPN = V_cross(XI,P);
+      PP(ipair,:) = V_cross(XI,PPN);
 
 %  ** rotate into y-z plane to calculate angles
 %     (use functions optimised for the two needed 
