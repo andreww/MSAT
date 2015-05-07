@@ -72,9 +72,9 @@ density_rock = 2600 ; % kg/m^3
 % axes (which are the same, the particles have rotational symmetry)
 % so values less than 1 are like smarties and values more than 1 are
 % like cigars. An aspect ratio of 1 gives a sphere, and an isotropic
-% elastic model.
-volume_fraction_rock = 0.1;
-rock_aspect_ratio = 1.3 ;
+% elastic model. Save figures as 'figure_volumefraction_rockaspect'
+volume_fraction_rock = 0.3;
+rock_aspect_ratio = 3.0;
 
 % Geometrical properties - these are just used to set up the 
 % modsimple input file and get the "dirty ice" in the right 
@@ -89,13 +89,13 @@ rock_aspect_ratio = 1.3 ;
 % smarties, the short direction could be vertical (in which case set
 % rot_X2 = 90 and rot_X3 = 0) or perpendicular to flow (in which case set
 % rot_X2 = 0 and rot_X3 = 90). It may be worth drawing a figure of this!
-rot_X2 = 0.0; % Degrees
+rot_X2 = 0; % Degrees
 rot_X3 = 0.0; % Degrees. 
 
 % This is just for modsimple
 depth_to_interface = 1000 ; % m
 depth_to_base = 1100;
-modsimple_filename = 'my_modsinple_file.rsp';
+modsimple_filename = 'modsimple.rsp';
 
 
 %                       +++++++++++++++
@@ -164,9 +164,9 @@ function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
 
     % Hard code X, Y and Z nodes here. We could make this
     % an argument, but I don't know what the rules are.
-    fprintf(fid, '%d %f %f\n', 10, 0.0, 10000.0);
-    fprintf(fid, '%d %f %f\n', 10, -5000.0, -5000.0);
-    fprintf(fid, '%d %f %f\n', 10, 0.0, -dtbs(num_layers)); % Base of hole
+    fprintf(fid, '%d %f %f\n', 10, -10000.0, 10000.0);
+    fprintf(fid, '%d %f %f\n', 10, -5000.0, 5000.0);
+    fprintf(fid, '%d %f %f\n', 10, -1100, -dtbs(num_layers)); % Base of hole
     
     % Now add each layer in turn
     j = 0;
