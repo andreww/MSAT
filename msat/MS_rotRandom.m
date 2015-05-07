@@ -67,7 +67,9 @@
 function [CC, eulers] = MS_rotRandom( C, varargin )
 
     % Default PRN stream and number of output tensors
-    stream = RandStream.getDefaultStream;
+    % Note that for older versions of Matlab, this should be
+    % stream = RandStream.getDefaultStream;
+    stream = RandStream.getGlobalStream;
     number = 1;
     
     % Process the optional arguments
