@@ -28,7 +28,7 @@
 %
 % See also: MS_AXES, MS_DECOMP
 
-% Copyright (c) 2011, James Wookey and Andrew Walker
+% Copyright (c) 2011-2015 James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
@@ -63,36 +63,27 @@
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
    
 function [ P ] = MS_norms( varargin )
-      
-%if (nargin~=(nargout+1)), ...
-%   error('Must be one more input than output, see help.'), end
 
-Cref = varargin{1} ;
-[Xref]=C2X(Cref) ;
+    Cref = varargin{1} ;
+    [Xref]=C2X(Cref) ;
 
-N = sqrt(Xref'*Xref) ;
+    N = sqrt(Xref'*Xref) ;
 
-Ctot=zeros(6,6);
-   
-for i=2:nargin
-   C = varargin{i} ;
-   Ctot = Ctot + varargin{i} ;
-   [Xtot]=C2X(Ctot) ;
-   XD=Xref-Xtot;
-   P(i-1)=1-(sqrt(XD'*XD)/N) ;
+    Ctot=zeros(6,6);
+    P(1:nargin-1) = 0.0;
+
+    for i=2:nargin
+        Ctot = Ctot + varargin{i} ;
+        [Xtot]=C2X(Ctot) ;
+        XD=Xref-Xtot;
+        P(i-1)=1-(sqrt(XD'*XD)/N) ;
+    end
+
+    % transform P
+    PP = [0 P] ;
+    P(1:nargin-1) = PP(2:nargin)-PP(1:nargin-1) ;
+
 end
-
-% transform P
-PP = [0 P] ;    
-P(1:nargin-1) = PP(2:nargin)-PP(1:nargin-1) ;
-
-return
-
-function Xn=mynorm(X)
-%   Xn=sqrt(sum(X.^2)) ; % Euclidean norm?
-    Xn=sqrt(dot(X,X)) ;
-    Xn=norm(X) ;
-return
 
 function [X]=C2X(C)
 %  after Browaeys and Chevrot (GJI, 2004)
@@ -120,4 +111,4 @@ function [X]=C2X(C)
 	X(20) = 2.*sqrt(2).*C(4,6) ;
 	X(21) = 2.*sqrt(2).*C(4,5) ;
 	
-return
+end
