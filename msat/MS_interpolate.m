@@ -40,7 +40,7 @@ function [ Cint ] = MS_interpolate(C1, C2, frac)
     [C2R, RR2] = MS_axes(C2, 'nowarn', 'X3_stiff');
     
     % Avarage C1R and C2R using Voigt-Reuss-Hill
-    CintR = MS_VRH([frac, 1-frac], C1R, 1.0, C2R, 1.0);
+    [~,~,CintR,~] = MS_VRH([frac, 1-frac], C1R, 1.0, C2R, 1.0);
 
     % Interpolate between forward rotations (C1->CR1 and C2->CR2)
     % using quaternion representation of rotations
