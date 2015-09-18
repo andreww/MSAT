@@ -630,7 +630,7 @@ function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
         fprintf(fid, '%s\n', 'ani');
         fprintf(fid, '%d\n', 0); 
         fprintf(fid, '%d\n', 21);
-        MS_save(fid, Cs(:,:,i), rhos(i), 'eunit', 'mbar', 'dunit', 'gcc', 'Aij');
+        MS_save(fid, Cs(:,:,i), rhos(i), 'eunit', 'pa', 'dunit', 'kgm3', 'Aij');
     end
     fclose(fid);
 end
