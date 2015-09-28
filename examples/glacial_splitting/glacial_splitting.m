@@ -21,7 +21,7 @@
 %       Note that setting this to 'GaussianWavelet' results in a much 
 %       longer execution time.
 
-% (C) Alan Baird and Andrew Walker, 2014
+% (C) Alan Baird and Andrew Walker, 2014, 2015
 % 
 % Redistribution and use in source and binary forms, 
 % with or without modification, are permitted provided 
@@ -126,6 +126,8 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     ddbs = zeros(1,length(all_data));
     Vpiso = zeros(1,length(all_data));
     Vsiso = zeros(1,length(all_data));
+    AVp = zeros(1,length(all_data));
+    AVs_max = zeros(1,length(all_data));
     j = 0;
     fprintf('\nLayer data (bottom to top) \n');
     fprintf('---------------------------\n');
@@ -158,6 +160,9 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
         Vsiso(j) = 1e-3.*sqrt((G_vrh*1e9)./rhos(j));
         % We may need the upper and lower bounds (V and R, respectivly)
 
+        % Anisotropy data for plot
+        [AVp(j), AVs_max(j)] = anisotropic_data(Cs(:,:,j), rhos(j));
+        
         report_layer(i, all_data(i).tex_file, Cs(:,:,j), rhos(j), ...
             all_data(i).dtb, dtt, all_data(i).Tav, plot_pole)
     end
@@ -166,7 +171,7 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Plot stratigraphic column
     
     figure();
-    subplot(1,4,1);
+    subplot(1,6,1);
     bar([fliplr(thickness);nan(size(thickness))],'stack');xlim([0.5,1.5]);ylim([0,4]);
     set(gca,'YDir','Reverse');
     hold on;
@@ -176,25 +181,35 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     ylabel('Depth (km)')
     hold off;
     
-    subplot(1,4,2);
+    subplot(1,6,2);
     stairs(temps,dtts./1000);xlim([-25,0]);ylim([0,4]);
     ylabel('Depth (km)');
     xlabel('Temperature (C)');
     set(gca,'YDir','Reverse');
     
-    subplot(1,4,3);
+    subplot(1,6,3);
     scatter(Vpiso,dtts./1000);ylim([0,4]);
     ylabel('Depth (km)');
     xlabel('Isotropic p-wave velocity (km/s)');
     set(gca,'YDir','Reverse');
 
-    
-    subplot(1,4,4);
-    scatter(Vsiso,dtts./1000);ylim([0,4]);
+    subplot(1,6,4);
+    scatter(Vpiso,dtts./1000);ylim([0,4]);
     ylabel('Depth (km)');
-    xlabel('Isotropic s-wave velocity (km/s)');
+    xlabel('Isotropic p-wave velocity (km/s)');
+    set(gca,'YDir','Reverse');
+    
+    subplot(1,6,5);
+    scatter(AVp,dtts./1000);ylim([0,4]);
+    ylabel('Depth (km)');
+    xlabel('P-wave anisotropy (%)');
     set(gca,'YDir','Reverse');
 
+    subplot(1,6,6);
+    scatter(AVs_max,dtts./1000);ylim([0,4]);
+    ylabel('Depth (km)');
+    xlabel('Maximum s-wave anisotropy (%)');
+    set(gca,'YDir','Reverse');
     
     % Create model for ATRAK
     create_modsimple_rsp('modsimple.rsp', dtts, dtbs, Cs, rhos)
@@ -633,5 +648,41 @@ function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
         MS_save(fid, Cs(:,:,i), rhos(i), 'eunit', 'pa', 'dunit', 'kgm3', 'Aij');
     end
     fclose(fid);
+end
+
+function [AVp, AVS_max] = anisotropic_data(C, rh)
+      % This is basically copied from MS_plot. We should
+      % pull this out into MS_something.
+
+      grid_spacing = 6;
+      
+      % Set up inc-az grids...
+      [INC,AZ] = meshgrid( 90:-grid_spacing:0 , 0:grid_spacing:360 ) ;
+      
+      % Invoke MS_phasevels to get wave velocities etc.
+      [~,~,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,...
+        reshape(INC, ((360/grid_spacing+1)*(90/grid_spacing+1)),1), ...
+        reshape(AZ,  ((360/grid_spacing+1)*(90/grid_spacing+1)),1));
+    
+      % reverse so sph2cart() works properly
+      % AZ = -AZ;
+      
+      % Reshape results back to grids
+      VS1 = reshape(vs1,61,16);
+      VS2 = reshape(vs2,61,16);
+      VP =  reshape(vp,61,16);
+      % VS1_x = reshape(S1P(:,1),61,16);
+      % VS1_y = reshape(S1P(:,2),61,16);
+      % VS1_z = reshape(S1P(:,3),61,16);
+        
+      % aVS data
+      dVS =  (VS1-VS2) ;
+      VSmean = (VS1+VS2)./2.0 ;
+      AVS = 100.0*(dVS./VSmean) ;
+      
+      % avp data
+      AVS_max = max(max(AVS));
+      AVp = (max(VP)- min(VP))/(max(VP)+min(VP)).*200.0;
+      
 end
 
