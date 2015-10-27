@@ -225,9 +225,9 @@ function [fast_eff,tlag_eff] = glacial_splitting(varargin)
     % Loop over source polarizations
     % and frequencies
     spol = min_azi:del_azi:max_azi; % Deg
-    freq = [0.3, 3.0, 30.0]; % Hz
+    freq = [3, 30, 3000]; % Hz
     freq_c = ['r', 'g', 'b'];
-    freq_names = {'0.3 Hz', '3.0 Hz', '30.0 Hz'};
+    freq_names = {'3 Hz', '30 Hz', '3000 Hz'};
     fast_eff = zeros(length(freq),length(spol));
     tlag_eff = zeros(length(freq),length(spol));
     for f = 1:length(freq)
