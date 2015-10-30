@@ -148,7 +148,7 @@ function [ varargout ] = MS_elasticDB( uid )
                   0.0   0.0   0.0   0.0 42.75   0.0 ; ...
                   0.0   0.0   0.0   0.0   0.0 51.005];
            rh = 3150;
-           
+
        case {'antigorite', 'atg'}
            info = 'Adiabatic single crystal antigorite, (Bezacier et al., EPSL 2010, 289:198-208; doi:10.1016/j.epsl.2009.11.009)';
            % Note that X1||a, X2||b and X3||c* - not IRE convection.
@@ -195,6 +195,16 @@ function [ varargout ] = MS_elasticDB( uid )
                   0     0       0     0    0    3.404 ];
            rh = 919.10; % See page 442 of paper.
            
+       case {'quartz', 'qz'}
+           info = 'Premium cultured single crystal alpha-quartz at 22 C using resonance-ultrasound spectroscopy. From Heyliger et al. (2003) Journal of the Accoustic Society of America 114:644-650';
+           C = [87.17  6.61  12.02 -18.23  0      0 ; ...
+                 6.61 87.17  12.02  18.23  0      0 ; ...
+                12.02 12.02 105.80   0.0   0      0 ; ...
+               -18.23 18.23   0.0   58.27  0      0 ; ...
+                 0     0      0      0    58.27 -18.23 ; ...
+                 0     0      0      0   -18.23  40.28 ];
+           rh = 2649.7;
+
        otherwise
          error('MS:ELASTICDB:UNKNOWN', ...
              'MS_elasticDB: Unknown identifier') ;
