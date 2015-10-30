@@ -78,7 +78,7 @@ function [ varargout ] = MS_decomp( C )
       C=C-CH ;
    end
 
-   if (nargout==6), varargout{6} = CH;, end
+   if (nargout==6), varargout{6} = C;, end
    
 
 return
