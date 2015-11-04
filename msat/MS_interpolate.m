@@ -9,7 +9,9 @@
 % Usage: 
 %     [ Cint ] = MS_interpolate( C1, C2, frac)                    
 %         Returns an elasticity matrix interpolated frac distance
-%         between elasticity matricies C1 and C2. 
+%         between elasticity matricies C1 and C2. Frac = 1 gives
+%         the elasticity of C1, frac = 0 gives the elasticity of 
+%         C2.
 %
 %
 % Notes:
@@ -46,7 +48,7 @@ function [ Cint ] = MS_interpolate(C1, C2, frac)
     % using quaternion representation of rotations
     q1 = SpinCalc('DCMtoQ',RR1, 0.001, 1);
     q2 = SpinCalc('DCMtoQ',RR2, 0.001, 1);  
-    qint = slerp(q1, q2, frac);
+    qint = slerp(q1, q2, 1-frac);
     Rint = SpinCalc('QtoDCM',qint, 0.001, 1);
     
     % Apply backwards rotation
