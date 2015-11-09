@@ -1,13 +1,13 @@
-% INTERPOLATE_EXAMPLE.m - example script showing two ways elasticity 
+% INTERPOLATE_1D_EXAMPLE.m - example script showing two ways elasticity 
 %                         matricies can be interpolated in MSAT.
 %
 % Interpolation of elastic constants can be a difficult problem. In this
 % example we show how two approaches, both implemented in MSAT, give quite 
 % different results. We imagine a region where the elasticity changes 
-% smoothly from one described by single crystal olivine rotated 30 degrees 
+% smoothly from one described by single crystal olivine rotated 60 degrees 
 % clockwise around its c-axis to one described by single crystal enstatie 
-% rotated 30 degrees anticlockwise around its c-axis and seek to calculate 
-% the elasticity of a point mid-way between these limits. One (commonly 
+% rotated 120 degrees clockwise around its c-axis and seek to calculate 
+% the elasticity of a points between these limits. One (commonly 
 % used) approach is to take the average of each element of the two 
 % elasticity tensors or the average of each element of the two compliance 
 % tensors. This amounts to the Voigt, Reuss or Voigt-Reuss-Hill average 
@@ -16,9 +16,19 @@
 % available in via MS_interpolate. This function by finding a common 
 % orientation for the two tensors, using MS_axes, averaging the rotated 
 % tensors, then moving the rotated tensor into the correct orientation. 
-% This example script compares the two approaches.  
+% This example script compares the two approaches.
+%
+% This example function takes a handfull of optional arguments intended to
+% allow robust timing of the two approaches. Turning off the generation of
+% phase velocity plots and summary information ('no_velocities' and 
+% 'no_summary') means that almost all time in this function is spent in the
+% MS_VRH or MS_interpolate. Setting 'calc_times' gathers timing information
+% for the avarage call (and implies 'no_velocities' and 'no_summary').
+% MS_VRH based interpolation is typically ~200 times faster than
+% MS_interpolate (0.0001 s per call versus 0.0023 s per call, on one
+% machine).
 % 
-% See also: MS_VRH, MS_INTERPOLATE
+% See also: MS_VRH, MS_INTERPOLATE, MS_AXES
 
 % (C) James Wookey and Andrew Walker, 2015
 % 
@@ -37,7 +47,7 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function interpolate_example(varargin)
+function interpolate_1D_example(varargin)
 
     % Default options
     phase_vels = 1; % Plot phase velocities
@@ -124,8 +134,7 @@ function interpolate_example(varargin)
     tic;
     for x = xvals
         i = i + 1;            
-        rh_interp = rh_x0*x + rh_x1*(1-x);
-        C_interp = MS_interpolate(C_x0, C_x1, x);
+        C_interp = MS_interpolate(C_x0, rh_x0, C_x1, rh_x1, x);
         if gather_results
             [P_ort_interp(i), P_low_interp(i), lmA_interp(i)] = ...
                 summary_anisotropy(C_interp);
