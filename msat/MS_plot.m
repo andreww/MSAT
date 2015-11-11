@@ -810,9 +810,9 @@ function plot_bands(baxis, bangles)
       end      
       
       % mask negative Z points. 
-      index=find(z>=0) ;   
-      
-      plot(x(index),y(index),'w--','LineWidth',1.5)
+      index=find(z>=0) ;
+
+      plot(x(index),y(index),'w-','LineWidth',1.5)
    end
    
    
