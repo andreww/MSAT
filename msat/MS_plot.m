@@ -84,6 +84,13 @@
 %          direction is also shown. Each argument (azimuth, inclination, 
 %          vp, polarisation and avs) is an array and each must be the 
 %          same length.
+%
+%     MS_plot(..., 'band', axis, angle)
+%          Draw a circle onto the sphere constant angle around the 
+%          specified axis (1,2 or 3). iaxis and angle can be a scalar 
+%          or vector and must have an equal number of entries. 
+%          For example, [1 1 1] [20 30 40] will draw circles on the
+%          sphere at a constant 20, 30 and 40 degrees from the 1-axis. 
 % 
 %     MS_plot(..., 'quiet')
 %          Don't write isotropic velocities to the terminal. 
@@ -229,6 +236,11 @@ function MS_plot(C,rh,varargin)
                pdata_mag = varargin{iarg+3};
                pdata_plot = 1;
                iarg = iarg + 4;
+            case 'band'
+               band_axis = varargin{iarg+1};
+               band_angle = varargin{iarg+2};
+               band_plot = 1;
+               iarg = iarg + 3;               
             otherwise 
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
@@ -264,6 +276,12 @@ function MS_plot(C,rh,varargin)
               'MS:PLOT:sdata_mismatch', ...
               'S-wave data arrays must be the same size.') ;
       end
+      if band_plot
+         assert(length(band_axis)==length(band_angle),...
+             'MS:PLOT:band_mismatch', ...
+             'To plot bands, angle and axis arrays must be the same size.') ;         
+      end
+      
 %  ** buggy MATLAB contourf (version 7.1-7.3)
 %
 %     in these versions of MATLAB, the contourf routine doesn't seem able to
@@ -349,6 +367,10 @@ function MS_plot(C,rh,varargin)
                           add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0);
                       end
                       
+                      if band_plot
+                         plot_bands(band_axis,band_angle) ;
+                      end    
+                      
                       %  ** add some information to the plot
                       VPlabel1 = sprintf(['Min. V_P =%6.2f, max.' ...
                           ' V_P =%6.2f'],VPmin,VPmax) ;
@@ -367,6 +389,10 @@ function MS_plot(C,rh,varargin)
                           buggyMATLAB, 'dV_S (%)')
                       
                       [AVSmin, AVSmax] = max_min_pole(AZ, INC, AVS);
+
+                      if band_plot
+                         plot_bands(band_axis,band_angle) ;
+                      end    
                       
                       %  ** add some information to the plot
                       AVSlabel1 = sprintf(['V_S anisotropy, min' ...
@@ -381,7 +407,11 @@ function MS_plot(C,rh,varargin)
                           buggyMATLAB, 'V_{S1} (km/s)')
                       
                       [VS1min, VS1max] = max_min_pole(AZ, INC, VS1);
-                      
+
+                      if band_plot
+                         plot_bands(band_axis,band_angle) ;
+                      end    
+                
                       %  ** add some information to the plot
                       VS1label1 = sprintf(['Min. V_{S1} =%6.2f, max.' ...
                           ' V_{S1} =%6.2f'],VS1min,VS1max) ;
@@ -400,6 +430,10 @@ function MS_plot(C,rh,varargin)
                           buggyMATLAB, 'V_{S2} (km/s)')
                       
                       [VS2min, VS2max] = max_min_pole(AZ, INC, VS1);
+
+                      if band_plot
+                         plot_bands(band_axis,band_angle) ;
+                      end    
                       
                       %  ** add some information to the plot
                       VS2label1 = sprintf(['Min. V_{S2} =%6.2f, max.' ...
@@ -411,12 +445,21 @@ function MS_plot(C,rh,varargin)
                       VS2label2 = sprintf('Anisotropy =%6.1f%%',VS2ani) ;
                       text(-1.3,0.8,VS2label2,'FontSize',fntsz, ...
                           'FontWeight','bold') ;
+
+                          if band_plot
+                             plot_bands(band_axis,band_angle) ;
+                          end    
+
                       
                   case 'avspol'
                       % Fast shear-wave polarisation plot
                       contour_pole(X, Y, AVS, view_angle, AVScvect, cmap, ...
                           fntsz, buggyMATLAB, 'Fast-shear polarisation')
                       
+                      if band_plot
+                         plot_bands(band_axis,band_angle) ;
+                      end    
+
                       if (limitsonpol)
                           [~, ~] = max_min_pole(AZ, INC, AVS);
                       end
@@ -431,7 +474,7 @@ function MS_plot(C,rh,varargin)
                       end
                       
                   otherwise
-                      error('MS:PLOT:BADPLOTMAP', ['An elelment of the '...
+                      error('MS:PLOT:BADPLOTMAP', ['An element of the '...
                           'plotmap was not recognised']);
               end
           end
@@ -738,4 +781,39 @@ function [VR] = V_rot_bet(V,bet)
 
     VR = V * RR ;
  
+end
+
+function plot_bands(baxis, bangles)
+% Plot bands on the pole figures.    
+   for iband=1:length(baxis)
+      % generate a set of points around the 3-axis
+      
+      r=ones(1,73) ;
+      th = 0:5:360 ;
+      ph = ones(1,73) .* (90-bangles(iband)) ;
+
+      [x,y,z]=sph2cart(th.*pi/180,ph.*pi/180,r) ;
+      
+      % rotate appropriately
+      if baxis(iband) == 1
+         VR = V_rot_bet([x ; y ; z]',90) ;
+         x=VR(:,1) ; y=VR(:,2) ; z=VR(:,3) ;
+      elseif baxis(iband) == 2
+         VR = V_rot_bet([x ; y ; z]',90) ;
+         VRR = V_rot_gam(VR,90) ;
+         x=VRR(:,1) ; y=VRR(:,2) ; z=VRR(:,3) ;         
+      elseif baxis(iband) == 3
+         % nothing required
+      else             
+         error('MS:PLOT:BADBANDAXIS', ...
+            'Bad axis specified to plot band.');
+      end      
+      
+      % mask negative Z points. 
+      index=find(z>=0) ;   
+      
+      plot(x(index),y(index),'w--','LineWidth',1.5)
+   end
+   
+   
 end
