@@ -80,28 +80,28 @@ function interpolate_2D_example(varargin)
     
     % Forsterite: X = 0, Y=0
     [C_x0y0, rh_x0y0] = MS_elasticDB('olivine');
-    C_x0y0 = MS_rot3(C_x0y0, 0, 0, 60);
+    C_x0y0 = MS_rot3(C_x0y0, 0, 0, 30);
     if phase_vels
        MS_plot(C_x0y0, rh_x0y0, 'wtitle', '100% forsterite', 'quiet');
     end 
     
     % Fayalite: X = 1, Y=0
     [C_x1y0, rh_x1y0] = MS_elasticDB('fayalite');
-    C_x1y0 = MS_rot3(C_x1y0, 0, 0, 120);
+    C_x1y0 = MS_rot3(C_x1y0, 0, 0, 30);
     if phase_vels
         MS_plot(C_x1y0, rh_x1y0, 'wtitle', '100% fayalite', 'quiet');
     end
     
     % Diopside: X = 0, Y=1
-    [C_x0y1, rh_x0y1] = MS_elasticDB('diopside');
-    C_x0y1 = MS_rot3(C_x0y1, 0, 0, 60);
+    [C_x0y1, rh_x0y1] = MS_elasticDB('olivine');
+    C_x0y1 = MS_rot3(C_x0y1, 0, 0, 50);
     if phase_vels
        MS_plot(C_x0y1, rh_x0y1, 'wtitle', '100% forsterite', 'quiet');
     end 
     
     % Enstatite: X = 1, Y=1
-    [C_x1y1, rh_x1y1] = MS_elasticDB('enstatite');
-    C_x1y1 = MS_rot3(C_x1y1, 0, 0, 120);
+    [C_x1y1, rh_x1y1] = MS_elasticDB('fayalite');
+    C_x1y1 = MS_rot3(C_x1y1, 0, 0, 50);
     if phase_vels
         MS_plot(C_x1y1, rh_x1y1, 'wtitle', '100% fayalite', 'quiet');
     end
@@ -109,13 +109,115 @@ function interpolate_2D_example(varargin)
     % Points for the interpolation
     [X, Y] = meshgrid(0:0.1:1, 0:0.1:1);
     C_interp = zeros([6 6 size(X)]);
-    C_voigt = zeros([6 6 size(Y)]);
+    C_interp_yx = zeros([6 6 size(X)]);
+    C_voigt = zeros([6 6 size(X)]);
+    r_interp = zeros(size(X));
+    r_interp_yx = zeros(size(X));
+    r_voigt = zeros(size(X));
+    Vp_interp = zeros(size(X));
+    Vp_interp_yx = zeros(size(X));
+    Vp_voigt = zeros(size(X));
+    P_ort_interp = zeros(size(X));
+    P_ort_interp_yx = zeros(size(X));
+    P_ort_voigt = zeros(size(X));
+    [ni, nj] = size(X);
     
-
+    inc = 0.0;
+    azi = 0.0;
+    
+    for i = 1:ni
+        for j = 1:nj
+            [C_interp(:,:,i,j), r_interp(i,j)] = bilinear_interp(C_x0y0,... 
+                rh_x0y0, C_x1y0, rh_x1y0, C_x0y1, rh_x0y1, C_x1y1, ...
+                rh_x1y1, X(i,j), Y(i,j), 0);
+            [C_interp_yx(:,:,i,j), r_interp_yx(i,j)] = bilinear_interp(C_x0y0,... 
+                rh_x0y0, C_x1y0, rh_x1y0, C_x0y1, rh_x0y1, C_x1y1, ...
+                rh_x1y1, X(i,j), Y(i,j), 1);
+            [C_voigt(:,:,i,j), r_voigt(i,j)] = bilinear_VRH(C_x0y0,... 
+                rh_x0y0, C_x1y0, rh_x1y0, C_x0y1, rh_x0y1, C_x1y1, ...
+                rh_x1y1, X(i,j), Y(i,j));
+            
+            [~, ~, ~, ~, Vp_interp(i,j)] = ...
+                MS_phasevels( C_interp(:,:,i,j), r_interp(i,j), inc, azi );
+            [~, ~, ~, ~, Vp_interp_yx(i,j)] = ...
+                MS_phasevels( C_interp_yx(:,:,i,j), r_interp_yx(i,j), inc, azi );
+            [~, ~, ~, ~, Vp_voigt(i,j)] = ...
+                MS_phasevels( C_voigt(:,:,i,j), r_voigt(i,j), inc, azi );
+            
+            [P_ort_interp(i,j), ~,~] = summary_anisotropy(C_interp(:,:,i,j));
+            [P_ort_interp_yx(i,j), ~,~] = summary_anisotropy(C_interp_yx(:,:,i,j));
+            [P_ort_voigt(i,j), ~,~] = summary_anisotropy(C_voigt(:,:,i,j));
+        end
+    end
+    
+    figure
+    subplot(3, 1, 1);
+    contourf(X, Y, Vp_interp);
+    colorbar;
+    title('Interp')
+    subplot(3, 1, 2);
+    contourf(X, Y, Vp_interp_yx);
+    colorbar;
+    title('Voigt')
+    subplot(3, 1, 3);
+    contourf(X, Y, Vp_voigt);
+    colorbar;
+    title('Voigt')
+    
+        figure
+    subplot(3, 1, 1);
+    contourf(X, Y, P_ort_interp);
+    colorbar;
+    title('Interp')
+    subplot(3, 1, 2);
+    contourf(X, Y, P_ort_interp_yx);
+    colorbar;
+    title('Voigt')
+    subplot(3, 1, 3);
+    contourf(X, Y, P_ort_voigt);
+    colorbar;
+    title('Voigt')
     
 end
 
-function bilinear 
+function [Cxy, rxy] = bilinear_interp(C00, r00, C10, r10, C01, r01, C11,...
+                                      r11, x, y, order)
+     % Bilinear interpolation of elastic constants and density at point x,
+     % y (between 0 and 1) given values at (x, y) of (0, 0), (1, 0), (0, 1)
+     % and (1, 1) the symmetry aware interpolator.
+     
+     if order == 0
+         % Interpolate along x at y=0
+         [Cy0, ry0] = MS_interpolate(C00, r00, C10, r10, x);
+         % Interpolate along x at y=1
+         [Cy1, ry1] = MS_interpolate(C01, r01, C11, r11, x);
+         % interpolate along y at x=x
+         [Cxy, rxy] = MS_interpolate(Cy0, ry0, Cy1, ry1, y);
+     else
+         % Interpolate along y at x=0
+         [Cx0, rx0] = MS_interpolate(C00, r00, C01, r01, y);
+         % Interpolate along y at x=1
+         [Cx1, rx1] = MS_interpolate(C10, r10, C11, r11, y);
+         % interpolate along y at x=x
+         [Cxy, rxy] = MS_interpolate(Cx0, rx0, Cx1, rx1, x);
+     end
+     
+end
+
+function [Cxy, rxy] = bilinear_VRH(C00, r00, C10, r10, C01, r01, C11,... 
+                                      r11, x, y)
+     % Bilinear interpolation of elastic constants and density at point x,
+     % y (between 0 and 1) given values at (x, y) of (0, 0), (1, 0), (0, 1)
+     % and (1, 1) the symmetry aware interpolator.
+     
+     % Interpolate along x at y=0
+     [~, ry0, Cy0] = MS_VRH([x 1-x], C00, r00, C10, r10);
+     % Interpolate along x at y=1
+     [~, ry1, Cy1] = MS_VRH([x 1-x], C01, r01, C11, r11);
+     % interpolate along y at x=x
+     [~, rxy, Cxy] = MS_VRH([y 1-y], Cy0, ry0, Cy1, ry1); 
+     
+end
     
 %     
 %     % Do the Voigt (element-wise) average
@@ -214,8 +316,8 @@ function [P_ort, P_low, Ua] = summary_anisotropy(C)
          CR = MS_axes(C) ;
          [C_iso,C_hex,C_tet,C_ort,C_mon,C_tri] = MS_decomp(CR);
          P = MS_norms(CR,C_iso,C_hex,C_tet,C_ort,C_mon,C_tri) ;
-         P_ort = sum(P(2:4))./sum(P(2:6));
-         P_low = sum(P(5:6))./sum(P(2:6));
+         P_ort = sum(P(1:4))./sum(P(1:6));
+         P_low = sum(P(5:6))./sum(P(1:6));
          [Ua] = MS_anisotropy(C);
 
 end
