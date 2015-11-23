@@ -178,6 +178,13 @@ function interpolate_2D_example(varargin)
     colorbar;
     title('Voigt')
     
+    % Read real data
+    [C_single, rh] = MS_elasticDB('llm_mgsio3ppv');
+    [Cs, X, Y] = setup_full_elasticity_grid(C_single, 'vpsc_textures.tex');
+    Cs
+    X
+    Y
+    
 end
 
 function [Cxy, rxy] = bilinear_interp(C00, r00, C10, r10, C01, r01, C11,...
@@ -219,88 +226,13 @@ function [Cxy, rxy] = bilinear_VRH(C00, r00, C10, r10, C01, r01, C11,...
      
 end
     
-%     
-%     % Do the Voigt (element-wise) average
-%     i = 0;
-%     tic;
-%     for x = xvals
-%         i = i + 1;
-%         [~, rh_interp, C_voigt] = MS_VRH([x 1-x], C_x0, rh_x0, C_x1, rh_x1);
-%         if gather_results
-%             [P_ort_voigt(i), P_low_voigt(i), lmA_voigt(i)] = ...
-%                 summary_anisotropy(C_voigt);
-%         end
-%         
-%         % Plot five values
-%         if (mod(x,0.25) == 0) && phase_vels
-%             plottitle = sprintf( ...
-%                 '%d%% forsterite %d%% fayalite, elementwise (Voigt mean)', ...
-%                 (x*100), (1-x)*100);          
-%             MS_plot(C_voigt, rh_interp, 'wtitle', plottitle, 'quiet');
-%         end
-%         
-%     end
-%     time_per_voigt = toc/i;
-%     
-% 
-%     % Do the MS_interpolate interpolation
-%     i = 0;
-%     tic;
-%     for x = xvals
-%         i = i + 1;            
-%         C_interp = MS_interpolate(C_x0, rh_x0, C_x1, rh_x1, x);
-%         if gather_results
-%             [P_ort_interp(i), P_low_interp(i), lmA_interp(i)] = ...
-%                 summary_anisotropy(C_interp);
-%         end
-%         
-%         % Plot five values
-%         if (mod(x,0.25) == 0) && phase_vels
-%             plottitle = sprintf( ...
-%                 '%d%% forsterite %d%% fayalite, (common orientation)', ...
-%                 (x*100), (1-x)*100);
-% 
-%             MS_plot(C_interp, rh_interp, 'wtitle', plottitle, 'quiet');
-%         end
-%         
-%     end
-%     time_per_interp = toc/i;
-%     
-%     if gather_results
-%         % Plot up the summary data
-%         figure;
-%         plot(xvals, P_ort_voigt*100, 'b-');
-%         hold on;
-%         plot(xvals, P_low_voigt*100, 'b--');
-%         plot(xvals, P_ort_interp*100, 'g-');
-%         plot(xvals, P_low_interp*100, 'g--');
-%         title('Anisotropic decomposition for interpolated points');
-%         legend('Consistent with orthorhombic symmetry, Voigt', ...
-%             'Inconsistent with orthorhombic symmetry, Voigt', ...
-%             'Consistent with orthorhombic symmetry, common orientation', ...
-%             'Inconsistent with orthorhombic symmetry, common orientation', ...
-%             'location', 'southoutside');
-%         xlabel('Volume fraction forsterite')
-%         ylabel('Norm of decomposed elasticity, \%')
-%         hold off;
-%         
-%         figure
-%         plot(xvals, lmA_voigt, 'b-');
-%         hold on;
-%         plot(xvals, lmA_interp, 'g-');
-%         title('Universal anisotropy index for interpolated points')
-%         legend('Voigt interpolation', 'Inperpolation based on common orientations')
-%         xlabel('Volume fraction forsterite')
-%         ylabel('Universal anisotropy index')
-%         hold off;
-%     end
+
 %     
 %     if report_time
 %         fprintf('Time per Voigt interpolation = %f s\n', time_per_voigt)
 %         fprintf('Time per common orientation interpolation = %f s\n', time_per_interp)
 %     end
 %     
-% end
 
 function [P_ort, P_low, Ua] = summary_anisotropy(C)
 
@@ -320,4 +252,111 @@ function [P_ort, P_low, Ua] = summary_anisotropy(C)
          P_low = sum(P(5:6))./sum(P(1:6));
          [Ua] = MS_anisotropy(C);
 
+end
+
+
+function [Cs, X, Y] = setup_full_elasticity_grid(C_single, filename)
+
+    % Read Euler angles for each strain increment - these are stored
+    % in cell arrays
+    [eulers, nxtl] = read_VPSC_file(filename);
+    num_blocks = length(nxtl) - 1; % We don't want the last block - which
+                                   % is the last block repeted
+    Cs_in = zeros([6 6 num_blocks]);
+    for i = 1:num_blocks
+        Cs_in(:, :, i) = elasticity_from_eulers(C_single, nxtl(i), ...
+            eulers{i});
+    end
+    
+    assert(num_blocks == 400, 'Grid assumes 400 strains');
+    
+    point_spacing = 1.0;
+    Cs = zeros(6, 6, 20, 20);
+    X = zeros(20, 20);
+    Y = zeros(20, 20);
+    % i is index along x (horizontal) and j is index aling y (vertical, 
+    % increses downwards, towards CMB).
+    for j = 1:20 
+        for i = 1:20
+          Cs(:,:,i,j) = Cs_in(:,:, i*j);
+          X(i,j) = i*point_spacing;
+          Y(i,j) = j*point_spacing;
+        end
+    end
+    
+end
+
+function [C_poly] = elasticity_from_eulers(C_single, nxtls, eulers)
+    % Elasticity of textured pv
+    Cs = zeros(6,6,nxtls);
+    for i = 1:nxtls
+        Cs(:,:,i) = MS_rotEuler(C_single, eulers(1,i), eulers(2,i), ...
+            eulers(3,i));
+    end
+    rhos = ones(nxtls,1); % All crystals have the same density.
+                          % we end up ignoring this.
+    vfs = ones(nxtls,1);  % Same volume fraction for each point 
+                          % - normalised by MS_VRH.
+    [C_poly, ~] = MS_VRH(vfs, Cs, rhos);
+
+end
+
+
+function [eulers, nxtl] = read_VPSC_file(filename)
+    % Reads data from a VPSC output or input texture file.
+    % Must be Bunge convention and in degrees. Returns eulers, a (3,nxtl) 
+    % array of Euler angles (Bunge convention, (1,:) = phi1, (2,:) = Phi
+    % and (3,:) = phi2) and a scalar nxtl, specifying the number of 
+    % crystals / Euler angle triples.
+
+    % Read data from the file
+    fid = fopen(filename); % Read - the default
+    
+    blocks = 0; % Which number texture block are we on?
+
+    while (true) % infinite loop (break with conditional)
+        
+        tmp_l = fgetl(fid);  % First header line - ignore...
+        if (tmp_l == -1)     % if no strain info then we are at the end 
+            break            % of the file, break out of read loop
+        end
+        
+        fgetl(fid); % Lengths of phase ellipsoid axes - ignore
+        fgetl(fid); % Euler angles for phase ellipsoid - ignore
+        L = sscanf(fgetl(fid), '%s %d'); % Convention and number of crystals
+
+        % Get hold of header info
+        assert((char(L(1))=='B'), ... % Check Euler angle convention
+            'Could not read VPSC file - not Bunge format\n');
+        tmp_nxtl = L(2); % Number of crystals
+
+        % loop over each grain and extract Eulers
+        tmp_eulers = zeros(3,tmp_nxtl);
+        for i = 1:tmp_nxtl
+            E = sscanf(fgetl(fid),'%g %g %g %g');
+        
+            % Build Euler angles array.
+            tmp_eulers(1,i) = E(1,:);
+            tmp_eulers(2,i) = E(2,:);
+            tmp_eulers(3,i) = E(3,:);
+        end
+                
+        % Build output...
+        blocks = blocks + 1;
+        if blocks == 1
+            eulers = tmp_eulers;
+            nxtl = tmp_nxtl;
+        elseif blocks == 2
+            % Multiple textures, bundle into a cell array...
+            eulers = {eulers};
+            eulers(2) = {tmp_eulers};
+            nxtl(blocks) = tmp_nxtl;
+        else
+            eulers(blocks) = {tmp_eulers};
+            nxtl(blocks) = tmp_nxtl;
+        end
+        
+    end
+    fclose(fid);
+   
 end
