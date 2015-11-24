@@ -75,115 +75,112 @@ function interpolate_2D_example(varargin)
        end
     end
     
-    % Set up and plot values we 'know' - on one end we have rotated 
-    % Fo90, on the other we have rotated fayalite
     
-    % Forsterite: X = 0, Y=0
-    [C_x0y0, rh_x0y0] = MS_elasticDB('olivine');
-    C_x0y0 = MS_rot3(C_x0y0, 0, 0, 30);
-    if phase_vels
-       MS_plot(C_x0y0, rh_x0y0, 'wtitle', '100% forsterite', 'quiet');
-    end 
+    % Read full data set from textures and convert to elasticity.
+    [C_single, rh] = MS_elasticDB('llm_mgsio3ppv');
+    [Cs_full, X_full, Y_full] = setup_full_elasticity_grid(C_single, ...
+        'vpsc_textures.tex');
     
-    % Fayalite: X = 1, Y=0
-    [C_x1y0, rh_x1y0] = MS_elasticDB('fayalite');
-    C_x1y0 = MS_rot3(C_x1y0, 0, 0, 30);
-    if phase_vels
-        MS_plot(C_x1y0, rh_x1y0, 'wtitle', '100% fayalite', 'quiet');
+    
+    % Setup low resolution model
+    [X_subset, Y_subset] = meshgrid(0:5:20, 0:5:20);
+    [ni, nj] = size(X_subset);
+    C_subset = zeros(6, 6, ni, nj);
+    for i = 1:ni
+        for j = 1:nj
+            C_subset(:,:,i,j) = Cs_full(:,:,i*4,j*4);
+        end
     end
     
-    % Diopside: X = 0, Y=1
-    [C_x0y1, rh_x0y1] = MS_elasticDB('olivine');
-    C_x0y1 = MS_rot3(C_x0y1, 0, 0, 50);
-    if phase_vels
-       MS_plot(C_x0y1, rh_x0y1, 'wtitle', '100% forsterite', 'quiet');
-    end 
     
-    % Enstatite: X = 1, Y=1
-    [C_x1y1, rh_x1y1] = MS_elasticDB('fayalite');
-    C_x1y1 = MS_rot3(C_x1y1, 0, 0, 50);
-    if phase_vels
-        MS_plot(C_x1y1, rh_x1y1, 'wtitle', '100% fayalite', 'quiet');
-    end
-
-    % Points for the interpolation
-    [X, Y] = meshgrid(0:0.1:1, 0:0.1:1);
-    C_interp = zeros([6 6 size(X)]);
-    C_interp_yx = zeros([6 6 size(X)]);
-    C_voigt = zeros([6 6 size(X)]);
-    r_interp = zeros(size(X));
-    r_interp_yx = zeros(size(X));
-    r_voigt = zeros(size(X));
-    Vp_interp = zeros(size(X));
-    Vp_interp_yx = zeros(size(X));
-    Vp_voigt = zeros(size(X));
-    P_ort_interp = zeros(size(X));
-    P_ort_interp_yx = zeros(size(X));
-    P_ort_voigt = zeros(size(X));
-    [ni, nj] = size(X);
+    % Do the interpolation
+    [ni_full, nj_full] = size(X_full);
+    Cs_interp = zeros(6,6,ni_full,nj_full);
+    Cs_voigt = zeros(6,6,ni_full,nj_full);
+    r_interp = zeros(ni_full, nj_full);
+    r_voigt = zeros(ni_full, nj_full);
+    
+    Vp_full = zeros(ni_full, nj_full);
+    Vp_interp = zeros(ni_full, nj_full);
+    Vp_voigt = zeros(ni_full, nj_full);
+    P_ort_full = zeros(ni_full, nj_full);
+    P_ort_interp = zeros(ni_full, nj_full);
+    P_ort_voigt = zeros(ni_full, nj_full);
     
     inc = 0.0;
     azi = 0.0;
     
-    for i = 1:ni
-        for j = 1:nj
-            [C_interp(:,:,i,j), r_interp(i,j)] = bilinear_interp(C_x0y0,... 
-                rh_x0y0, C_x1y0, rh_x1y0, C_x0y1, rh_x0y1, C_x1y1, ...
-                rh_x1y1, X(i,j), Y(i,j), 0);
-            [C_interp_yx(:,:,i,j), r_interp_yx(i,j)] = bilinear_interp(C_x0y0,... 
-                rh_x0y0, C_x1y0, rh_x1y0, C_x0y1, rh_x0y1, C_x1y1, ...
-                rh_x1y1, X(i,j), Y(i,j), 1);
-            [C_voigt(:,:,i,j), r_voigt(i,j)] = bilinear_VRH(C_x0y0,... 
-                rh_x0y0, C_x1y0, rh_x1y0, C_x0y1, rh_x0y1, C_x1y1, ...
-                rh_x1y1, X(i,j), Y(i,j));
+    for i = 1:ni_full
+        for j = 1:nj_full
             
+            x = X_full(i,j);
+            y = Y_full(i,j);
+            [dx, dy, illcnr, jllcnr] = point_finder(x, y, ...
+                X_subset, Y_subset);
+            
+            [Cs_interp(:,:,i,j), r_interp(i,j)] = bilinear_interp(...
+                                     C_subset(:,:,illcnr,jllcnr), rh, ...
+                                     C_subset(:,:,illcnr,jllcnr+1), rh, ...
+                                     C_subset(:,:,illcnr+1,jllcnr), rh, ...
+                                     C_subset(:,:,illcnr+1,jllcnr+1), rh, ...
+                                     dx/4, dy/4, 0);
+                                 
+            [Cs_voigt(:,:,i,j), r_voigt(i,j)] = bilinear_VRH(...
+                                     C_subset(:,:,illcnr,jllcnr), rh, ...
+                                     C_subset(:,:,illcnr,jllcnr+1), rh, ...
+                                     C_subset(:,:,illcnr+1,jllcnr), rh, ...
+                                     C_subset(:,:,illcnr+1,jllcnr+1), rh, ...
+                                     dx/4, dy/4);
+           
+            [~, ~, ~, ~, Vp_full(i,j)] = ...
+                MS_phasevels( Cs_full(:,:,i,j), rh, inc, azi );                   
             [~, ~, ~, ~, Vp_interp(i,j)] = ...
-                MS_phasevels( C_interp(:,:,i,j), r_interp(i,j), inc, azi );
-            [~, ~, ~, ~, Vp_interp_yx(i,j)] = ...
-                MS_phasevels( C_interp_yx(:,:,i,j), r_interp_yx(i,j), inc, azi );
+                MS_phasevels( Cs_interp(:,:,i,j), r_interp(i,j), inc, azi );
             [~, ~, ~, ~, Vp_voigt(i,j)] = ...
-                MS_phasevels( C_voigt(:,:,i,j), r_voigt(i,j), inc, azi );
+                MS_phasevels( Cs_voigt(:,:,i,j), r_voigt(i,j), inc, azi );
             
-            [P_ort_interp(i,j), ~,~] = summary_anisotropy(C_interp(:,:,i,j));
-            [P_ort_interp_yx(i,j), ~,~] = summary_anisotropy(C_interp_yx(:,:,i,j));
-            [P_ort_voigt(i,j), ~,~] = summary_anisotropy(C_voigt(:,:,i,j));
+            [P_ort_full(i,j), ~,~] = summary_anisotropy(Cs_full(:,:,i,j));
+            [P_ort_interp(i,j), ~,~] = summary_anisotropy(Cs_interp(:,:,i,j));
+            [P_ort_voigt(i,j), ~,~] = summary_anisotropy(Cs_voigt(:,:,i,j));
         end
     end
     
     figure
     subplot(3, 1, 1);
-    contourf(X, Y, Vp_interp);
+    contourf(X_full, Y_full, Vp_full);
     colorbar;
-    title('Interp')
+    title('Full');
     subplot(3, 1, 2);
-    contourf(X, Y, Vp_interp_yx);
+    contourf(X_full, Y_full, Vp_interp);
     colorbar;
-    title('Voigt')
+    title('Interp');
     subplot(3, 1, 3);
-    contourf(X, Y, Vp_voigt);
+    contourf(X_full, Y_full, Vp_voigt);
     colorbar;
-    title('Voigt')
+    title('Voigt');
     
-        figure
+    figure
     subplot(3, 1, 1);
-    contourf(X, Y, P_ort_interp);
+    contourf(X_full, Y_full, P_ort_full);
     colorbar;
-    title('Interp')
+    title('Full');
     subplot(3, 1, 2);
-    contourf(X, Y, P_ort_interp_yx);
+    contourf(X_full, Y_full, P_ort_interp);
     colorbar;
-    title('Voigt')
+    title('Interpt')
     subplot(3, 1, 3);
-    contourf(X, Y, P_ort_voigt);
+    contourf(X_full, Y_full, P_ort_voigt);
     colorbar;
-    title('Voigt')
+    title('Voigt');
     
-    % Read real data
-    [C_single, rh] = MS_elasticDB('llm_mgsio3ppv');
-    [Cs, X, Y] = setup_full_elasticity_grid(C_single, 'vpsc_textures.tex');
-    Cs
-    X
-    Y
+        
+
+%     
+%     if report_time
+%         fprintf('Time per Voigt interpolation = %f s\n', time_per_voigt)
+%         fprintf('Time per common orientation interpolation = %f s\n', time_per_interp)
+%     end
+%     
     
 end
 
@@ -211,6 +208,7 @@ function [Cxy, rxy] = bilinear_interp(C00, r00, C10, r10, C01, r01, C11,...
      
 end
 
+
 function [Cxy, rxy] = bilinear_VRH(C00, r00, C10, r10, C01, r01, C11,... 
                                       r11, x, y)
      % Bilinear interpolation of elastic constants and density at point x,
@@ -225,14 +223,81 @@ function [Cxy, rxy] = bilinear_VRH(C00, r00, C10, r10, C01, r01, C11,...
      [~, rxy, Cxy] = MS_VRH([y 1-y], Cy0, ry0, Cy1, ry1); 
      
 end
-    
 
-%     
-%     if report_time
-%         fprintf('Time per Voigt interpolation = %f s\n', time_per_voigt)
-%         fprintf('Time per common orientation interpolation = %f s\n', time_per_interp)
-%     end
-%     
+
+function [dx, dy, illcnr, jllcnr] = point_finder(x, y, Xgrid, Ygrid)
+    % Given the point (x,y) and a grid of points Xgrid and Ygrid
+    % which could have been produced by meshgrid, find the indicies of the
+    % grids representing the 'lower left' corner of the grid - i.e. the 
+    % point x,y is in the box defined by (Xgrid(i,j), Ygrid(i,j)), 
+    % (Xgrid(i,j+1), Ygrid(i,j+1)), (Xgrid(i+1,j), Ygrid(i+1,j)),
+    % and (Xgrid(i+1,j+1), Ygrid(i+1,j+1)). The distance from the corner
+    % to the point is given by dx and dy.
+    
+    [ni, nj] = size(Xgrid);
+    % Check most of the gird (brute force)
+    for i = 1:ni-1
+        for j = 1:nj-1
+            xllcnr = Xgrid(i,j);
+            yllcnr = Ygrid(i,j);
+            xurcnr = Xgrid(i+1,j+1);
+            yurcnr = Ygrid(i+1,j+1);
+            if (x >= xllcnr) && (y >= yllcnr) ...
+                    && (x < xurcnr) && (y < yurcnr)
+                dx = x - xllcnr;
+                dy = y - yllcnr;
+                illcnr = i;
+                jllcnr = j;
+                return
+            end        
+        end
+    end
+
+    % Check the upper and right hand edges
+    i = ni;
+    for j = 1:nj-1
+        xllcnr = Xgrid(i,j);
+        yllcnr = Ygrid(i,j);
+        yurcnr = Ygrid(i,j+1);
+        if (x == xllcnr) && (y >= yllcnr) && (y < yurcnr)
+            dx = x - xllcnr;
+            dy = y - yllcnr;
+            illcnr = i;
+            jllcnr = j;
+            return
+        end        
+    end
+    j = nj;
+    for i = 1:ni-1
+        xllcnr = Xgrid(i,j);
+        yllcnr = Ygrid(i,j);
+        xurcnr = Xgrid(i+1,j);
+        if (x >= xllcnr) && (y == yllcnr) && (x < xurcnr)
+            dx = x - xllcnr;
+            dy = y - yllcnr;
+            illcnr = i;
+            jllcnr = j;
+            return
+        end        
+    end
+    xllcnr = Xgrid(ni,nj);
+    yllcnr = Ygrid(ni,nj);
+    if (x == xllcnr) && (y == yllcnr)
+        dx = 0;
+        dy = 0;
+        illcnr = ni;
+        jllcnr = nj; 
+        return
+    end
+    
+    x
+    y
+    Xgrid
+    Ygrid
+    error('failed to find point in grid')
+
+end
+
 
 function [P_ort, P_low, Ua] = summary_anisotropy(C)
 
@@ -279,8 +344,8 @@ function [Cs, X, Y] = setup_full_elasticity_grid(C_single, filename)
     for j = 1:20 
         for i = 1:20
           Cs(:,:,i,j) = Cs_in(:,:, i*j);
-          X(i,j) = i*point_spacing;
-          Y(i,j) = j*point_spacing;
+          X(i,j) = (i*point_spacing)-point_spacing;
+          Y(i,j) = (j*point_spacing)-point_spacing;
         end
     end
     
