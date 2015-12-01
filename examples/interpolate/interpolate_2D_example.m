@@ -82,13 +82,16 @@ function interpolate_2D_example(varargin)
         'vpsc_textures.tex');
     
     
+    % subset value
+    subset_step = 2;
+    
     % Setup low resolution model
-    [X_subset, Y_subset] = meshgrid(0:5:20, 0:5:20);
+    [X_subset, Y_subset] = meshgrid(0:subset_step:19, 0:subset_step:19);
     [ni, nj] = size(X_subset);
     C_subset = zeros(6, 6, ni, nj);
     for i = 1:ni
         for j = 1:nj
-            C_subset(:,:,i,j) = Cs_full(:,:,i*4,j*4);
+            C_subset(:,:,i,j) = Cs_full(:,:,i*subset_step,j*subset_step);
         end
     end
     
@@ -115,22 +118,22 @@ function interpolate_2D_example(varargin)
             
             x = X_full(i,j);
             y = Y_full(i,j);
-            [dx, dy, illcnr, jllcnr] = point_finder(x, y, ...
+            [dx, dy, illcnr, jllcnr, iurcnr, jurcnr] = point_finder(x, y, ...
                 X_subset, Y_subset);
             
             [Cs_interp(:,:,i,j), r_interp(i,j)] = bilinear_interp(...
                                      C_subset(:,:,illcnr,jllcnr), rh, ...
-                                     C_subset(:,:,illcnr,jllcnr+1), rh, ...
-                                     C_subset(:,:,illcnr+1,jllcnr), rh, ...
-                                     C_subset(:,:,illcnr+1,jllcnr+1), rh, ...
-                                     dx/4, dy/4, 0);
+                                     C_subset(:,:,illcnr,jurcnr), rh, ...
+                                     C_subset(:,:,iurcnr,jllcnr), rh, ...
+                                     C_subset(:,:,iurcnr,jurcnr), rh, ...
+                                     dx/subset_step, dy/subset_step, 0);
                                  
             [Cs_voigt(:,:,i,j), r_voigt(i,j)] = bilinear_VRH(...
                                      C_subset(:,:,illcnr,jllcnr), rh, ...
-                                     C_subset(:,:,illcnr,jllcnr+1), rh, ...
-                                     C_subset(:,:,illcnr+1,jllcnr), rh, ...
-                                     C_subset(:,:,illcnr+1,jllcnr+1), rh, ...
-                                     dx/4, dy/4);
+                                     C_subset(:,:,illcnr,jurcnr), rh, ...
+                                     C_subset(:,:,iurcnr,jllcnr), rh, ...
+                                     C_subset(:,:,iurcnr,jurcnr), rh, ...
+                                     dx/subset_step, dy/subset_step);
            
             [~, ~, ~, ~, Vp_full(i,j)] = ...
                 MS_phasevels( Cs_full(:,:,i,j), rh, inc, azi );                   
@@ -225,7 +228,7 @@ function [Cxy, rxy] = bilinear_VRH(C00, r00, C10, r10, C01, r01, C11,...
 end
 
 
-function [dx, dy, illcnr, jllcnr] = point_finder(x, y, Xgrid, Ygrid)
+function [dx, dy, illcnr, jllcnr, iurcnr, jurcnr] = point_finder(x, y, Xgrid, Ygrid)
     % Given the point (x,y) and a grid of points Xgrid and Ygrid
     % which could have been produced by meshgrid, find the indicies of the
     % grids representing the 'lower left' corner of the grid - i.e. the 
@@ -234,61 +237,73 @@ function [dx, dy, illcnr, jllcnr] = point_finder(x, y, Xgrid, Ygrid)
     % and (Xgrid(i+1,j+1), Ygrid(i+1,j+1)). The distance from the corner
     % to the point is given by dx and dy.
     
+    
+    % Inside the grid
     [ni, nj] = size(Xgrid);
-    % Check most of the gird (brute force)
     for i = 1:ni-1
-        for j = 1:nj-1
-            xllcnr = Xgrid(i,j);
-            yllcnr = Ygrid(i,j);
-            xurcnr = Xgrid(i+1,j+1);
-            yurcnr = Ygrid(i+1,j+1);
-            if (x >= xllcnr) && (y >= yllcnr) ...
-                    && (x < xurcnr) && (y < yurcnr)
-                dx = x - xllcnr;
-                dy = y - yllcnr;
+        for j = 1:ni-1
+            x_min = Xgrid(i,j);
+            y_min = Ygrid(i,j);
+            x_max = Xgrid(i,j+1);
+            y_max = Ygrid(i+1,j);
+            if (x >= x_min) && (x < x_max) && (y >= y_min) && (y < y_max)
+                dx = x - x_min;
+                dy = y - y_min;
                 illcnr = i;
                 jllcnr = j;
+                iurcnr = i+1;
+                jurcnr = j+1;
                 return
-            end        
+            end
         end
     end
-
-    % Check the upper and right hand edges
-    i = ni;
-    for j = 1:nj-1
-        xllcnr = Xgrid(i,j);
-        yllcnr = Ygrid(i,j);
-        yurcnr = Ygrid(i,j+1);
-        if (x == xllcnr) && (y >= yllcnr) && (y < yurcnr)
-            dx = x - xllcnr;
-            dy = y - yllcnr;
-            illcnr = i;
-            jllcnr = j;
-            return
-        end        
-    end
-    j = nj;
+    
+    % maximum x edge
     for i = 1:ni-1
-        xllcnr = Xgrid(i,j);
-        yllcnr = Ygrid(i,j);
-        xurcnr = Xgrid(i+1,j);
-        if (x >= xllcnr) && (y == yllcnr) && (x < xurcnr)
-            dx = x - xllcnr;
-            dy = y - yllcnr;
+        x_edge = Xgrid(1,nj);
+        y_min = Ygrid(i,nj);
+        y_max = Ygrid(i+1,nj);
+        if (x >= x_edge) && (y >= y_min) && (y < y_max)
+            dx = x - x_edge;
+            dy = y - y_min;
             illcnr = i;
-            jllcnr = j;
+            jllcnr = nj;
+            iurcnr = i+1;
+            jurcnr = nj;
             return
-        end        
+        end
     end
-    xllcnr = Xgrid(ni,nj);
-    yllcnr = Ygrid(ni,nj);
-    if (x == xllcnr) && (y == yllcnr)
-        dx = 0;
-        dy = 0;
+   
+    % maximum y edge
+    for j = 1:nj-1
+        y_edge = Ygrid(ni, j);
+        x_min = Xgrid(ni,j);
+        x_max = Xgrid(ni, j+1);
+        if (y >= y_edge) && (x >= x_min) && (x < x_max)
+            dx = x - x_min;
+            dy = y - y_edge;
+            illcnr = ni;
+            jllcnr = j;
+            iurcnr = ni;
+            jurcnr = j + 1;
+            return
+        end
+    end
+    
+    % Maximum corner
+    x_edge = Xgrid(ni, nj);
+    y_edge = Ygrid(ni, nj);
+    if (x >= x_edge) && (y >= y_edge)
+        dx = x - x_edge;
+        dy = y - y_edge;
         illcnr = ni;
-        jllcnr = nj; 
+        jllcnr = nj;
+        iurcnr = ni;
+        jurcnr = nj;
         return
     end
+        
+
     
     x
     y
