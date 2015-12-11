@@ -143,7 +143,7 @@ function [misfit]=orientation_misfit(str_dip,Cbase,rh,...
    misfit=0 ;
    for i=1:length(data_fast)
       misfit = misfit + MS_splitting_misfit(data_fast(i),data_tlag(i),...
-                           fast(i),tlag(i),data_spol,data_dfreq,'mode','lam2') ;
+                           fast(i),tlag(i),data_spol,data_dfreq,'mode','lam2s') ;
    end
    misfit = misfit ./ length(data_fast) ;
    

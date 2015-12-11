@@ -174,18 +174,18 @@ function [misfit] = ...
    
    [time,T00,T90] = MS_make_trace(spol,dfreq,max_tlag) ;
 
-   if (idebug), plot_wavelet(time,T00,T90), end
+   if (idebug), MS_plot_trace(time,T00,T90), end
 
    % apply splitting operator 1 
    [T00sp,T90sp] = MS_split_trace(time,T00,T90,fast1,tlag1) ;
 
    
-   if (idebug), plot_wavelet(time,T00sp,T90sp), end
+   if (idebug), MS_plot_trace(time,T00sp,T90sp), end
    
    % apply inverse of splitting operator 2
    [T00sp2,T90sp2] = MS_split_trace(time,T00sp,T90sp,fast2,-tlag2) ;   
 
-   if (idebug), plot_wavelet(time,T00sp2,T90sp2), end
+   if (idebug), MS_plot_trace(time,T00sp2,T90sp2), end
    
    
    %% measure second eignvalue of the resulting wavelet
