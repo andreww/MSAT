@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -742,87 +740,88 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_PLOT - Plot phasevels/anisotropy on pole figures.</tt></pre>
+<pre><code>MS_PLOT - Plot phasevels/anisotropy on pole figures.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Given an elasticity matrix and density, produce pole figures showing
-    the P- and S-wave anisotrpy.</tt></pre>
+<pre><code>Given an elasticity matrix and density, produce pole figures showing
+    the P- and S-wave anisotrpy.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(C, rh, ...)</tt></pre>
+<pre><code>MS_plot(C, rh, ...)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Usage:
+<pre><code>Usage:
     MS_plot(C, rh)
         Produce three pole figures showing P-wave velocity, S-wave
-        anisotropy and fast S-wave polarisation direction</tt></pre>
+        anisotropy and fast S-wave polarisation direction</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'fontsize', f)
-     Set minimum fontsize in plots to f.</tt></pre>
+<pre><code>MS_plot(..., 'fontsize', f)
+     Set minimum fontsize in plots to f.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'wtitle', S)
+<pre><code>MS_plot(..., 'wtitle', S)
      Set the (window) title to be string S. If a minus sign is prepended
      to this title, the figure number is also suppressed (the minus sign
-     is not shown).</tt></pre>
+     is not shown).</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'cmap', CM)
+<pre><code>MS_plot(..., 'cmap', CM)
      Redefine the colormap. CM can either be a (nx3) matrix containing a
      colormap, or a string describing a function to generate such a
      matrix (such as the built-in MATLAB colormap functions). E.g.:
         MS_plot(C,rh,'cmap','cool(64)') - uses the MATLAB function cool
            to generate a cyan-to-purple colourmap.
      The default is 'jet', reversed so blue is fast/high, as is
-     conventional for seismic velocity colorscales.</tt></pre>
+     conventional for seismic velocity colorscales.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'reverse')
+<pre><code>MS_plot(..., 'reverse')
      Unreverse the sense of the colour map. Default (no argument) is
      for blue to be fast/high as is conventional for seismic velocity
-     colorscales. Setting this option results in red being fast/high.</tt></pre>
+     colorscales. Setting this option results in red being fast/high.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'pcontours', pcvect)
+<pre><code>MS_plot(..., 'pcontours', pcvect)
+MS_plot(..., 'avscontours', ascvect)
 MS_plot(..., 'scontours', scvect)
-     Set the contour levels for the P-wave velocity and S-wave
-     anisotropy plots. The values of pcvect and scvect can be scalars
-     indicating the number of contour lines to use or vectors, where
-     each value represents a different contour line. Thus, the
-     minimum, maximum values and spacing of contours can easily be
-     set using the syntax [minval:spacing:maxval] for pcvect and
-     scvect.</tt></pre>
+     Set the contour levels for the P-wave velocity, S-wave
+     anisotropy and (optional) S-wave velocity plots. The values of
+     pcvect, ascvect and scvect can be scalars indicating the number
+     of contour lines to use or vectors, where each value represents
+     a different contour line. Thus, the minimum, maximum values and
+     spacing of contours can easily be set using the syntax
+     [minval:spacing:maxval] for pcvect ascvect or scvect.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'limitsonpol')
+<pre><code>MS_plot(..., 'limitsonpol')
      Include markers for the maximum and minimum values of S-wave
      anisotropy on the plot of fast S-wave polarisation direction.
-     Not shown by default.</tt></pre>
+     Not shown by default.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'polsize' s1, s2, w1, w2)
+<pre><code>MS_plot(..., 'polsize' s1, s2, w1, w2)
      Set the size of the markers used to indicate the fast S-wave
      polarisation direction. There are two markers used a larger
      white "background" marker with a length set by s1 (defaults to
      0.18) and width set by w1 (defaults to 3.0) and an inner black
      marker with width set by w2 (defaults to 2.0) and length set by
      s2 (defaults to 0.18). A useful "neet" alternitive to the
-     default is s1 = 0.18, s2 = 0.16, w1 = 2.0 and w2 = 1.0.</tt></pre>
+     default is s1 = 0.18, s2 = 0.16, w1 = 2.0 and w2 = 1.0.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'plotmap', pmap)
+<pre><code>MS_plot(..., 'plotmap', pmap)
      Change the order, or content, of the subplots. This allows a
      single pole figure (e.g. the P-wave velocity) to be drawn, or
      the pole figures to be drawn in a different order. The argument
@@ -832,11 +831,11 @@ MS_plot(..., 'scontours', scvect)
      {'VP', 'AVS', 'AVSPOL'} draws three pole figures in a row. If
      the argument were {'VP'; 'AVS'} two pole figures would be drawn,
      one above the other. Valid strings are 'VP", 'AVS' and 'AVSPOL'.
-     These are not case sensitive.</tt></pre>
+     These are not case sensitive.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'pdata', azimuth, inclination, vp)
+<pre><code>MS_plot(..., 'pdata', azimuth, inclination, vp)
 MS_plot(..., 'sdata', azimuth, inclination, polarisation, avs)
      Add data points to the P-wave velocity ('VP') or S-wave
      polarisation plot ('AVSPOL'), respectively. This can be used,
@@ -848,16 +847,16 @@ MS_plot(..., 'sdata', azimuth, inclination, polarisation, avs)
      or. In the case of S-wave anisotropy, the fast polarisation
      direction is also shown. Each argument (azimuth, inclination,
      vp, polarisation and avs) is an array and each must be the
-     same length.</tt></pre>
+     same length.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_plot(..., 'quiet')
-     Don't write isotropic velocities to the terminal.</tt></pre>
+<pre><code>MS_plot(..., 'quiet')
+     Don't write isotropic velocities to the terminal.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See also: MS_SPHERE, MS_PHASEVELS</tt></pre>
+<pre><code>See also: MS_SPHERE, MS_PHASEVELS</code></pre>
 </div></div>
 </div>
 </div>
@@ -865,7 +864,7 @@ MS_plot(..., 'sdata', azimuth, inclination, polarisation, avs)
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-01 10:21:58 BST
+Last updated 2015-12-12 19:16:20 GMT
 </div>
 </div>
 </body>

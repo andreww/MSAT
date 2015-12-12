@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -742,126 +740,126 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_SPHERE - Plot a spherical plot of phasevels/anisotropy from a set of
-             elastic constants.</tt></pre>
+<pre><code>MS_SPHERE - Plot a spherical plot of phasevels/anisotropy from a set of
+             elastic constants.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Given an elasticity matrix and density, produce spherical figures showing
-    the P- or S-wave anisotropy or the slowness surface.</tt></pre>
+<pre><code>Given an elasticity matrix and density, produce spherical figures showing
+    the P- or S-wave anisotropy or the slowness surface.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(CC,rh,mode,...)</tt></pre>
+<pre><code>MS_sphere(CC,rh,mode,...)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Usage:
+<pre><code>Usage:
     MS_sphere(CC,rh,mode)
         Mode can be 'p'(-wave), 's'(-wave), 's1' (fast s-wave) or 's2'
         (slow s-wave) for velocity plots or 'slowP','slowS1' or 'slowS2'
-        for slowness plots (slowness is the inverse of velocity).</tt></pre>
+        for slowness plots (slowness is the inverse of velocity).</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(CC,rh,mode,...)
+<pre><code>MS_sphere(CC,rh,mode,...)
      Further arguments are optional, can be combined in any order and
      change the behaviour of the function. Specific options are
-     listed below.</tt></pre>
+     listed below.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'reverse')
+<pre><code>MS_sphere(..., 'reverse')
      Unreverse the sense of the colour map. Default (no argument) is
      for blue to be fast/high as is conventional for seismic velocity
-     colorscales. Setting this option results in red being fast/high.</tt></pre>
+     colorscales. Setting this option results in red being fast/high.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'sdata',azi,inc,pol,magn)
+<pre><code>MS_sphere(..., 'sdata',azi,inc,pol,magn)
      Overlay a S-wave (splitting) dataset onto the sphere at the points.
      indicated by the azi, inc arrays. The data are in 2 vectors: pol
      (SW orientation) and mag ( anisotropy). They are plotted as coloured
-     spots with vector ticks.</tt></pre>
+     spots with vector ticks.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'pdata',azi,inc,vel)
+<pre><code>MS_sphere(..., 'pdata',azi,inc,vel)
      Overlay a P-wave (velocity) dataset (in vel) onto the sphere at
      the points. indicated by the azi, inc arrays. They are plotted as
-     coloured spots.</tt></pre>
+     coloured spots.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'FSWTickLength', length)
+<pre><code>MS_sphere(..., 'FSWTickLength', length)
      Set the length of the Fast shear wave direction markers, default
-     is 0.08.</tt></pre>
+     is 0.08.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'FSWMarkerSize', length)
+<pre><code>MS_sphere(..., 'FSWMarkerSize', length)
      Set the size of the Fast shear wave direction markers, default
-     is 4.</tt></pre>
+     is 4.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'cmap', CM)
+<pre><code>MS_sphere(..., 'cmap', CM)
      Redefine the colormap. CM can either be a (nx3) matrix containing a
      colormap, or a string describing a function to generate such a
      matrix (such as the built-in MATLAB colormap functions). E.g.:
      MS_sphere(C,rh,mode,'cmap','cool(64)') - uses the MATLAB
      function cool to generate a cyan-to-purple colourmap.
      The default is 'jet', reversed so blue is fast/high, as is
-     conventional for seismic velocity colorscales.</tt></pre>
+     conventional for seismic velocity colorscales.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'velmesh', levels)
+<pre><code>MS_sphere(..., 'velmesh', levels)
      Choose the number of points used to mesh the velocity contours
      expressed in terms of the number of times the mesh spacing is
-     halved. Default is 3.</tt></pre>
+     halved. Default is 3.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'polmesh', levels)
+<pre><code>MS_sphere(..., 'polmesh', levels)
      Choose the number of points used to mesh the fast shear wave
      markers. Expressed in terms of the number of times the mesh spacing is
-     halved. Default is 2.</tt></pre>
+     halved. Default is 2.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'dirs', array)
+<pre><code>MS_sphere(..., 'dirs', array)
      Directions of interest, this should be a vector of azi,
-     inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4].</tt></pre>
+     inc pairs, e.g., [az1 in1 az2 in2 az3 in3 az4 in4].</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'dlen', lenght)
-     Set length of doi vectors. Default is 1.5</tt></pre>
+<pre><code>MS_sphere(..., 'dlen', lenght)
+     Set length of doi vectors. Default is 1.5</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'nolabels')
-     Supress printing of the text labels.</tt></pre>
+<pre><code>MS_sphere(..., 'nolabels')
+     Supress printing of the text labels.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'noaxes')
-     Supress printing of the direction axes.</tt></pre>
+<pre><code>MS_sphere(..., 'noaxes')
+     Supress printing of the direction axes.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'nocbar')
-     Supress printing of the colour bar.</tt></pre>
+<pre><code>MS_sphere(..., 'nocbar')
+     Supress printing of the colour bar.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_sphere(..., 'nofig')
-     Suppress the figure command, so plot can be sub-plotted.</tt></pre>
+<pre><code>MS_sphere(..., 'nofig')
+     Suppress the figure command, so plot can be sub-plotted.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See also: MS_SPHERE, MS_PHASEVELS</tt></pre>
+<pre><code>See also: MS_SPHERE, MS_PHASEVELS</code></pre>
 </div></div>
 </div>
 </div>
@@ -869,7 +867,7 @@ asciidoc.install();
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-01 10:21:58 BST
+Last updated 2015-12-12 19:16:20 GMT
 </div>
 </div>
 </body>

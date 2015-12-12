@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Example 3: Texture analysis and MTEX</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -763,9 +761,9 @@ directory also contains the data file needed to run the example.</p></div>
 <div class="paragraph"><p>The example is implemented as follows, wrapped in a function:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>function texture_example()
+<pre><code>function texture_example()
 
-    fprintf('\nMSAT TEXTURE EXAMPLE SCRIPT\n\n');</tt></pre>
+    fprintf('\nMSAT TEXTURE EXAMPLE SCRIPT\n\n');</code></pre>
 </div></div>
 <div class="paragraph"><p>First setup basic parameters - single crystal elastic constants and
 symmetry. Note that I don&#8217;t know what the the sample is made of -
@@ -773,7 +771,7 @@ just that it&#8217;s a two phase mixture with both phases belonging to the
 m-3m point group. We guess a NaCl / KCl mixture.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    % Elastic constants <strong>and</strong> density
+<pre><code>    % Elastic constants <strong>and</strong> density
     [C1, rho1] = MS_elasticDB('NaCl');
     [C2, rho2] = MS_elasticDB('KCl');
 
@@ -782,13 +780,13 @@ m-3m point group. We guess a NaCl / KCl mixture.</p></div>
           symmetry('m-3m')};
 
     % specimen symmetry
-    SS = symmetry('-1');</tt></pre>
+    SS = symmetry('-1');</code></pre>
 </div></div>
 <div class="paragraph"><p>Second, load in all the EBSD data using MTEX. NaCl data ends up in ebsd(1)
 and KCl data ends up in ebsd(2).</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    tic; fprintf('Loading EBSD data ...');
+<pre><code>    tic; fprintf('Loading EBSD data ...');
 
     % specify file name. Use a local copy as the MTEX version seems to move
     % about between versions.
@@ -800,14 +798,14 @@ and KCl data ends up in ebsd(2).</p></div>
           'Euler3' 'MAD' 'BC' 'BS' 'Bands' 'Error' 'ReliabilityIndex'}, ...
           'Bunge', 'ignorePhase', 0);
 
-    telap = toc; fprintf(' done (%4.2f secs)\n',telap);</tt></pre>
+    telap = toc; fprintf(' done (%4.2f secs)\n',telap);</code></pre>
 </div></div>
 <div class="paragraph"><p>Third, for each EBSD measurement, create an elastic matrix with the measured
 orientation. Work on NaCl, then KCl before joining the elastic
 matrices together.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    tic; fprintf('Extracting Euler angles ...');
+<pre><code>    tic; fprintf('Extracting Euler angles ...');
     % NaCl Euler angles
     [Nphi1s, Nthetas, Nphi2s] = Euler(get(ebsd(1),'orientations'), 'Bundge');
     % KCl Euler angles
@@ -847,17 +845,17 @@ matrices together.</p></div>
     rhos = [NaCl_rhos KCl_rhos] ;
 
     [Cav, rhoav] = MS_VRH(vfs, Cs, rhos);
-    telap = toc; fprintf(' done (%4.2f secs)\n\n',telap);</tt></pre>
+    telap = toc; fprintf(' done (%4.2f secs)\n\n',telap);</code></pre>
 </div></div>
 <div class="paragraph"><p>Finally, plot the S-wave anisotropy of the rock sample and report
 some data on elastic constants.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    plot(ebsd);
+<pre><code>    plot(ebsd);
     MS_plot(Cav, rhoav);
     MS_info(Cav, rhoav);
     fprintf('\ndone.\n\n');
-end</tt></pre>
+end</code></pre>
 </div></div>
 </div>
 </div>
@@ -865,7 +863,7 @@ end</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-06-17 09:42:06 BST
+Last updated 2015-07-30 13:43:56 BST
 </div>
 </div>
 </body>

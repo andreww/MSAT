@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Example 7: Modelling texture inheritance between post-perovskite and perovskite</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -1994,7 +1992,7 @@ can be found in the supplementary information of that paper.</p></div>
 <div class="paragraph"><p>The example is packaged as a function taking a number of optional
 arguments to give the source of the VPSC output and restart files
 but these are not needed. The script can most simply be run as
-<tt>topotaxy_model()</tt> on the command line. The MTEX toolkit (Bachmann
+<code>topotaxy_model()</code> on the command line. The MTEX toolkit (Bachmann
 et al. 2010) can be used to produce pole figures of the textures
 but this is not required. The function can take one, two, or four
 optional arguments:</p></div>
@@ -2025,22 +2023,22 @@ slip systems in perovskite and post-perovskite alter the results.</p></div>
 </td>
 </tr></table>
 </div>
-<div class="paragraph"><p>The code for this example can be found in <tt>/examples/topotaxy/topotaxy_model.m</tt> which,
+<div class="paragraph"><p>The code for this example can be found in <code>/examples/topotaxy/topotaxy_model.m</code> which,
 after parsing the optional arguments described above, performs a number of operations
 on the Euler angles read in from the input file.</p></div>
 <div class="paragraph"><p>The input (post-perovskite) Euler angles are read into the
-array <tt>eulers</tt> using the included function <tt>read_VPSC_file()</tt>, which
+array <code>eulers</code> using the included function <code>read_VPSC_file()</code>, which
 takes a file name as an argument. Pole figures of the input texture
 are shown below. These are only produced if MTEX is installed (see
-<tt>plot_pole_figure()</tt> for details.</p></div>
+<code>plot_pole_figure()</code> for details.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="ppv_tex.png" alt="Post-perovskite texture pole figures" />
 </span></p></div>
 <div class="paragraph"><p>The elasticity of the input polycrystalline aggregate can then be
-calculated using <tt>MS_rotEuler()</tt> and <tt>MS_VRH()</tt>.</p></div>
+calculated using <code>MS_rotEuler()</code> and <code>MS_VRH()</code>.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% Elasticity of textured ppv pre-transformeation
+<pre><code>% Elasticity of textured ppv pre-transformeation
     Cs = zeros(6,6,nxtls);
     <strong>for</strong> i = 1:nxtls
         Cs(:,:,i) = MS_rotEuler(C_ppv, eulers(1,i), eulers(2,i), eulers(3,i));
@@ -2055,9 +2053,9 @@ calculated using <tt>MS_rotEuler()</tt> and <tt>MS_VRH()</tt>.</p></div>
         % Save Cij <strong>in</strong> format <strong>for</strong> reflectivity calc.
         MS_save(ppv_elastic_name, C_ppv_av, rh_ppv_av, 'Aij', 'eunit', ...
             'Pa');
-    end</tt></pre>
+    end</code></pre>
 </div></div>
-<div class="paragraph"><p>The function <tt>report_elasticity</tt> prints the resulting elasticity matrix
+<div class="paragraph"><p>The function <code>report_elasticity</code> prints the resulting elasticity matrix
 and draws the phase velocity pole figures shown below.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="ppv_seis.png" alt="Post-perovskite phase velocities" />
@@ -2066,15 +2064,15 @@ and draws the phase velocity pole figures shown below.</p></div>
 exhibits topotaxy with the relations $[001]_{pv}=[001]_{ppv}$
 and either $[100]_{pv}=[1\bar{1}0]_{ppv}$ or
 $[100]_{pv}=[110]_{ppv}$. This relationship is expressed as
-a rotation matrix by the function <tt>getTopotaxyRotations()</tt>, which
+a rotation matrix by the function <code>getTopotaxyRotations()</code>, which
 calculates unit vectors along the crystallographic axes and then
 builds the rotation matrix to go from one to the other.
 For ease of manipulation the Euler angle triples describing the
 texture are also converted
-into rotation matrices using the <tt>rot_from_Euler()</tt> function:</p></div>
+into rotation matrices using the <code>rot_from_Euler()</code> function:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>function [ g ] = rot_from_Euler(phi1, theta, phi2)
+<pre><code>function [ g ] = rot_from_Euler(phi1, theta, phi2)
     % Given three Euler angles phi1, Phi, phi2 (Bunge notation,
     % <strong>in</strong> degrees) <strong>return</strong> a rotation matrix, g, representing the
     % rotation. This <strong>is</strong> the 'passive' rotation.
@@ -2093,13 +2091,13 @@ into rotation matrices using the <tt>rot_from_Euler()</tt> function:</p></div>
     g = [cp1*cp2 - sp1*sp2*cth, sp1*cp2 + cp1*sp2*cth, sp2*sth ; ...
         -1*cp1*sp2 - sp1*cp2*cth, -1*sp1*sp2 + cp1*cp2*cth, cp2*sth; ...
         sp1*sth, -1*cp1*sth, cth];
-end</tt></pre>
+end</code></pre>
 </div></div>
 <div class="paragraph"><p>This allows the Euler angles of the aggregate after the phase transition to be
 calculated:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    % Texture of transformed material
+<pre><code>    % Texture of transformed material
     % ===============================
 
         transformed_eulers = zeros(size(eulers));
@@ -2117,7 +2115,7 @@ calculated:</p></div>
             transformed_eulers(1,x) = phi1;
             transformed_eulers(2,x) = Phi;
             transformed_eulers(3,x) = phi2;
-        end</tt></pre>
+        end</code></pre>
 </div></div>
 <div class="paragraph"><p>along with its elasticity. Pole figures for the transformed texture and
 phase velocity are shown below.</p></div>
@@ -2128,7 +2126,7 @@ phase velocity are shown below.</p></div>
 <img src="pv_seis.png" alt="Perovskite phase velocities" />
 </span></p></div>
 <div class="paragraph"><p>The resulting texture and elasticity is then optionally written out for further use. The
-file <tt>/examples/topotaxy/extract_pv_def_results.m</tt> is a cut down version of the example
+file <code>/examples/topotaxy/extract_pv_def_results.m</code> is a cut down version of the example
 described above which focuses on only the analysis of elasticity allowing the output
 perovskite texture to be further deformed using the VPSC code and the results examined.</p></div>
 </div>
@@ -2154,7 +2152,7 @@ F. Bachmann, R. Hielscher and H. Schaeben (2010) "Texture analysis with MTEX&#82
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-06-17 10:03:33 BST
+Last updated 2015-07-30 13:43:56 BST
 </div>
 </div>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -742,16 +740,16 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_MEASURE_TRACE_SPLITTING - Measure SWS for a pair of orthogonal traces</tt></pre>
+<pre><code>MS_MEASURE_TRACE_SPLITTING - Measure SWS for a pair of orthogonal traces</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[fast, tlag] = MS_measure_trace_splitting(time, T00, T90, d_fast, ...
-    d_tlag, max_tlag ...)</tt></pre>
+<pre><code>[fast, tlag] = MS_measure_trace_splitting(time, T00, T90, d_fast, ...
+    d_tlag, max_tlag ...)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Inputs:
+<pre><code>Inputs:
    time (vector) : Series of time points where amplitudes are known (s)
    T00 (vector)  : Series of amplitudes of transverse wave #1 before
                    splitting applied.
@@ -759,26 +757,26 @@ asciidoc.install();
                    splitting applied.
    d_fast (scalar) : Spacing of grid search for fast direction (degrees)
    d_tlag (scalar) : Spacing of grid search lag time (s)
-   max_tlag (scalar) : Maximum lag time in grid search</tt></pre>
+   max_tlag (scalar) : Maximum lag time in grid search</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Outputs:
+<pre><code>Outputs:
    fast (vector)  : Optimum fast direction (degrees).
-   tlag (vector)  : Optimum lag tim</tt></pre>
+   tlag (vector)  : Optimum lag tim</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Given a two traces (T00 and T90) on a common time axis (time) find
+<pre><code>Given a two traces (T00 and T90) on a common time axis (time) find
 the splitting operator (fast and tlag) that minimises the second
 eigenvalue of the covariance matrix. This is done in two steps. First
 using an approximate grid search (spacing and time limits set by
 d_fast, d_tlag and max_tlag) then by using the Matlab built
-in simplex optimiser from the best grid point.</tt></pre>
+in simplex optimiser from the best grid point.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Options:</tt></pre>
+<pre><code>Options:</code></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -806,7 +804,7 @@ MS_measure_trace_splitting( &#8230; <em>optimoptions</em>, options)
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-01 10:21:58 BST
+Last updated 2015-12-12 19:16:20 GMT
 </div>
 </div>
 </body>

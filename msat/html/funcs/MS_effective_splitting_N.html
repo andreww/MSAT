@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -742,69 +740,69 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_EFFECTIVE_SPLITTING_N - N-layer effective splitting operator calculation.</tt></pre>
+<pre><code>MS_EFFECTIVE_SPLITTING_N - N-layer effective splitting operator calculation.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...)</tt></pre>
+<pre><code>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Common Inputs:
+<pre><code>Common Inputs:
    f (scalar) : Dominant frequency of wave (Hz)
    spol (scalar) : initial source polarisation (degrees)
    fast (scalar/vector) : fast direction(s) of layer(s) to be
                           included (s)
    tlag (scalar/vector) : lag time(s) of layer(s) to be included
-                          (degrees)</tt></pre>
+                          (degrees)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Fast and tlag can be scalars or vectors but must all be the same length.</tt></pre>
+<pre><code>Fast and tlag can be scalars or vectors but must all be the same length.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Usage:
+<pre><code>Usage:
  [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag)
    or
  [fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
- 'mode', 'S&amp;S')</tt></pre>
+ 'mode', 'S&amp;S')</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Calculate effective splitting parameters using the method of Silver
+<pre><code>Calculate effective splitting parameters using the method of Silver
 and Savage (1994). CAUTION! This is quick but is known to fail if the delay
 time becomes large compared to the dominant frequency of the wave. It
 also gives unstable results when the source polarisation is near the
 effective fast direction. This would, however probably be seen as a
-null result anyway.</tt></pre>
+null result anyway.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
-'mode', 'GaussianWavelet')</tt></pre>
+<pre><code>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+'mode', 'GaussianWavelet')</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Calculate effective splitting parameters by first applying the
+<pre><code>Calculate effective splitting parameters by first applying the
 splitting operators in sequence to an unsplit first-derivative
 Gaussian wavelet then searching for the effective splitting operator
 that minimises the second eigenvalue of the covariance matrix
 of the result. This is the ray theory approach described by
-Bonnin et al. (2012).</tt></pre>
+Bonnin et al. (2012).</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
-'mode', 'GaussianWavelet', 'PlotWavelet')</tt></pre>
+<pre><code>[fast_eff,tlag_eff]=MS_effective_splitting_N(f, spol, fast, tlag, ...
+'mode', 'GaussianWavelet', 'PlotWavelet')</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Plot the resulting wavelet when in GaussianWavelet mode.</tt></pre>
+<pre><code>Plot the resulting wavelet when in GaussianWavelet mode.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>References:
+<pre><code>References:
     M. Bonnin, A. Tommasi, R. Hassani, S. Chevrot, J. Wookey, G. Barruol
       (2012) "Numerical modelling of the upper-mantle anisotropy beneath
       a migrating strike-slip plate boundary: the San Andreas Fault
@@ -812,7 +810,7 @@ Bonnin et al. (2012).</tt></pre>
       http://dx.doi.org/10.1111/j.1365-246X.2012.05650.x
     Silver, P. G. and Savage, M. K. 1994 "The interpretation of shear-wave
       splitting parameters in the presence of two anisotropic layers"
-      Geophysical Journal International, v119 pp 949-963.</tt></pre>
+      Geophysical Journal International, v119 pp 949-963.</code></pre>
 </div></div>
 </div>
 </div>
@@ -820,7 +818,7 @@ Bonnin et al. (2012).</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-01 10:21:58 BST
+Last updated 2015-12-12 19:16:20 GMT
 </div>
 </div>
 </body>

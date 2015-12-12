@@ -1,0 +1,6 @@
+To cite MSAT in publications, please use:
+
+A. M. Walker and J. Wookey (2012) "MSAT - A new toolkit for the 
+analysis of elastic and seismic anisotropy" Computers and 
+Geosciences, 49, pp.81-90. doi:10.1016/j.cageo.2012.05.031 
+

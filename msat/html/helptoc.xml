@@ -67,6 +67,7 @@
         <tocitem target="./funcs/MS_rotEuler.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotEuler</tocitem>
         <tocitem target="./funcs/MS_rotM.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotM</tocitem>
         <tocitem target="./funcs/MS_rotR.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotR</tocitem>
+        <tocitem target="./funcs/MS_rotRandom.html" image="$toolbox/matlab/icons/help_fx.png">MS_rotRandom</tocitem>
         <tocitem target="./funcs/MS_save.html" image="$toolbox/matlab/icons/help_fx.png">MS_save</tocitem>
         <tocitem target="./funcs/MS_sphere.html" image="$toolbox/matlab/icons/help_fx.png">MS_sphere</tocitem>
         <tocitem target="./funcs/MS_split_trace.html" image="$toolbox/matlab/icons/help_fx.png">MS_split_trace</tocitem>

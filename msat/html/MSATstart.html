@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -2018,12 +2016,12 @@ cellspacing="0" cellpadding="4">
 <div class="paragraph"><p>To get elastic constants for olivine (from REF) for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt;&gt; [C,rho] = MS_elasticDB('Olivine')</tt></pre>
+<pre><code>&gt;&gt; [C,rho] = MS_elasticDB('Olivine')</code></pre>
 </div></div>
 <div class="paragraph"><p>returns</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>C =
+<pre><code>C =
 
   320.5000   68.1000   71.6000         0         0         0
    68.1000  196.5000   76.8000         0         0         0
@@ -2035,7 +2033,7 @@ cellspacing="0" cellpadding="4">
 
 rho =
 
-        3355</tt></pre>
+        3355</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -2043,7 +2041,7 @@ rho =
 <div class="paragraph"><p>Once the stiffness matrix (and density) are laoded MSAT provides a set of routines for performing various manipulations and transforms of them (see <a href="MSATguide.html">the user guide</a> for full list). For example, the function <a href="funcs/MS_rot3.html">MS_rot3</a> applies rotations about the principle cartesian axes to an elastic tensor. So, for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt;&gt; C = MS_elasticDB('Olivine')
+<pre><code>&gt;&gt; C = MS_elasticDB('Olivine')
 
 C =
 
@@ -2054,19 +2052,19 @@ C =
          0         0         0         0   77.0000         0
          0         0         0         0         0   78.7000
 
-&gt;&gt; CR = MS_rot3(C,90,0,0)</tt></pre>
+&gt;&gt; CR = MS_rot3(C,90,0,0)</code></pre>
 </div></div>
 <div class="paragraph"><p>returns</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>CR =
+<pre><code>CR =
 
   320.5000   71.6000   68.1000    0.0000         0         0
    71.6000  233.5000   76.8000    0.0000         0         0
    68.1000   76.8000  196.5000    0.0000         0         0
     0.0000    0.0000    0.0000   64.0000         0         0
          0         0         0         0   78.7000   -0.0000
-         0         0         0         0   -0.0000   77.0000</tt></pre>
+         0         0         0         0   -0.0000   77.0000</code></pre>
 </div></div>
 <div class="paragraph"><p>which is the expected orientation of horizontally-strained olivine under dry upper mantle conditions.</p></div>
 </div>
@@ -2075,12 +2073,12 @@ C =
 <div class="paragraph"><p>As well as transformations, MSAT provides routines for analysing various aspects of stiffness tensors. For example, <a href="funcs/MS_anisotropy.html">MS_anisotropy</a> calculates a variety of simple measures of the anisotropy of an input elastic tensor:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt;&gt; C = MS_elasticDB('Albite') ;
+<pre><code>&gt;&gt; C = MS_elasticDB('Albite') ;
 &gt;&gt; uA = MS_anisotropy(C)
 
 uA =
 
-    2.0694</tt></pre>
+    2.0694</code></pre>
 </div></div>
 <div class="paragraph"><p>where <strong>uA</strong> is the Universal Elastic Anisotropy Index of Ranganathan and Ostoja-Starzewski (<a href="http://dx.doi.org/10.1103/PhysRevLett.101.055504">2008</a>).</p></div>
 </div>
@@ -2089,8 +2087,8 @@ uA =
 <div class="paragraph"><p>Finally, MSAT can be used to create various kinds of visualisations of elasticity matrices. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt;&gt; [C,rh] = MS_elasticDB('Albite') ;
-&gt;&gt; MS_sphere(C,rh,'S')</tt></pre>
+<pre><code>&gt;&gt; [C,rh] = MS_elasticDB('Albite') ;
+&gt;&gt; MS_sphere(C,rh,'S')</code></pre>
 </div></div>
 <div class="paragraph"><p>produces:</p></div>
 <div class="paragraph"><p><span class="image">
@@ -2109,7 +2107,7 @@ uA =
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-05 11:32:17 GMT
+Last updated 2015-07-30 13:43:56 BST
 </div>
 </div>
 </body>

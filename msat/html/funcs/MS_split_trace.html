@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -742,34 +740,34 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_SPLIT_TRACE - Apply splitting operator to a pair of orthogonal traces</tt></pre>
+<pre><code>MS_SPLIT_TRACE - Apply splitting operator to a pair of orthogonal traces</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[T00sp,T90sp] = MS_split_trace(time,T00,T90,fast,tlag)</tt></pre>
+<pre><code>[T00sp,T90sp] = MS_split_trace(time,T00,T90,fast,tlag)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Inputs:
+<pre><code>Inputs:
    time (vector) : Series of time points where amplitudes are known (s)
    T00 (vector)  : Series of amplitudes of transverse wave #1 before
                    splitting applied.
    T90 (vector)  : Series of amplitudes of transverse wave #2 before
                    splitting applied.
    fast (scalar) : polarisation direction of fast wave (degrees)
-   tlag (scalar) : lag time splitting operator to be applied (s)</tt></pre>
+   tlag (scalar) : lag time splitting operator to be applied (s)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Outputs:
+<pre><code>Outputs:
    T00sp (vector)  : Series of amplitudes of transverse wave #1 after
                      splitting applied.
    T90sp (vector)  : Series of amplitudes of transverse wave #2 after
-                     splitting applied.</tt></pre>
+                     splitting applied.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_split_trace applies a shear wave splitting operator (fast and tlag)
+<pre><code>MS_split_trace applies a shear wave splitting operator (fast and tlag)
 to a time series of the amplitude of displacement in two orthogonal
 directions (e.g. of waves or wavelets) stored in time, T00 and T90. The
 displacements are first rotated into the fast direction before being time
@@ -777,7 +775,7 @@ shifted by forwards (for the fast wave) or backwards (for the slow wave)
 by half of the lag time and interpolated onto the same time series. The
 resulting displacements are then rotated back into the original frame.
 The fast direction is measured clockwise from the direction of T00
-with a 90 degree fast orientation being parallel with T90.</tt></pre>
+with a 90 degree fast orientation being parallel with T90.</code></pre>
 </div></div>
 </div>
 </div>
@@ -785,7 +783,7 @@ with a 90 degree fast orientation being parallel with T90.</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-01 10:21:58 BST
+Last updated 2015-12-12 19:16:20 GMT
 </div>
 </div>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Example 5: Modelling shear-wave splitting variation with backazimuth</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -754,7 +752,7 @@ directory distributed with MSAT.</p></div>
 and calculate the ray distances in the two layers.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>%  ** Setup model parameters
+<pre><code>%  ** Setup model parameters
       S_slow = 4.814 ; % (SKS at 100 degrees <strong>from</strong> iasp91) -&gt;
       aoi = 11.2262 ; % at 100 km depth, angle of incidence
 
@@ -777,12 +775,12 @@ and calculate the ray distances in the two layers.</p></div>
 
 %  ** calculate distances
       [dist1]=distance_in_dipping_layer(L1_dip,aoi,L1_thick,baz) ;
-      [dist2]=distance_in_dipping_layer(L2_dip,aoi,L2_thick,baz) ;</tt></pre>
+      [dist2]=distance_in_dipping_layer(L2_dip,aoi,L2_thick,baz) ;</code></pre>
 </div></div>
 <div class="paragraph"><p>The example then builds elasticity matrices for the two layers:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>%  ** load anisotropy, <strong>and</strong> generate an isotropic version of it.
+<pre><code>%  ** load anisotropy, <strong>and</strong> generate an isotropic version of it.
       [Cani,rh] = MS_elasticDB('olivine') ;
       [Ciso] = MS_decomp(MS_axes(Cani)) ;
       Cani = MS_rot3(Cani,90,0,0) ; % orientation <strong>for</strong> dry upper mantle
@@ -794,13 +792,13 @@ and calculate the ray distances in the two layers.</p></div>
          MS_rot3(Cani,0,-L1_dip,L1_aaz,'order',[3 2 1]),rh, Ciso, rh) ;
 
       [L2_C,~] = MS_VRH([L2_faln 2-L2_faln],...
-         MS_rot3(Cani,0,-L2_dip,L2_aaz,'order',[3 2 1]),rh, Ciso, rh) ;</tt></pre>
+         MS_rot3(Cani,0,-L2_dip,L2_aaz,'order',[3 2 1]),rh, Ciso, rh) ;</code></pre>
 </div></div>
 <div class="paragraph"><p>Finally, the splitting parameters for each layer are calculated, and then
 combined:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>%  ** interrogate elasticities to generate splitting parameters <strong>for</strong> each layer.
+<pre><code>%  ** interrogate elasticities to generate splitting parameters <strong>for</strong> each layer.
       [ pol, ~, vs1, vs2, ~, ~, ~ ] = MS_phasevels( L1_C, rh, inc, baz ) ;
       fast1 = MS_unwind_pm_90((baz - pol')) ; % geog. reference frame
       tlag1 = dist1./vs2' - dist1./vs1' ;
@@ -816,7 +814,7 @@ combined:</p></div>
          [fast_eff(i),tlag_eff(i)] = ...
             MS_effective_splitting_N(0.125,baz(i), ...
             [fast2(i) fast1(i)],[tlag2(i) tlag1(i)]) ;
-      end</tt></pre>
+      end</code></pre>
 </div></div>
 <div class="paragraph"><p>Results for this calculation are shown in the graph below. For these parameters the delay time
 becomes very large when the fast polarisation direction in the upper layer becomes close to
@@ -838,7 +836,7 @@ resulting splitting parameters measured. Results of this computation ate shown b
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-06-17 09:42:06 BST
+Last updated 2015-07-30 13:43:56 BST
 </div>
 </div>
 </body>

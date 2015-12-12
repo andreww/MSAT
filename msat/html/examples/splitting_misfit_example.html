@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Example 6: Splitting misfit measurement and model fitting</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -1983,8 +1981,8 @@ measurements.</p></div>
 <div class="sect1">
 <h2 id="_calculating_a_misfit">Calculating a misfit</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The example file <tt>demo_splitting_misfit.m</tt> in the <tt>examples/splitting_misfit</tt>
-directory shows how the MSAT function <tt>MS_splitting_misfit</tt> can be used
+<div class="paragraph"><p>The example file <code>demo_splitting_misfit.m</code> in the <code>examples/splitting_misfit</code>
+directory shows how the MSAT function <code>MS_splitting_misfit</code> can be used
 and plots the value of the misfit function for pairs of splitting
 parameters. The reference splitting parameters, $\Gamma_1$,
 for this illustration are $dt_1 = 2$ seconds and
@@ -1995,10 +1993,10 @@ $dt_2 = 0$ to $dt_2 = 4$ seconds. For the methods
 that are sensitive to source polarization three values are used, 45,
 30 and 0 degrees. The calculation of misfit over this grid of values
 of $\Gamma_2$ is done as follows in the function
-<tt>calc_misfit_surface</tt>:</p></div>
+<code>calc_misfit_surface</code>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   fast = [-90:5:90] ;
+<pre><code>   fast = [-90:5:90] ;
    tlag = [0:0.1:4] ;
 
    [TLAG,FAST] = meshgrid(tlag,fast) ;
@@ -2011,9 +2009,9 @@ of $\Gamma_2$ is done as follows in the function
            MS_splitting_misfit(fast_ref,tlag_ref, ...
               fast(ifast),tlag(itlag),spol,0.1,'mode',modeStr,'max_tlag',10) ;
       end
-   end</tt></pre>
+   end</code></pre>
 </div></div>
-<div class="paragraph"><p>The call to <tt>MS_splitting_misfit</tt> calculates the misfit for each of the
+<div class="paragraph"><p>The call to <code>MS_splitting_misfit</code> calculates the misfit for each of the
 values of $\Gamma_2$. This is done for each of the
 polarisation directions and misfit calculation methods ("simple",
 "intensity", "lam2" and "lam2S") and the calculated misfit
@@ -2022,7 +2020,7 @@ surfaces plotted.</p></div>
 <img src="splitting_misfit_pol0.png" alt="Misfit surfaces for 0 degree polarisation" />
 </span></p></div>
 <div class="paragraph"><p>The images above show the misfit surfaces produced by the
-<tt>demo_splitting_misfit</tt> example for the 0 degree polarisation angle.
+<code>demo_splitting_misfit</code> example for the 0 degree polarisation angle.
 It is instructive to first consider the "simple" approach (lower left
 figure). This approach takes the average of the magnitude of the
 difference between the delay times and magnitude of the difference
@@ -2064,7 +2062,7 @@ model that best fits SWS results.</p></div>
 <div class="sect1">
 <h2 id="_from_a_misfit_to_a_model">From a misfit to a model</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The file <tt>examples/splitting_misfit/fit_TTI_orientation.m</tt> shows how the splitting
+<div class="paragraph"><p>The file <code>examples/splitting_misfit/fit_TTI_orientation.m</code> shows how the splitting
 misfit described above can be used to find an elastic model that matches a set
 of SWS measurements. In the following example an elastic model with tilted
 transverse anisotropy (TTI) is generated and used to calculate three splitting parameters
@@ -2080,7 +2078,7 @@ TTI medium and calculate the "observed" splitting parameters. The model is set u
 as follows:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   %% set the raypath parameters. ---------------------------------------------
+<pre><code>   %% set the raypath parameters. ---------------------------------------------
    razi = [045 135 048] ;
    rinc = [000 000 032] ;
    dist = 50 ; % km
@@ -2093,20 +2091,20 @@ as follows:</p></div>
    vsi=1;
    rh=2000;
 
-   [Craw]=MS_VTI(vpi,vsi,rh,0.05,0.05,0.05) ;</tt></pre>
+   [Craw]=MS_VTI(vpi,vsi,rh,0.05,0.05,0.05) ;</code></pre>
 </div></div>
 <div class="paragraph"><p>and we note that (as is commonly the case for SWS) there is no way to distinguish
 a thin layer of strong anisotropy from a thick layer of weak anisotropy. We thus
 assume a 50 km thick layer of fixed strength of anisotropy throughout and only solve
 for the orientation of this layer. The "observed" parameters are returned by a
-the function call <tt>[fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;</tt>,
-which makes use of <tt>MS_phasevels</tt>.</p></div>
-<div class="paragraph"><p>The second stage of the calculation is to compute the misfit between <tt>fast</tt> and
-<tt>tlag</tt> and the calculated splitting parameters for a range of TTI orientations.
+the function call <code>[fast,tlag,ravs]=create_dataset(Craw,rh,str,dip,razi,rinc,dist) ;</code>,
+which makes use of <code>MS_phasevels</code>.</p></div>
+<div class="paragraph"><p>The second stage of the calculation is to compute the misfit between <code>fast</code> and
+<code>tlag</code> and the calculated splitting parameters for a range of TTI orientations.
 This is done in the loop over strikes and dips thus:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   %% calculate a grid of misfits over a range of strikes <strong>and</strong> dips. -----------
+<pre><code>   %% calculate a grid of misfits over a range of strikes <strong>and</strong> dips. -----------
    fprintf('Grid searching over strike <strong>and</strong> dip ... \n')
    [GSTR GDIP] = meshgrid([0:10:360],[0:5:90]) ;
    GMIS=GSTR.*0 ;
@@ -2117,15 +2115,15 @@ This is done in the loop over strikes and dips thus:</p></div>
          GMIS(i,j) = orientation_misfit(str_dip,Craw,rh,...
             0,0.1,fast,tlag,razi,rinc,dist) ;
       end
-   end</tt></pre>
+   end</code></pre>
 </div></div>
-<div class="paragraph"><p>with the misfit stored in <tt>GMIS</tt>. Calculation of the misfit for each orientation
-is performed by the <tt>orientation_misfit</tt> function with the body of the calculation
-involving the use of <tt>MS_phasevels</tt> and <tt>MS_splitting_misfit</tt> for each "observed"
+<div class="paragraph"><p>with the misfit stored in <code>GMIS</code>. Calculation of the misfit for each orientation
+is performed by the <code>orientation_misfit</code> function with the body of the calculation
+involving the use of <code>MS_phasevels</code> and <code>MS_splitting_misfit</code> for each "observed"
 splitting function:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   % rotate the test matrix
+<pre><code>   % rotate the test matrix
    [Ctest]=MS_rot3(Cbase,0,-str_dip(2),str_dip(1)) ;
 
    % calculate associated splitting
@@ -2140,15 +2138,15 @@ splitting function:</p></div>
       misfit = misfit + MS_splitting_misfit(data_fast(i),data_tlag(i),...
                            fast(i),tlag(i),data_spol,data_dfreq,'mode','lam2') ;
    end
-   misfit = misfit ./ length(data_fast) ;</tt></pre>
+   misfit = misfit ./ length(data_fast) ;</code></pre>
 </div></div>
 <div class="paragraph"><p>The final step is to report and plot the best fitting model and misfit surface. The
-model and "observations" are plotted together using the "sdata" option in <tt>MS_plot</tt>:</p></div>
+model and "observations" are plotted together using the "sdata" option in <code>MS_plot</code>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   fprintf('Plotting model <strong>and</strong> observations\n')
+<pre><code>   fprintf('Plotting model <strong>and</strong> observations\n')
    Cbest = MS_rot3(Craw, 0, -GDIP(imin,jmin), GSTR(imin,jmin));
-   MS_plot(Cbest,rh,'sdata',razi,rinc,fast',ravs','plotmap', {'avspol'}) ;</tt></pre>
+   MS_plot(Cbest,rh,'sdata',razi,rinc,fast',ravs','plotmap', {'avspol'}) ;</code></pre>
 </div></div>
 <div class="paragraph"><p>which produces the diagnostic pole figure below. In this figure "observed" SWS data
 (white lines, coloured spots refer to strength of anisotropy) and the best fitting
@@ -2162,7 +2160,7 @@ model (black lines, coloured contours refer to strength of anisotropy) are both 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-01 10:18:17 BST
+Last updated 2015-07-30 13:43:56 BST
 </div>
 </div>
 </body>

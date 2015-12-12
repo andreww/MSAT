@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title></title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -742,42 +740,42 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>MS_ROTEULER - Rotate an elasticity matrix using Bunge's Euler angles.</tt></pre>
+<pre><code>MS_ROTEULER - Rotate an elasticity matrix using Bunge's Euler angles.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Rotate one or more elasticity matrices using Bunge's Euler angles</tt></pre>
+<pre><code>Rotate one or more elasticity matrices using Bunge's Euler angles</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Usage:</tt></pre>
+<pre><code>Usage:</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[ CC ] = MS_rotEuler( C, phi1, Phi, phi2 )</tt></pre>
+<pre><code>[ CC ] = MS_rotEuler( C, phi1, Phi, phi2 )</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>For three angles in degrees (phi1, theta, phi2) representing a
+<pre><code>For three angles in degrees (phi1, theta, phi2) representing a
 rotation in Bunge convention rotate the elasticity matrix C. All
 variables can be arrays or scalars but (1) the angles must all be the
 same length and (2) either C or all the angles must be scalars unless
-they are the same length.</tt></pre>
+they are the same length.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[ CC ] = MS_rotEuler( C, phi1, Phi, phi2, 'sense', 'active' )
-[ CC ] = MS_rotEuler( C, phi1, Phi, phi2, 'sense', 'passive' )</tt></pre>
+<pre><code>[ CC ] = MS_rotEuler( C, phi1, Phi, phi2, 'sense', 'active' )
+[ CC ] = MS_rotEuler( C, phi1, Phi, phi2, 'sense', 'passive' )</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>As above, but allow user choice between 'active' (the default) or
+<pre><code>As above, but allow user choice between 'active' (the default) or
 'passive' rotations (the usual description for texture analysis).
-See notes, below, for details.</tt></pre>
+See notes, below, for details.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Notes:
+<pre><code>Notes:
    In the context of this function the term 'Euler angle' is used in
    the sense common in texture analysis not computer graphics etc. where
    the three angles are rotations around a fixes axis system (see
@@ -791,11 +789,11 @@ See notes, below, for details.</tt></pre>
    (which, at this point, is no longer parallel to the sample x axis).
    Finally, a second anticlockwise rotation of phi2 degrees about the
    frame's z axis is made to bring the moving reference into line with
-   the crystal axes. See Figure 5 of Bunge 1985 for a graphical example.</tt></pre>
+   the crystal axes. See Figure 5 of Bunge 1985 for a graphical example.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>As described, the Euler angles are passive rotations showing how the
+<pre><code>As described, the Euler angles are passive rotations showing how the
 reference frame must be rotated. However, for most applications one
 knows the elasticity matrix of the crystal on the crystal axis system
 and wants to calculate the elasticity matrix represented on the global
@@ -805,19 +803,19 @@ default, the MS_rotEuler function applies the active rotation.
 The optional arguments 'sense' and 'passive' can be used to reverse
 the sense of rotation. This can be used if, for example, the
 elasticity has been measured on an experimental frame which is offset
-from the crystal frame more usually used.</tt></pre>
+from the crystal frame more usually used.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>References:
+<pre><code>References:
    Bunge, H. J. (1985) "Representation of Preferred Orientations" in H.-R.
    Wenk (ed.) "Preferred Orientation in Deformed Metals and Rocks:
     An Introduction to Modern Texture Analysis" Academic Press inc.
-    Orlando.</tt></pre>
+    Orlando.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>See also: MS_ROT3 MS_ROTR</tt></pre>
+<pre><code>See also: MS_ROT3 MS_ROTR</code></pre>
 </div></div>
 </div>
 </div>
@@ -825,7 +823,7 @@ from the crystal frame more usually used.</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-01 10:21:58 BST
+Last updated 2015-12-12 19:16:20 GMT
 </div>
 </div>
 </body>
