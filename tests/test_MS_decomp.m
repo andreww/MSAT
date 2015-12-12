@@ -98,3 +98,18 @@ function test_MS_decomp_enst_lit
     assertElementsAlmostEqual(C_monc, C_mon, 'absolute', 0.1);
     assertElementsAlmostEqual(C_tric, C_tri, 'absolute', 0.1);
 end
+
+function test_MS_decomp_DB
+    % Check that when we decompose things in the database, the sum of the 
+    % elements add up to what we started with.
+    
+    uid = {'albite', 'an96', 'ol', 'ens', 'jd', 'nacl', 'kcl', 'atg'};
+    
+    for i = 1:length(uid)
+        C = MS_elasticDB(uid{i});
+        [C_iso,C_hex,C_tet,C_ort,C_mon,C_tri] = MS_decomp(C);
+        Ctot = C_iso + C_hex + C_tet + C_ort + C_mon + C_tri;
+        assertElementsAlmostEqual(C, Ctot);
+    end
+
+end

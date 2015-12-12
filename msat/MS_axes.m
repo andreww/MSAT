@@ -22,7 +22,8 @@
 %
 %  [ ... ] = MS_axes( C, 'X3_stiff' )
 %     For hexagonal or tetragonal tensors, make X3 the stiffest direction,
-%     not the distinct direction.
+%     not the distinct direction. For triclinic or monoclinic tensors,
+%     align the axes with the axes of the dilational stiffness tensor.
 %
 %  [ ... ] = MS_axes( C, 'debug' )
 %     Enable debugging plots and messages. These are quite messy.  
@@ -208,16 +209,43 @@ case 3
           irot = 0;
       end
    else
-% monoclinic or triclinic. Here we have to make a 'best-guess'. Following
-% Browraeys and Chevrot we use the bisectrix of each of the eigenvectors of
-% d and its closest match in v.
-       
-      isMonoOrTri = 1 ;
-      
-      [X1,X2,X3]=estimate_basis(D1,D2,D3,V1,V2,V3) ;
-
-      irot = 1 ;
-      if (X3(1)==0 & X3(2)==0), irot=0; end      
+      if X3_distinct
+          % monoclinic or triclinic. Here we have to make a 'best-guess'. Following
+          % Browraeys and Chevrot we use the bisectrix of each of the eigenvectors of
+          % d and its closest match in v.
+          
+          isMonoOrTri = 1 ;
+          
+          [X1,X2,X3]=estimate_basis(D1,D2,D3,V1,V2,V3) ;
+          
+          irot = 1 ;
+          if (X3(1)==0 & X3(2)==0), irot=0; end
+      else
+         % Do a rotation based on the eigenvectors of D such that the stiff
+         % direction is along X3 and the soft direction is along X1.
+         % Eigen vectors are sorted, so treat like orthorhombic but with
+         % sorted eigenvectors
+         
+         % Sort the eigenvectors of D
+         [~, ind] = sort(vald, 2, 'descend') ;
+         vecd_out = zeros(3);
+         for i=1:3
+             vecd_out(:,i) = vecd(:,ind(i)) ;
+         end
+         vecd = vecd_out;
+         
+         % Rotate such that X3 is stiff
+         X1=vecd(:,1)' ;
+         X2=vecd(:,2)' ;
+         X3=vecd(:,3)' ;
+         irot = 1 ;
+         if (all(all([X1' X2' X3'] == eye(3))))
+           irot = 0;
+         end 
+         
+         % We still need to deal with the 180 degree flips
+         isMonoOrTri = 1 ; 
+      end
    end
 otherwise
 % not possible.

@@ -4,12 +4,14 @@
 %
 % Symmetry aware linear interpolation between two elasticity matrices. 
 %
-%  % [ required_outputs, ... ] = MS_template( required_inputs, ... )
+%  % [ Cint, RhoInt ] = MS_interpolate( C1, rho1, C2, rho2, frac)
 %
 % Usage: 
-%     [ Cint ] = MS_interpolate( C1, C2, frac)                    
+%     [ Cint, RhoInt ] = MS_interpolate( C1, rho1, C2, rho2, frac)                    
 %         Returns an elasticity matrix interpolated frac distance
-%         between elasticity matricies C1 and C2. 
+%         between elasticity matricies C1 and C2. Frac = 1 gives
+%         the elasticity of C1, frac = 0 gives the elasticity of 
+%         C2.
 %
 %
 % Notes:
@@ -31,22 +33,22 @@
 %
 % See also: MS_AXES, MS_VRH
 
-% (C) James Wookey and Andrew Walker, 2011
+% (C) James Wookey and Andrew Walker, 2011-2015
 
-function [ Cint ] = MS_interpolate(C1, C2, frac)
+function [ Cint, rhoint ] = MS_interpolate(C1, rho1, C2, rho2, frac)
     % Rotate C1 and C2 onto principal axis system and store 
     % roation matries
     [C1R, RR1] = MS_axes(C1, 'nowarn', 'X3_stiff');
     [C2R, RR2] = MS_axes(C2, 'nowarn', 'X3_stiff');
     
-    % Avarage C1R and C2R using Voigt-Reuss-Hill
-    CintR = MS_VRH([frac, 1-frac], C1R, 1.0, C2R, 1.0);
+    % Avarage C1R and C2R using Voigt
+    [~,rhoint,CintR] = MS_VRH([frac, 1-frac], C1R, rho1, C2R, rho2);
 
     % Interpolate between forward rotations (C1->CR1 and C2->CR2)
     % using quaternion representation of rotations
     q1 = SpinCalc('DCMtoQ',RR1, 0.001, 1);
     q2 = SpinCalc('DCMtoQ',RR2, 0.001, 1);  
-    qint = slerp(q1, q2, frac);
+    qint = slerp(q1, q2, 1-frac);
     Rint = SpinCalc('QtoDCM',qint, 0.001, 1);
     
     % Apply backwards rotation
