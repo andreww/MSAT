@@ -14,3 +14,4 @@ examples include:
 * link:splitting_model_example.html[Example 5: Modelling shear-wave splitting variation with backazimuth]
 * link:splitting_misfit_example.html[Example 6: Measuring splitting misfit and fitting elasticity from SWS measurement] 
 * link:topotaxy_example.html[Example 7: Modelling texture inheritance between post-perovskite and perovskite]
+* link:interpolate_example.html[Example 8:Interpolation of elastic constants tensors]

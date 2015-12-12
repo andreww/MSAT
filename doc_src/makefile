@@ -26,8 +26,8 @@ install: html_funcs html_docs example-docs
 	cp ./examples/*.png ../msat/html/examples
 	$(MAKE) clean
 
-example-docs: examples/diopside_example.txt examples/index.txt examples/lmm_anisotropy_example.txt examples/loading_examples.txt examples/splitting_model_example.txt examples/texture_example.txt examples/splitting_misfit_example.txt examples/splitting_misfit_pol0.png examples/topotaxy_example.txt
-	(cd examples; $(AD) diopside_example.txt; $(AD) index.txt ; $(AD) lmm_anisotropy_example.txt ; $(AD) loading_examples.txt ; $(AD) splitting_model_example.txt ; $(AD) texture_example.txt; $(AD) -a latexmath splitting_misfit_example.txt; $(AD) -a latexmath topotaxy_example.txt)
+example-docs: examples/diopside_example.txt examples/index.txt examples/lmm_anisotropy_example.txt examples/loading_examples.txt examples/splitting_model_example.txt examples/texture_example.txt examples/splitting_misfit_example.txt examples/splitting_misfit_pol0.png examples/topotaxy_example.txt examples/interpolate_example.txt examples/interp_method.png examples/interp_example.png
+	(cd examples; $(AD) diopside_example.txt; $(AD) index.txt ; $(AD) lmm_anisotropy_example.txt ; $(AD) loading_examples.txt ; $(AD) splitting_model_example.txt ; $(AD) texture_example.txt; $(AD) -a latexmath splitting_misfit_example.txt; $(AD) -a latexmath topotaxy_example.txt; $(AD) interpolate_example.txt)
 
 external-install: html_funcs html_docs
 	# NB - $(TARGET) must be set on the command line 
