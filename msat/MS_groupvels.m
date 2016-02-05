@@ -1,4 +1,4 @@
-function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_groupvels(C,rh,inc,azi)
+function [PP  ,S1P ,S2P ,SNP ,SNS1,SNS2,VGP ,VGS1,VGS2] = MS_groupvels(C,rh,inc,azi)
 
       if (length(inc)~=length(azi))
 			error('MS:ListsMustMatch', ...
@@ -9,36 +9,26 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_groupvels(C,rh,inc,azi)
       inc = reshape(inc,length(inc),1) ;
       azi = reshape(azi,length(azi),1) ;
 
-      isotol = sqrt(eps); % Mbars
-
-      % Check that C is valid (if check not suppressed)
-      MS_checkC(C);
+ 
       
       %  ** convert GPa to MB file units (Mbars), density to g/cc
 
       C(:,:) = C(:,:) * 0.01 ;
       rh = rh ./ 1e3 ;
       
-		avs = zeros(size(azi)) ;
-		vp = zeros(size(azi)) ;
-		vs1 = zeros(size(azi)) ;
-		vs2 = zeros(size(azi)) ;
-		pol = zeros(size(azi)) ;
-		S1 = zeros(length(azi),3) ;
-		S1P = zeros(length(azi),3) ;
-      S2P = zeros(length(azi),3) ;
+      
+      
+      
+    PP  = zeros(length(azi),3) ;
+	S1P = zeros(length(azi),3) ;
+    S2P = zeros(length(azi),3) ;
+    SNP  = zeros(length(azi),3) ;
+	SNS1 = zeros(length(azi),3) ;
+    SNS2 = zeros(length(azi),3) ;
+    VGP  = zeros(length(azi),3) ;
+	VGS1 = zeros(length(azi),3) ;
+    VGS2 = zeros(length(azi),3) ;
         
-%   ** Handle isotropic case quickly
-     if isIsotropic(C, isotol)
-         vp(:) = sqrt(( ((1.0/3.0)*(C(1,1)+2*C(1,2)))+ ...
-                        ((4.0/3.0)*C(4,4)) )/rh)*10.0;
-         vs1(:) = sqrt(C(4,4)/rh)*10.0; % Factor of 10 converts from
-         vs2 = vs1;                     % Mbar to Pa.
-         avs(:) = 0.0;
-         pol(:) = NaN; % Both waves have same velocity... meaningless.
-         S1P(:) = NaN;
-         return
-     end
 
 %	** start looping
 	for ipair = 1:length(inc)
@@ -52,63 +42,25 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_groupvels(C,rh,inc,azi)
 		[V,EIGVEC]=velo(XI,rh,C) ;
 		
 %  ** pull out the eigenvectors
-      P  = EIGVEC(:,1) ;
-      S1 = EIGVEC(:,2) ;
+        PP(ipair,:)  = EIGVEC(:,1) ;
+        S1P(ipair,:) = EIGVEC(:,2) ;
+        S2P(ipair,:) = EIGVEC(:,3) ;
+        
+% ** slowness vectors
+        SNP(ipair,:)  = XI/V(1)
+        SNS1(ipair,:) = XI/V(2)
+        SNS2(ipair,:) = XI/V(3)
+        
+% ** Group velocity vectors (need to convert density back first)
+        VGP(ipair,:) = rayvel(C,SNP(ipair,:),rh*1e3)
+        VGS1(ipair,:) = rayvel(C,SNS1(ipair,:),rh*1e3)
+        VGS2(ipair,:) = rayvel(C,SNS2(ipair,:),rh*1e3)
 
-  		if ~isreal(S1)
-            error_str = ['The S1 polarisation vector is not real!\n\n'...
-                sprintf('inc = %f, azi = %f\n\n',cinc,cazi) ...
-                sprintf('C = %f %f %f %f %f %f\n',C(1:6,1)) ...
-                sprintf('    %f %f %f %f %f %f\n',C(1:6,2)) ...
-                sprintf('    %f %f %f %f %f %f\n',C(1:6,3)) ...
-                sprintf('    %f %f %f %f %f %f\n',C(1:6,4)) ...
-                sprintf('    %f %f %f %f %f %f\n',C(1:6,5)) ...
-                sprintf('    %f %f %f %f %f %f\n\n',C(1:6,6)) ...
-                sprintf('S1 = %f %f %f\n',S1)];
-  			error('MS:PHASEVELS:vectornotreal', error_str) ;
-  		end
-      S2 = EIGVEC(:,3) ;
+        
 
-%  ** calculate projection onto propagation plane      
-      S1N = V_cross(XI,S1) ;
-      S1P(ipair,:) = V_cross(XI,S1N);
-      S2N = V_cross(XI,S2) ;
-      S2P(ipair,:) = V_cross(XI,S2N);
-
-%  ** rotate into y-z plane to calculate angles
-%     (use functions optimised for the two needed 
-%      rotations, see below).
-      [S1PR] = V_rot_gam(S1P(ipair,:),cazi) ;
-	   [S1PRR] = V_rot_bet(S1PR,cinc) ;
-
-
-      
-	   ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
-
-%  ** transform angle to between -90 and 90
-      if (ph < -90.), ph = ph + 180.;end
-      if (ph >  90.), ph = ph - 180.;end
-
-%	** calculate some useful values
-      dVS =  (V(2)-V(3)) ;
-      VSmean = (V(2)+V(3))/2.0 ;
-
-      avs(ipair) = 100.0*(dVS/VSmean) ;
-      vp(ipair) =  V(1) ;
-      vs1(ipair) = V(2) ;
-      vs2(ipair) = V(3) ;
-		
-      pol(ipair) = ph ;
 	end % ipair = 1:length(inc_in)
 
-   % If any directions have zero avs (within machine accuracy)
-   % set pol to NaN - array wise:
-   isiso = real(avs > sqrt(eps)) ; % list of 1.0 and 0.0.
-   pol = pol .* (isiso./isiso) ; % times by 1.0 or NaN. 
 
-   S1P(:,1) = S1P(:,1) .* (isiso./isiso);
-   S1P(:,2) = S1P(:,2) .* (isiso./isiso);
-   S1P(:,3) = S1P(:,3) .* (isiso./isiso);
     
 return
 %=======================================================================================  
@@ -319,4 +271,7 @@ for i=1:3
 end
 
 end % function
+
+
+
 
