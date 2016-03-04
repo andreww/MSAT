@@ -83,7 +83,7 @@
 % OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
+function [pol,avs,vs1,vs2,vp,S1P,S2P,PE,S1E,S2E,XIS] = MS_phasevels(C,rh,inc,azi)
 
       if (length(inc)~=length(azi))
 			error('MS:ListsMustMatch', ...
@@ -104,14 +104,20 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
       C(:,:) = C(:,:) * 0.01 ;
       rh = rh ./ 1e3 ;
       
-		avs = zeros(size(azi)) ;
-		vp = zeros(size(azi)) ;
-		vs1 = zeros(size(azi)) ;
-		vs2 = zeros(size(azi)) ;
-		pol = zeros(size(azi)) ;
-		S1 = zeros(length(azi),3) ;
-		S1P = zeros(length(azi),3) ;
+      avs = zeros(size(azi)) ;
+      vp = zeros(size(azi)) ;
+      vs1 = zeros(size(azi)) ;
+      vs2 = zeros(size(azi)) ;
+      pol = zeros(size(azi)) ;
+      S1P = zeros(length(azi),3) ;
       S2P = zeros(length(azi),3) ;
+      
+      % Eigenvectors
+      PE  = zeros(length(azi),3) ;
+  	  S1E = zeros(length(azi),3) ;
+      S2E = zeros(length(azi),3) ;
+      % Cartesion propagation vectors
+      XIS = zeros(length(azi),3) ;
         
 %   ** Handle isotropic case quickly
      if isIsotropic(C, isotol)
@@ -132,6 +138,7 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
 
 %  ** create the cartesian vector
 		XI = cart2(cinc,cazi) ;
+        XIS(ipair,:)=XI ;
 
 %  ** compute phase velocities		
 		[V,EIGVEC]=velo(XI,rh,C) ;
@@ -153,6 +160,10 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
   			error('MS:PHASEVELS:vectornotreal', error_str) ;
   		end
       S2 = EIGVEC(:,3) ;
+      
+      PE(ipair,:)  = P ;
+      S1E(ipair,:) = S1 ;
+      S2E(ipair,:) = S2 ;
 
 %  ** calculate projection onto propagation plane      
       S1N = V_cross(XI,S1) ;
@@ -194,6 +205,41 @@ function [pol,avs,vs1,vs2,vp, S1P, S2P] = MS_phasevels(C,rh,inc,azi)
    S1P(:,1) = S1P(:,1) .* (isiso./isiso);
    S1P(:,2) = S1P(:,2) .* (isiso./isiso);
    S1P(:,3) = S1P(:,3) .* (isiso./isiso);
+
+   % switch nargout
+   % case 5
+   %    varargout{1} = pol ;
+   %    varargout{2} = avs ;
+   %    varargout{3} = vs1 ;
+   %    varargout{4} = vs2 ;
+   %    varargout{5} = vp ;
+   %
+   % case 7
+   %    varargout{1} = pol ;
+   %    varargout{2} = avs ;
+   %    varargout{3} = vs1 ;
+   %    varargout{4} = vs2 ;
+   %    varargout{5} = vp ;
+   %    varargout{6} = S1P ;
+   %    varargout{7} = S2P ;
+   %
+   % case 11
+   %     varargout{1} = pol ;
+   %     varargout{2} = avs ;
+   %     varargout{3} = vs1 ;
+   %     varargout{4} = vs2 ;
+   %     varargout{5} = vp ;
+   %     varargout{6} = S1P ;
+   %     varargout{7} = S2P ;
+   %     varargout{8} = PE ;
+   %     varargout{9} = S1E ;
+   %     varargout{10} = S2E ;
+   %     varargout{11} = XIS ;
+   %
+   % otherwise
+   %    error('MS:PHASEVELS:BadOutputArgs','Requires 5, 7, or 11 output arguments.')
+   % end
+
     
 return
 %=======================================================================================  
