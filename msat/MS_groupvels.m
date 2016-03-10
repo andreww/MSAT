@@ -65,6 +65,8 @@ function [ varargout ] = MS_groupvels(C,rh,inc,azi)
     VGP  = zeros(length(azi),3) ;
 	VGS1 = zeros(length(azi),3) ;
     VGS2 = zeros(length(azi),3) ;
+    
+
         
 
 %	** start looping
@@ -75,11 +77,11 @@ function [ varargout ] = MS_groupvels(C,rh,inc,azi)
         SNS1(ipair,:) = XIS(ipair,:)./vs1(ipair);
         SNS2(ipair,:) = XIS(ipair,:)./vs2(ipair);
         
-% ** Group velocity vectors (need to convert density back first)
+% ** Group velocity vectors
 
-        VGP(ipair,:) = rayvel(C,SNP(ipair,:),rh);
-        VGS1(ipair,:) = rayvel(C,SNS1(ipair,:),rh);
-        VGS2(ipair,:) = rayvel(C,SNS2(ipair,:),rh);
+        VGP(ipair,:) = rayvel(C,SNP(ipair,:),rh./1e3);
+        VGS1(ipair,:) = rayvel(C,SNS1(ipair,:),rh./1e3);
+        VGS2(ipair,:) = rayvel(C,SNS2(ipair,:),rh./1e3);
 
 	end 
     
@@ -180,7 +182,7 @@ for k=1:3
     DFD(k) = 0.0;
     for i=1:3
         for j=1:3
-            DFD(k)=DFD(k)+DF(i,j,k)+CF(i,j);
+            DFD(k)=DFD(k)+DF(i,j,k)*CF(i,j);
         end        
     end
 end
