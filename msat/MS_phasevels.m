@@ -14,8 +14,12 @@
 %         details are given below.
 %
 %     [ pol, avs, vs1, vs2, vp, SF, SS ] = MS_phasevels( C, rh, inc, azi )                    
-%         Additionally output fast and slow S-wave polarisation in vector
-%         form.
+%         Additionally output fast and slow S-wave polarisation projected onto 
+%         the plane normal to the propagation direction in vector form.
+%
+%     [ pol, avs, vs1, vs2, vp, SF, SS, PE, S1E, S2E, XIS ] = MS_phasevels( C, rh, inc, azi )                    
+%         Additionally output P, S1 and S2-wave polarisations in vector
+%         form, and the plane wave propagation vector.
 %
 % Notes:
 %     Azi is defined as the angle in degrees from the +ve 1-axis in x1-x2 

@@ -1,4 +1,4 @@
-% MS_PHASEVELS - Wave velocities in anisotropic media.
+% MS_GROUPVELS - Wave velocities in anisotropic media.
 %
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
@@ -20,6 +20,17 @@
 %     [ VGP, VGS1, VGS2, PE, S1E, S2E, SNP, SNS1, SNS2 ] = MS_groupvels( C, rh, inc, azi )                 
 %         Additionally output P, S1 and S2 Slowness vectors
 %
+%
+% Notes:
+%     This code is based on EMATRIX6 by D. Mainprice, recoded in 
+%     MATLAB by Alan Baird.
+%     
+% Reference: Mainprice D. (1990). An efficient
+%            FORTRAN program to calculate seismic anisotropy from
+%            the lattice preferred orientation of minerals.
+%            Computers & Gesosciences, vol16, pp385-393.
+%
+% See also: MS_PHASEVELS
 
 % Copyright (c) 2016, Alan Baird
 % All rights reserved.
