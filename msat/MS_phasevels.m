@@ -85,51 +85,51 @@
 
 function [pol,avs,vs1,vs2,vp,S1P,S2P,PE,S1E,S2E,XIS] = MS_phasevels(C,rh,inc,azi)
 
-      if (length(inc)~=length(azi))
-			error('MS:ListsMustMatch', ...
-                'AZI and INC must be scalars or vectors of the same dimension');
-      end
+    if (length(inc)~=length(azi))
+    		error('MS:ListsMustMatch', ...
+              'AZI and INC must be scalars or vectors of the same dimension');
+    end
       
 %  ** convert inc, azi to column vectors if necessary      
-      inc = reshape(inc,length(inc),1) ;
-      azi = reshape(azi,length(azi),1) ;
-
-      isotol = sqrt(eps); % Mbars
-
-      % Check that C is valid (if check not suppressed)
-      MS_checkC(C);
-      
-      %  ** convert GPa to MB file units (Mbars), density to g/cc
-
-      C(:,:) = C(:,:) * 0.01 ;
-      rh = rh ./ 1e3 ;
-      
-      avs = zeros(size(azi)) ;
-      vp = zeros(size(azi)) ;
-      vs1 = zeros(size(azi)) ;
-      vs2 = zeros(size(azi)) ;
-      pol = zeros(size(azi)) ;
-      S1P = zeros(length(azi),3) ;
-      S2P = zeros(length(azi),3) ;
-      
-      % Eigenvectors
-      PE  = zeros(length(azi),3) ;
-  	  S1E = zeros(length(azi),3) ;
-      S2E = zeros(length(azi),3) ;
-      % Cartesion propagation vectors
-      XIS = zeros(length(azi),3) ;
+    inc = reshape(inc,length(inc),1) ;
+    azi = reshape(azi,length(azi),1) ;
+    
+    isotol = sqrt(eps); % Mbars
+    
+    % Check that C is valid (if check not suppressed)
+    MS_checkC(C);
+    
+    %  ** convert GPa to MB file units (Mbars), density to g/cc
+    
+    C(:,:) = C(:,:) * 0.01 ;
+    rh = rh ./ 1e3 ;
+    
+    avs = zeros(size(azi)) ;
+    vp = zeros(size(azi)) ;
+    vs1 = zeros(size(azi)) ;
+    vs2 = zeros(size(azi)) ;
+    pol = zeros(size(azi)) ;
+    S1P = zeros(length(azi),3) ;
+    S2P = zeros(length(azi),3) ;
+    
+    % Eigenvectors
+    PE  = zeros(length(azi),3) ;
+    S1E = zeros(length(azi),3) ;
+    S2E = zeros(length(azi),3) ;
+    % Cartesion propagation vectors
+    XIS = zeros(length(azi),3) ;
         
 %   ** Handle isotropic case quickly
-     if isIsotropic(C, isotol)
-         vp(:) = sqrt(( ((1.0/3.0)*(C(1,1)+2*C(1,2)))+ ...
-                        ((4.0/3.0)*C(4,4)) )/rh)*10.0;
-         vs1(:) = sqrt(C(4,4)/rh)*10.0; % Factor of 10 converts from
-         vs2 = vs1;                     % Mbar to Pa.
-         avs(:) = 0.0;
-         pol(:) = NaN; % Both waves have same velocity... meaningless.
-         S1P(:) = NaN;
-         return
-     end
+    if isIsotropic(C, isotol)
+        vp(:) = sqrt(( ((1.0/3.0)*(C(1,1)+2*C(1,2)))+ ...
+                       ((4.0/3.0)*C(4,4)) )/rh)*10.0;
+        vs1(:) = sqrt(C(4,4)/rh)*10.0; % Factor of 10 converts from
+        vs2 = vs1;                     % Mbar to Pa.
+        avs(:) = 0.0;
+        pol(:) = NaN; % Both waves have same velocity... meaningless.
+        S1P(:) = NaN;
+        return
+    end
 
 %	** start looping
 	for ipair = 1:length(inc)
@@ -144,8 +144,8 @@ function [pol,avs,vs1,vs2,vp,S1P,S2P,PE,S1E,S2E,XIS] = MS_phasevels(C,rh,inc,azi
 		[V,EIGVEC]=velo(XI,rh,C) ;
 		
 %  ** pull out the eigenvectors
-      P  = EIGVEC(:,1) ;
-      S1 = EIGVEC(:,2) ;
+        P  = EIGVEC(:,1) ;
+        S1 = EIGVEC(:,2) ;
 
   		if ~isreal(S1)
             error_str = ['The S1 polarisation vector is not real!\n\n'...
@@ -159,88 +159,53 @@ function [pol,avs,vs1,vs2,vp,S1P,S2P,PE,S1E,S2E,XIS] = MS_phasevels(C,rh,inc,azi
                 sprintf('S1 = %f %f %f\n',S1)];
   			error('MS:PHASEVELS:vectornotreal', error_str) ;
   		end
-      S2 = EIGVEC(:,3) ;
-      
-      PE(ipair,:)  = P ;
-      S1E(ipair,:) = S1 ;
-      S2E(ipair,:) = S2 ;
-
+        S2 = EIGVEC(:,3) ;
+        
+        PE(ipair,:)  = P ;
+        S1E(ipair,:) = S1 ;
+        S2E(ipair,:) = S2 ;
+        
 %  ** calculate projection onto propagation plane      
-      S1N = V_cross(XI,S1) ;
-      S1P(ipair,:) = V_cross(XI,S1N);
-      S2N = V_cross(XI,S2) ;
-      S2P(ipair,:) = V_cross(XI,S2N);
+        S1N = V_cross(XI,S1) ;
+        S1P(ipair,:) = V_cross(XI,S1N);
+        S2N = V_cross(XI,S2) ;
+        S2P(ipair,:) = V_cross(XI,S2N);
 
 %  ** rotate into y-z plane to calculate angles
 %     (use functions optimised for the two needed 
 %      rotations, see below).
-      [S1PR] = V_rot_gam(S1P(ipair,:),cazi) ;
-	   [S1PRR] = V_rot_bet(S1PR,cinc) ;
+        [S1PR] = V_rot_gam(S1P(ipair,:),cazi) ;
+        [S1PRR] = V_rot_bet(S1PR,cinc) ;
 
 
       
-	   ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
+        ph = atan2(S1PRR(2),S1PRR(3)) .* 180/pi ;
 
 %  ** transform angle to between -90 and 90
-      if (ph < -90.), ph = ph + 180.;end
-      if (ph >  90.), ph = ph - 180.;end
+        if (ph < -90.), ph = ph + 180.;end
+        if (ph >  90.), ph = ph - 180.;end
 
 %	** calculate some useful values
-      dVS =  (V(2)-V(3)) ;
-      VSmean = (V(2)+V(3))/2.0 ;
+        dVS =  (V(2)-V(3)) ;
+        VSmean = (V(2)+V(3))/2.0 ;
+        
+        avs(ipair) = 100.0*(dVS/VSmean) ;
+        vp(ipair) =  V(1) ;
+        vs1(ipair) = V(2) ;
+        vs2(ipair) = V(3) ;
+        	
+        pol(ipair) = ph ;
+    end % ipair = 1:length(inc_in)
 
-      avs(ipair) = 100.0*(dVS/VSmean) ;
-      vp(ipair) =  V(1) ;
-      vs1(ipair) = V(2) ;
-      vs2(ipair) = V(3) ;
-		
-      pol(ipair) = ph ;
-	end % ipair = 1:length(inc_in)
+% If any directions have zero avs (within machine accuracy)
+% set pol to NaN - array wise:
+    isiso = real(avs > sqrt(eps)) ; % list of 1.0 and 0.0.
+    pol = pol .* (isiso./isiso) ; % times by 1.0 or NaN. 
 
-   % If any directions have zero avs (within machine accuracy)
-   % set pol to NaN - array wise:
-   isiso = real(avs > sqrt(eps)) ; % list of 1.0 and 0.0.
-   pol = pol .* (isiso./isiso) ; % times by 1.0 or NaN. 
+    S1P(:,1) = S1P(:,1) .* (isiso./isiso);
+    S1P(:,2) = S1P(:,2) .* (isiso./isiso);
+    S1P(:,3) = S1P(:,3) .* (isiso./isiso);
 
-   S1P(:,1) = S1P(:,1) .* (isiso./isiso);
-   S1P(:,2) = S1P(:,2) .* (isiso./isiso);
-   S1P(:,3) = S1P(:,3) .* (isiso./isiso);
-
-   % switch nargout
-   % case 5
-   %    varargout{1} = pol ;
-   %    varargout{2} = avs ;
-   %    varargout{3} = vs1 ;
-   %    varargout{4} = vs2 ;
-   %    varargout{5} = vp ;
-   %
-   % case 7
-   %    varargout{1} = pol ;
-   %    varargout{2} = avs ;
-   %    varargout{3} = vs1 ;
-   %    varargout{4} = vs2 ;
-   %    varargout{5} = vp ;
-   %    varargout{6} = S1P ;
-   %    varargout{7} = S2P ;
-   %
-   % case 11
-   %     varargout{1} = pol ;
-   %     varargout{2} = avs ;
-   %     varargout{3} = vs1 ;
-   %     varargout{4} = vs2 ;
-   %     varargout{5} = vp ;
-   %     varargout{6} = S1P ;
-   %     varargout{7} = S2P ;
-   %     varargout{8} = PE ;
-   %     varargout{9} = S1E ;
-   %     varargout{10} = S2E ;
-   %     varargout{11} = XIS ;
-   %
-   % otherwise
-   %    error('MS:PHASEVELS:BadOutputArgs','Requires 5, 7, or 11 output arguments.')
-   % end
-
-    
 return
 %=======================================================================================  
 
@@ -271,28 +236,28 @@ return
 function [VR] = V_rot_gam(V,gam)
 
 %  Make rotation matrix
-g = gam * pi/180. ;
-
-RR = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
-VR = V * RR ;
+    g = gam * pi/180. ;
+    
+    RR = [ cos(g) sin(g) 0 ; -sin(g) cos(g) 0 ; 0 0 1 ] ;
+    VR = V * RR ;
  
 return
 
 function [VR] = V_rot_bet(V,bet)
 
 %  Make rotation matrix
-b = bet * pi/180. ;
-
-RR = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
-
-VR = V * RR ;
+    b = bet * pi/180. ;
+    
+    RR = [ cos(b) 0 -sin(b) ; 0 1 0 ; sin(b) 0 cos(b) ] ;
+    
+    VR = V * RR ;
  
 return
 
 %=======================================================================================  
 
 %=======================================================================================  
-	function [X] = cart2(inc,azm)
+function [X] = cart2(inc,azm)
 %=======================================================================================  
 %c convert from spherical to cartesian co-ordinates
 %c north x=100  west y=010 up z=001
@@ -312,11 +277,11 @@ return
     r=sqrt(X(1)*X(1)+X(2)*X(2)+X(3)*X(3)) ;
    
 	X = X./r ;
-   return
+return
 %=======================================================================================  
 
 %=======================================================================================  
-	function [V,EIGVEC]=velo(X,rh,C)
+function [V,EIGVEC]=velo(X,rh,C)
 %=======================================================================================  
 % PHASE-VELOCITY SURFACES IN AN ANISOTROPIC MEDIUM
 % revised April 1991
@@ -332,13 +297,13 @@ return
 % from 6x6 to 3x3x3x3 form using the formula from page 1076 of 
 % Winterstein 1990. This is > twice as fast as the quickest way I
 % have found going via the full tensor form.
-        gamma = [X(1) 0.0  0.0  0.0  X(3) X(2) ; ...
-                 0.0  X(2) 0.0  X(3) 0.0  X(1) ; ...
-                 0.0  0.0  X(3) X(2) X(1) 0.0 ];
-        T = gamma * C * gamma';
-         
+    gamma = [X(1) 0.0  0.0  0.0  X(3) X(2) ; ...
+             0.0  X(2) 0.0  X(3) 0.0  X(1) ; ...
+             0.0  0.0  X(3) X(2) X(1) 0.0 ];
+    T = gamma * C * gamma';
+     
 % determine the eigenvalues of symmetric tij
-        [EIVEC EIVAL] = eig(T) ;
+    [EIVEC EIVAL] = eig(T) ;
 
 % calculate velocities and sort
 % note that we could get a significant speedup if
@@ -349,14 +314,14 @@ return
 % that the eignevalues are not returned in sorted order"
 % http://www.mathworks.com/matlabcentral/newsreader/view_original/394371 
 % so we have to sort here...
-		V_RAW = (sqrt([EIVAL(1,1) EIVAL(2,2) EIVAL(3,3)]./rh))*10. ;
-		[V IND] = sort(V_RAW,2,'descend') ;
-		EIGVEC = EIVEC ; % for dimensioning
-		for i=1:3
-			EIGVEC(:,i) = EIVEC(:,IND(i)) ;
-		end
+    V_RAW = (sqrt([EIVAL(1,1) EIVAL(2,2) EIVAL(3,3)]./rh))*10. ;
+    [V IND] = sort(V_RAW,2,'descend') ;
+    EIGVEC = EIVEC ; % for dimensioning
+    for i=1:3
+    	EIGVEC(:,i) = EIVEC(:,IND(i)) ;
+    end
 
-      return
+return
 %=======================================================================================  
 
 function [ l ] = isIsotropic( C, tol )

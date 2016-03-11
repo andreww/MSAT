@@ -137,65 +137,65 @@ function VG =rayvel(C,SN,rho)
 %
 % returns VG: Group velocity vector (3)
 
-ijkl = [1,6,5; ...
-        6,2,4; ...
-        5,4,3] ;
-        
-        
-gamma = [SN(1) 0.0  0.0  0.0  SN(3) SN(2) ; ...
-         0.0  SN(2) 0.0  SN(3) 0.0  SN(1) ; ...
-         0.0  0.0  SN(3) SN(2) SN(1) 0.0 ];
-         
-F = gamma * C * gamma'-eye(3).*rho;
-        
-        
+    ijkl = [1,6,5; ...
+            6,2,4; ...
+            5,4,3] ;
+            
+            
+    gamma = [SN(1) 0.0  0.0  0.0  SN(3) SN(2) ; ...
+             0.0  SN(2) 0.0  SN(3) 0.0  SN(1) ; ...
+             0.0  0.0  SN(3) SN(2) SN(1) 0.0 ];
+             
+    F = gamma * C * gamma'-eye(3).*rho;
+            
+            
 % Signed cofactors of F[i,k]
-CF = zeros(3,3);
-
-CF(1,1)=F(2,2)*F(3,3)-F(2,3)^2;
-CF(2,2)=F(1,1)*F(3,3)-F(1,3)^2;
-CF(3,3)=F(1,1)*F(2,2)-F(1,2)^2;
-CF(1,2)=F(2,3)*F(3,1)-F(2,1)*F(3,3);
-CF(2,1)=CF(1,2);
-CF(2,3)=F(3,1)*F(1,2)-F(3,2)*F(1,1);
-CF(3,2)=CF(2,3);
-CF(3,1)=F(1,2)*F(2,3)-F(1,3)*F(2,2);
-CF(1,3)=CF(3,1);
-
-
+    CF = zeros(3,3);
+    
+    CF(1,1)=F(2,2)*F(3,3)-F(2,3)^2;
+    CF(2,2)=F(1,1)*F(3,3)-F(1,3)^2;
+    CF(3,3)=F(1,1)*F(2,2)-F(1,2)^2;
+    CF(1,2)=F(2,3)*F(3,1)-F(2,1)*F(3,3);
+    CF(2,1)=CF(1,2);
+    CF(2,3)=F(3,1)*F(1,2)-F(3,2)*F(1,1);
+    CF(3,2)=CF(2,3);
+    CF(3,1)=F(1,2)*F(2,3)-F(1,3)*F(2,2);
+    CF(1,3)=CF(3,1);
+    
+    
 % Derivatives of determinant elements
-DF = zeros(3,3,3);
-for i=1:3
-    for j=1:3
-        for k=1:3
-            DF(i,j,k)=0.0;
-            for l=1:3
-                DF(i,j,k) = DF(i,j,k) + (C(ijkl(i,j),ijkl(k,l))+ C(ijkl(k,j),ijkl(i,l)) ) * SN(l);                
+    DF = zeros(3,3,3);
+    for i=1:3
+        for j=1:3
+            for k=1:3
+                DF(i,j,k)=0.0;
+                for l=1:3
+                    DF(i,j,k) = DF(i,j,k) + (C(ijkl(i,j),ijkl(k,l))+ C(ijkl(k,j),ijkl(i,l)) ) * SN(l);                
+                end
             end
         end
     end
-end
 
 % Components of Gradient
-DFD = zeros(3,1);
-for k=1:3
-    DFD(k) = 0.0;
-    for i=1:3
-        for j=1:3
-            DFD(k)=DFD(k)+DF(i,j,k)*CF(i,j);
-        end        
+    DFD = zeros(3,1);
+    for k=1:3
+        DFD(k) = 0.0;
+        for i=1:3
+            for j=1:3
+                DFD(k)=DFD(k)+DF(i,j,k)*CF(i,j);
+            end        
+        end
     end
-end
 
 % Normalize to obtain group velocity
-denom = 0.0;
-VG = zeros(3,1);
-for i=1:3
-    denom = denom+SN(i)*DFD(i);
-end
-for i=1:3
-    VG(i) = DFD(i)./denom;
-end
+    denom = 0.0;
+    VG = zeros(3,1);
+    for i=1:3
+        denom = denom+SN(i)*DFD(i);
+    end
+    for i=1:3
+        VG(i) = DFD(i)./denom;
+    end
 
 return % function
 
