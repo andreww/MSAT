@@ -45,11 +45,11 @@ function test_MS_norms_olivine_lit
     
     % Only some results are in the paper (page 671)
     % Check results - only know the answer to 1dp.
-    assertElementsAlmostEqual(P(1), 0.793, 'absolute', 0.3);
-    assertElementsAlmostEqual(P(2), 0.152, 'absolute', 0.3);
-    assertElementsAlmostEqual((P(3)+P(4)), 0.055, 'absolute', 0.3);
-    assertElementsAlmostEqual(P(5), 0.0, 'absolute', 0.3);
-    assertElementsAlmostEqual(P(6), 0.0, 'absolute', 0.3);
+    assertElementsAlmostEqual(P(1), 0.793, 'absolute', 0.001);
+    assertElementsAlmostEqual(P(2), 0.152, 'absolute', 0.001);
+    assertElementsAlmostEqual((P(3)+P(4)), 0.055, 'absolute', 0.001);
+    assertElementsAlmostEqual(P(5), 0.0, 'absolute', 0.001);
+    assertElementsAlmostEqual(P(6), 0.0, 'absolute', 0.001);
 end
 
 function test_MS_norms_enst_lit
@@ -95,10 +95,10 @@ function test_MS_norms_enst_lit
     
     % Only some results are in the paper (page 671)
     % Check results - only know the answer to 1dp.
-    assertElementsAlmostEqual(P(1), 0.908, 'absolute', 0.3);
-    assertElementsAlmostEqual(P(2), 0.043, 'absolute', 0.3);
-    assertElementsAlmostEqual((P(3)+P(4)), 0.049, 'absolute', 0.3);
-    assertElementsAlmostEqual(P(5), 0.0, 'absolute', 0.3);
-    assertElementsAlmostEqual(P(6), 0.0, 'absolute', 0.3);
+    assertElementsAlmostEqual(P(1), 0.908, 'absolute', 0.001);
+    assertElementsAlmostEqual(P(2), 0.043, 'absolute', 0.001);
+    assertElementsAlmostEqual((P(3)+P(4)), 0.049, 'absolute', 0.001);
+    assertElementsAlmostEqual(P(5), 0.0, 'absolute', 0.001);
+    assertElementsAlmostEqual(P(6), 0.0, 'absolute', 0.001);
 end
             
