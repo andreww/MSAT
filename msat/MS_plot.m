@@ -268,6 +268,9 @@ function MS_plot(C,rh,varargin)
 
       % Check any data inputs
       if pdata_plot
+          pdata_azi = force_row_vec(pdata_azi);
+          pdata_inc = force_row_vec(pdata_inc);
+          pdata_mag = force_row_vec(pdata_mag);
           assert(length(pdata_azi)==length(pdata_inc),...
               'MS:PLOT:pdata_mismatch', ...
               'P-wave data arrays must be the same size.') ;
@@ -276,6 +279,10 @@ function MS_plot(C,rh,varargin)
               'P-wave data arrays must be the same size.') ;
       end
       if sdata_plot
+          sdata_azi = force_row_vec(sdata_azi);
+          sdata_inc = force_row_vec(sdata_inc);
+          sdata_mag = force_row_vec(sdata_mag);
+          sdata_pol = force_row_vec(sdata_pol);
           assert(length(sdata_azi)==length(sdata_inc),...
               'MS:PLOT:sdata_mismatch', ...
               'S-wave data arrays must be the same size.') ;
@@ -860,4 +867,14 @@ function plot_bands(baxis, bangles, istereo)
    end
    
    
+end
+
+function [vec] = force_row_vec(vec)
+          assert(isvector(vec), ...
+              'MS:PLOT:data_mismatch', ...
+              'S-wave or P-wave data arrays must be vectors.') ;
+          s = size(vec);
+          if s(2) == 1
+              vec = vec';
+          end
 end
