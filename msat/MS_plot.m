@@ -389,7 +389,7 @@ function MS_plot(C,rh,varargin)
                       end
                       
                       if band_plot
-                         plot_bands(band_axis,band_angle) ;
+                         plot_bands(band_axis,band_angle, istereo) ;
                       end    
                       
                       %  ** add some information to the plot
@@ -412,7 +412,7 @@ function MS_plot(C,rh,varargin)
                       [AVSmin, AVSmax] = max_min_pole(AZ, INC, AVS);
 
                       if band_plot
-                         plot_bands(band_axis,band_angle) ;
+                         plot_bands(band_axis,band_angle, istereo) ;
                       end    
                       
                       %  ** add some information to the plot
@@ -430,7 +430,7 @@ function MS_plot(C,rh,varargin)
                       [VS1min, VS1max] = max_min_pole(AZ, INC, VS1);
 
                       if band_plot
-                         plot_bands(band_axis,band_angle) ;
+                         plot_bands(band_axis,band_angle, istereo) ;
                       end    
                 
                       %  ** add some information to the plot
@@ -453,7 +453,7 @@ function MS_plot(C,rh,varargin)
                       [VS2min, VS2max] = max_min_pole(AZ, INC, VS1);
 
                       if band_plot
-                         plot_bands(band_axis,band_angle) ;
+                         plot_bands(band_axis,band_angle, istereo) ;
                       end    
                       
                       %  ** add some information to the plot
@@ -468,7 +468,7 @@ function MS_plot(C,rh,varargin)
                           'FontWeight','bold') ;
 
                           if band_plot
-                             plot_bands(band_axis,band_angle) ;
+                             plot_bands(band_axis,band_angle, istereo) ;
                           end    
 
                       
@@ -478,7 +478,7 @@ function MS_plot(C,rh,varargin)
                           fntsz, buggyMATLAB, 'Fast-shear polarisation')
                       
                       if band_plot
-                         plot_bands(band_axis,band_angle) ;
+                         plot_bands(band_axis,band_angle, istereo) ;
                       end    
 
                       if (limitsonpol)
@@ -819,7 +819,7 @@ function [VR] = V_rot_bet(V,bet)
  
 end
 
-function plot_bands(baxis, bangles)
+function plot_bands(baxis, bangles, istereo)
 % Plot bands on the pole figures.    
    for iband=1:length(baxis)
       % generate a set of points around the 3-axis
@@ -844,10 +844,18 @@ function plot_bands(baxis, bangles)
          error('MS:PLOT:BADBANDAXIS', ...
             'Bad axis specified to plot band.');
       end      
+
+      %  ** if required, apply stereographic transform
+      if istereo
+         xs=x./(1+z) ;
+         ys=y./(1+z) ;
+         x=xs;
+         y=ys;
+      end  
       
       % mask negative Z points. 
       index=find(z>=0) ;
-
+      
       plot(x(index),y(index),'w-','LineWidth',1.5)
    end
    
