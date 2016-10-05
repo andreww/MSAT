@@ -3,7 +3,7 @@
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 % Given an elasticity matrix and density, produce pole figures showing 
-%     the P- and S-wave anisotrpy. 
+%     the P- and S-wave anisotropy. 
 %
 %  % MS_plot(C, rh, ...)
 %
@@ -33,6 +33,10 @@
 %          Unreverse the sense of the colour map. Default (no argument) is 
 %          for blue to be fast/high as is conventional for seismic velocity 
 %          colorscales. Setting this option results in red being fast/high.
+%
+%     MS_plot(..., 'stereo')
+%          Use an angle preserving stereographic projection instead of the
+%          default spherical projection. 
 %
 %     MS_plot(..., 'pcontours', pcvect)
 %     MS_plot(..., 'avscontours', ascvect)
@@ -148,6 +152,9 @@ function MS_plot(C,rh,varargin)
 %  ** configure font options
       fntsz = 12;
 
+%  ** set stereographic projection
+      istereo = 0 ;
+
 %  ** configure colormap options
       cmap = jet(64) ;
       icmapflip = 1 ; % reverse the sense of the colourscale
@@ -167,6 +174,9 @@ function MS_plot(C,rh,varargin)
       iarg = 1 ;
       while iarg <= (length(varargin))
          switch lower(varargin{iarg})
+            case 'stereo'
+               istereo = 1 ;
+               iarg = iarg + 1 ;
             case 'reverse'
                icmapflip = 0 ;
                iarg = iarg + 1 ;
@@ -331,6 +341,17 @@ function MS_plot(C,rh,varargin)
 %  ** generate X/Y matrices for plotting
       [X,Y,Z] = sph2cart(AZ.*rad,INC.*rad,ones(size(AZ))) ;
 
+
+%  ** if required, apply stereographic transform
+      if istereo
+         XS=X./(1+Z) ;
+         YS=Y./(1+Z) ;
+         X=XS;
+         Y=YS;
+      end   
+
+
+
       k = 0;
       for j = 1:nrow;
           for i = 1:ncol
@@ -423,11 +444,11 @@ function MS_plot(C,rh,varargin)
                       
                       pol_pole(VS1_x,VS1_y,VS1_z, X, Y, Z, AZ, INC, ...
                           qwhite_scale, qblack_scale, qwhite_width, ...
-                          qblack_width);
+                          qblack_width, istereo);
                       
                       if sdata_plot
                           add_data(sdata_azi, sdata_inc, sdata_pol, ...
-                              sdata_mag, 1);
+                              sdata_mag, 1, istereo);
                       end
                       
                   otherwise
@@ -507,7 +528,7 @@ end
    end
 %===============================================================================
 
-function add_data(data_azi, data_inc, data_pol, data_mag, with_pol)
+function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, istereo)
 
     % Get data points as XYZ
     % reverse so sph2cart() works properly
@@ -516,6 +537,14 @@ function add_data(data_azi, data_inc, data_pol, data_mag, with_pol)
     % Data points
     [X,Y,Z] = sph2cart(data_azi.*rad, data_inc.*rad, ones(size(data_azi)));
     
+    if istereo
+       XS=X./(1+Z) ;
+       YS=Y./(1+Z) ;
+       X=XS;
+       Y=YS;
+    end   
+
+
     if with_pol
         % Vectors in ray frame:
         nsdata = length(data_pol);
@@ -632,7 +661,7 @@ function [VALmin, VALmax] = max_min_pole(AZ, INC, VAL)
 end
 
 function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
-          qwhite_scale, qblack_scale, qwhite_width, qblack_width)
+          qwhite_scale, qblack_scale, qwhite_width, qblack_width, istereo)
       
 %  ** transform vectors
       [V_x,V_y,V_z] = vnormalise2(V_x,V_y,V_z) ;
@@ -658,13 +687,20 @@ function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
       
       [VR_x,VR_y,VR_z] = vnormalise2(VR_x,VR_y,VR_z) ;
  
-%  ** define subset of polarisations to plot      
-      cl = [1,3,5,7,9,11,15] ;
-      drw = [60 10 5 3 2 2 2] ;
+%  ** define subset of polarisations to plot (stereographic uses a
+%     different set)     
+      if istereo
+        cl = [  1  3  5  7  9 11 12 13 14 15  16] ;
+        drw = [60 10  5  3  2  2  2  2  2 2  2] ;
+        np=260 ;
+      else
+        cl =  [  1  3  5  7  9 11 15 ] ;
+        drw = [ 60 10  5  3  2  2  2 ] ;
+        np=136 ;
+      end
 
       ii=0 ;
       ip=0 ;
-      np=136 ;
       ind1 = zeros(1,np) ;
       ind2 = zeros(1,np) ;
       
