@@ -861,13 +861,34 @@ function plot_bands(baxis, bangles, projection, ilower)
             'Bad axis specified to plot band.');
       end      
 
-      %  ** if required, apply stereographic transform
-      [x,y]=apply_projection(x,y,z,projection,ilower) ;
+      %  ** if required, apply stereographic transform, but pretend
+      % x3 is upper hemisphere even if it is not
+      if baxis(iband) == 3
+          [x,y]=apply_projection(x,y,z,projection,0) ;
+      else
+          [x,y]=apply_projection(x,y,z,projection,ilower) ;
+      end
       
-      % mask negative Z points. 
-      index=find(z>=0) ;
+      % mask negative Z points - taking casere of some lower hemisphere oddness. 
+      if ilower && (baxis(iband) ~= 3)
+          index = find(z<=0);
+          px = x(index);
+          py = y(index);
+          % Lower hemisphere can be out of order (and ugly) - fix
+          if baxis(iband) == 1
+              [py, i] = sort(py);
+              px = px(i);
+          elseif baxis(iband) == 2
+              [px, i] = sort(px);
+              py = py(i);
+          end % n.b no bother for 3
+      else
+          index = find(z>=0);
+          px = x(index);
+          py = y(index);
+      end
       
-      plot(x(index),y(index),'w-','LineWidth',1.5)
+      plot(px,py,'w-','LineWidth',1.5)
    end
    
    
