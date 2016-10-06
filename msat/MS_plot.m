@@ -86,8 +86,8 @@
 %          the P-wave velocity, vp, or S-wave anisotropy, avs, in km/s
 %          or %. In the case of S-wave anisotropy, the fast polarisation 
 %          direction is also shown. Each argument (azimuth, inclination, 
-%          vp, polarisation and avs) is an array and each must be the 
-%          same length.
+%          vp, polarisation and avs) is an array and each must have the 
+%          same number of elements.
 %
 %     MS_plot(..., 'band', axis, angle)
 %          Draw a circle onto the sphere constant angle around the 
@@ -101,7 +101,7 @@
 %
 % See also: MS_SPHERE, MS_PHASEVELS
 
-% Copyright (c) 2011-2013 James Wookey and Andrew Walker
+% Copyright (c) 2011-2016 James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
@@ -870,11 +870,21 @@ function plot_bands(baxis, bangles, istereo)
 end
 
 function [vec] = force_row_vec(vec)
-          assert(isvector(vec), ...
-              'MS:PLOT:data_mismatch', ...
-              'S-wave or P-wave data arrays must be vectors.') ;
-          s = size(vec);
-          if s(2) == 1
-              vec = vec';
-          end
+    % Turn a matrix of any shape, or a column vector
+    % into a row vector. This helps us handle a wide range
+    % of input into the pdata and sdata options. This returns
+    % scalars unaltered.
+
+    % We may have a matrix - turn it into a (column) vector
+    % (this doesn't change vectors
+    vec = vec(:);
+    % make sure we end up with a row...
+    s = size(vec);
+    if s(2) == 1
+        vec = vec';
+    end
+    % and check we have something sensible to return (scalar seems OK)
+    assert(isvector(vec), ...
+        'MS:PLOT:data_mismatch', ...
+        'S-wave or P-wave data arrays must be vectors.') ;
 end
