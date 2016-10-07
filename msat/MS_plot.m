@@ -3,7 +3,7 @@
 % // Part of MSAT - The Matlab Seismic Anisotropy Toolkit //
 %
 % Given an elasticity matrix and density, produce pole figures showing 
-%     the P- and S-wave anisotrpy. 
+%     the P- and S-wave anisotropy. 
 %
 %  % MS_plot(C, rh, ...)
 %
@@ -33,6 +33,16 @@
 %          Unreverse the sense of the colour map. Default (no argument) is 
 %          for blue to be fast/high as is conventional for seismic velocity 
 %          colorscales. Setting this option results in red being fast/high.
+%
+%     MS_plot(..., 'projection',P)
+%          Set the projection of the pole figure to that specified in P.
+%          Currently supported options are: 
+%          'sphere' : Spherical projection (default).
+%          'angle'  : An angle preserving stereographic projection.
+%          'area'   : Lambert area preserving projection. 
+%
+%     MS_plot(..., 'lower')
+%          Plot the lower hemisphere rather than the upper hemisphere.
 %
 %     MS_plot(..., 'pcontours', pcvect)
 %     MS_plot(..., 'avscontours', ascvect)
@@ -82,15 +92,22 @@
 %          the P-wave velocity, vp, or S-wave anisotropy, avs, in km/s
 %          or %. In the case of S-wave anisotropy, the fast polarisation 
 %          direction is also shown. Each argument (azimuth, inclination, 
-%          vp, polarisation and avs) is an array and each must be the 
-%          same length.
+%          vp, polarisation and avs) is an array and each must have the 
+%          same number of elements.
+%
+%     MS_plot(..., 'band', axis, angle)
+%          Draw a circle onto the sphere constant angle around the 
+%          specified axis (1,2 or 3). iaxis and angle can be a scalar 
+%          or vector and must have an equal number of entries. 
+%          For example, [1 1 1] [20 30 40] will draw circles on the
+%          sphere at a constant 20, 30 and 40 degrees from the 1-axis. 
 % 
 %     MS_plot(..., 'quiet')
 %          Don't write isotropic velocities to the terminal. 
 %
 % See also: MS_SPHERE, MS_PHASEVELS
 
-% Copyright (c) 2011-2013 James Wookey and Andrew Walker
+% Copyright (c) 2011-2016 James Wookey and Andrew Walker
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, 
@@ -148,6 +165,12 @@ function MS_plot(C,rh,varargin)
 %  ** configure font options
       fntsz = 12;
 
+%  ** set default projection
+      projection = 'sphere' ;
+
+%  ** set lower hemisphere (upper hemisphere is default)
+      ilower = 0 ;      
+
 %  ** configure colormap options
       cmap = jet(64) ;
       icmapflip = 1 ; % reverse the sense of the colourscale
@@ -162,11 +185,20 @@ function MS_plot(C,rh,varargin)
       plotmap = {'VP', 'AVS', 'AVSPOL'};
       sdata_plot = 0; % no sdata overlay
       pdata_plot = 0; % no pdata overlay      
+
+%  ** set default for band plot
+      band_plot=0 ;      
       
 %  ** process the optional arguments
       iarg = 1 ;
       while iarg <= (length(varargin))
          switch lower(varargin{iarg})
+            case 'projection'
+               projection = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
+            case 'lower'
+               ilower = 1 ;
+               iarg = iarg + 1 ;
             case 'reverse'
                icmapflip = 0 ;
                iarg = iarg + 1 ;
@@ -229,6 +261,11 @@ function MS_plot(C,rh,varargin)
                pdata_mag = varargin{iarg+3};
                pdata_plot = 1;
                iarg = iarg + 4;
+            case 'band'
+               band_axis = varargin{iarg+1};
+               band_angle = varargin{iarg+2};
+               band_plot = 1;
+               iarg = iarg + 3;               
             otherwise 
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
@@ -246,6 +283,9 @@ function MS_plot(C,rh,varargin)
 
       % Check any data inputs
       if pdata_plot
+          pdata_azi = force_row_vec(pdata_azi);
+          pdata_inc = force_row_vec(pdata_inc);
+          pdata_mag = force_row_vec(pdata_mag);
           assert(length(pdata_azi)==length(pdata_inc),...
               'MS:PLOT:pdata_mismatch', ...
               'P-wave data arrays must be the same size.') ;
@@ -254,6 +294,10 @@ function MS_plot(C,rh,varargin)
               'P-wave data arrays must be the same size.') ;
       end
       if sdata_plot
+          sdata_azi = force_row_vec(sdata_azi);
+          sdata_inc = force_row_vec(sdata_inc);
+          sdata_mag = force_row_vec(sdata_mag);
+          sdata_pol = force_row_vec(sdata_pol);
           assert(length(sdata_azi)==length(sdata_inc),...
               'MS:PLOT:sdata_mismatch', ...
               'S-wave data arrays must be the same size.') ;
@@ -264,6 +308,12 @@ function MS_plot(C,rh,varargin)
               'MS:PLOT:sdata_mismatch', ...
               'S-wave data arrays must be the same size.') ;
       end
+      if band_plot
+         assert(length(band_axis)==length(band_angle),...
+             'MS:PLOT:band_mismatch', ...
+             'To plot bands, angle and axis arrays must be the same size.') ;         
+      end
+      
 %  ** buggy MATLAB contourf (version 7.1-7.3)
 %
 %     in these versions of MATLAB, the contourf routine doesn't seem able to
@@ -284,8 +334,12 @@ function MS_plot(C,rh,varargin)
       deg = 180./pi ;
       
       % Set up inc-az grids...
-      [INC,AZ] = meshgrid([90:-6:0],[0:6:360]) ;
-      
+      if ilower
+        [INC,AZ] = meshgrid([-90:6:0],[0:6:360]) ;
+      else
+        [INC,AZ] = meshgrid([90:-6:0],[0:6:360]) ;
+      end  
+
       % Invoke MS_phasevels to get wave velocities etc.
       [~,~,vs1,vs2,vp, S1P] = MS_phasevels(C,rh,...
         reshape(INC,61*16,1),reshape(AZ,61*16,1));
@@ -331,6 +385,10 @@ function MS_plot(C,rh,varargin)
 %  ** generate X/Y matrices for plotting
       [X,Y,Z] = sph2cart(AZ.*rad,INC.*rad,ones(size(AZ))) ;
 
+
+%  ** if required, apply stereographic transform
+      [X,Y]=apply_projection(X,Y,Z,projection,ilower) ;
+
       k = 0;
       for j = 1:nrow;
           for i = 1:ncol
@@ -348,6 +406,10 @@ function MS_plot(C,rh,varargin)
                       if pdata_plot
                           add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0);
                       end
+                      
+                      if band_plot
+                         plot_bands(band_axis,band_angle, projection, ilower) ;
+                      end    
                       
                       %  ** add some information to the plot
                       VPlabel1 = sprintf(['Min. V_P =%6.2f, max.' ...
@@ -367,6 +429,10 @@ function MS_plot(C,rh,varargin)
                           buggyMATLAB, 'dV_S (%)')
                       
                       [AVSmin, AVSmax] = max_min_pole(AZ, INC, AVS);
+
+                      if band_plot
+                         plot_bands(band_axis,band_angle, projection, ilower) ;
+                      end    
                       
                       %  ** add some information to the plot
                       AVSlabel1 = sprintf(['V_S anisotropy, min' ...
@@ -381,7 +447,11 @@ function MS_plot(C,rh,varargin)
                           buggyMATLAB, 'V_{S1} (km/s)')
                       
                       [VS1min, VS1max] = max_min_pole(AZ, INC, VS1);
-                      
+
+                      if band_plot
+                         plot_bands(band_axis,band_angle, projection, ilower) ;
+                      end    
+                
                       %  ** add some information to the plot
                       VS1label1 = sprintf(['Min. V_{S1} =%6.2f, max.' ...
                           ' V_{S1} =%6.2f'],VS1min,VS1max) ;
@@ -400,6 +470,10 @@ function MS_plot(C,rh,varargin)
                           buggyMATLAB, 'V_{S2} (km/s)')
                       
                       [VS2min, VS2max] = max_min_pole(AZ, INC, VS1);
+
+                      if band_plot
+                         plot_bands(band_axis,band_angle, projection, ilower) ;
+                      end    
                       
                       %  ** add some information to the plot
                       VS2label1 = sprintf(['Min. V_{S2} =%6.2f, max.' ...
@@ -411,27 +485,36 @@ function MS_plot(C,rh,varargin)
                       VS2label2 = sprintf('Anisotropy =%6.1f%%',VS2ani) ;
                       text(-1.3,0.8,VS2label2,'FontSize',fntsz, ...
                           'FontWeight','bold') ;
+
+                          if band_plot
+                             plot_bands(band_axis,band_angle, projection, ilower) ;
+                          end    
+
                       
                   case 'avspol'
                       % Fast shear-wave polarisation plot
                       contour_pole(X, Y, AVS, view_angle, AVScvect, cmap, ...
                           fntsz, buggyMATLAB, 'Fast-shear polarisation')
                       
+                      if band_plot
+                         plot_bands(band_axis,band_angle, projection, ilower) ;
+                      end    
+
                       if (limitsonpol)
                           [~, ~] = max_min_pole(AZ, INC, AVS);
                       end
                       
                       pol_pole(VS1_x,VS1_y,VS1_z, X, Y, Z, AZ, INC, ...
                           qwhite_scale, qblack_scale, qwhite_width, ...
-                          qblack_width);
+                          qblack_width, projection, ilower);
                       
                       if sdata_plot
                           add_data(sdata_azi, sdata_inc, sdata_pol, ...
-                              sdata_mag, 1);
+                              sdata_mag, 1, projection, ilower);
                       end
                       
                   otherwise
-                      error('MS:PLOT:BADPLOTMAP', ['An elelment of the '...
+                      error('MS:PLOT:BADPLOTMAP', ['An element of the '...
                           'plotmap was not recognised']);
               end
           end
@@ -507,7 +590,7 @@ end
    end
 %===============================================================================
 
-function add_data(data_azi, data_inc, data_pol, data_mag, with_pol)
+function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, projection, ilower)
 
     % Get data points as XYZ
     % reverse so sph2cart() works properly
@@ -516,6 +599,10 @@ function add_data(data_azi, data_inc, data_pol, data_mag, with_pol)
     % Data points
     [X,Y,Z] = sph2cart(data_azi.*rad, data_inc.*rad, ones(size(data_azi)));
     
+
+    % if required, apply stereographic transform
+    [X,Y]=apply_projection(X,Y,Z,projection,ilower) ;
+
     if with_pol
         % Vectors in ray frame:
         nsdata = length(data_pol);
@@ -563,7 +650,7 @@ function add_data(data_azi, data_inc, data_pol, data_mag, with_pol)
              [VR_xR(ip),VR_yR(ip),VR_zR(ip)] = ...
                         rotate_pm_vector(...
              VR_x(ip),VR_y(ip),VR_z(ip),...
-             data_azi(ip),data_inc(ip));          
+             data_azi(ip),data_inc(ip)+180*ilower);          
         end 
         
         h=quiver(X,Y,VR_xR,VR_yR,0.1,'w.') ;
@@ -632,7 +719,8 @@ function [VALmin, VALmax] = max_min_pole(AZ, INC, VAL)
 end
 
 function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
-          qwhite_scale, qblack_scale, qwhite_width, qblack_width)
+          qwhite_scale, qblack_scale, qwhite_width, qblack_width, ...
+          projection, ilower)
       
 %  ** transform vectors
       [V_x,V_y,V_z] = vnormalise2(V_x,V_y,V_z) ;
@@ -658,13 +746,24 @@ function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
       
       [VR_x,VR_y,VR_z] = vnormalise2(VR_x,VR_y,VR_z) ;
  
-%  ** define subset of polarisations to plot      
-      cl = [1,3,5,7,9,11,15] ;
-      drw = [60 10 5 3 2 2 2] ;
+%  ** define subset of polarisations to plot
+      switch lower(projection)
+      case 'sphere'
+        cl =  [  1  3  5  7  9 11 15 ] ;
+        drw = [ 60 10  5  3  2  2  2 ] ;
+        np=136 ;
+      case 'angle'           
+        cl = [  1  3  5  7  9 11 12 13 14 15  16] ;
+        drw = [60 10  5  3  2  2  2  2  2 2  2] ;
+        np=260 ;
+      case 'area'
+        cl = [  1  2  4  6  8 10 12 14 16] ;
+        drw = [60 20  5  3  2  2  2  2  2] ;
+        np=195 ;        
+      end
 
       ii=0 ;
       ip=0 ;
-      np=136 ;
       ind1 = zeros(1,np) ;
       ind2 = zeros(1,np) ;
       
@@ -684,7 +783,7 @@ function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
                     rotate_pm_vector(...
          VR_x(ind1(ip),ind2(ip)),VR_y(ind1(ip),...
                 ind2(ip)),VR_z(ind1(ip),ind2(ip)),...
-         AZ(ind1(ip),ind2(ip)),INC(ind1(ip),ind2(ip)));          
+         AZ(ind1(ip),ind2(ip)),INC(ind1(ip),ind2(ip))+(180*ilower));          
       end   
 
 %  ** form the subsets
@@ -738,4 +837,106 @@ function [VR] = V_rot_bet(V,bet)
 
     VR = V * RR ;
  
+end
+
+function plot_bands(baxis, bangles, projection, ilower)
+% Plot bands on the pole figures.    
+   for iband=1:length(baxis)
+      % generate a set of points around the 3-axis
+      
+      r=ones(1,73) ;
+      th = 0:5:360 ;
+      ph = ones(1,73) .* (90-bangles(iband)) ;
+
+      [x,y,z]=sph2cart(th.*pi/180,ph.*pi/180,r) ;
+      
+      % rotate appropriately
+      if baxis(iband) == 1
+         VR = V_rot_bet([x ; y ; z]',90) ;
+         x=VR(:,1) ; y=VR(:,2) ; z=VR(:,3) ;
+      elseif baxis(iband) == 2
+         VR = V_rot_bet([x ; y ; z]',90) ;
+         VRR = V_rot_gam(VR,90) ;
+         x=VRR(:,1) ; y=VRR(:,2) ; z=VRR(:,3) ;         
+      elseif baxis(iband) == 3
+         % nothing required
+      else             
+         error('MS:PLOT:BADBANDAXIS', ...
+            'Bad axis specified to plot band.');
+      end      
+
+      %  ** if required, apply stereographic transform, but pretend
+      % x3 is upper hemisphere even if it is not
+      if baxis(iband) == 3
+          [x,y]=apply_projection(x,y,z,projection,0) ;
+      else
+          [x,y]=apply_projection(x,y,z,projection,ilower) ;
+      end
+      
+      % mask negative Z points - taking casere of some lower hemisphere oddness. 
+      if ilower && (baxis(iband) ~= 3)
+          index = find(z<=0);
+          px = x(index);
+          py = y(index);
+          % Lower hemisphere can be out of order (and ugly) - fix
+          if baxis(iband) == 1
+              [py, i] = sort(py);
+              px = px(i);
+          elseif baxis(iband) == 2
+              [px, i] = sort(px);
+              py = py(i);
+          end % n.b no bother for 3
+      else
+          index = find(z>=0);
+          px = x(index);
+          py = y(index);
+      end
+      
+      plot(px,py,'w-','LineWidth',1.5)
+   end
+   
+   
+end
+
+function [vec] = force_row_vec(vec)
+    % Turn a matrix of any shape, or a column vector
+    % into a row vector. This helps us handle a wide range
+    % of input into the pdata and sdata options. This returns
+    % scalars unaltered.
+
+    % We may have a matrix - turn it into a (column) vector
+    % (this doesn't change vectors
+    vec = vec(:);
+    % make sure we end up with a row...
+    s = size(vec);
+    if s(2) == 1
+        vec = vec';
+    end
+    % and check we have something sensible to return (scalar seems OK)
+    assert(isvector(vec), ...
+        'MS:PLOT:data_mismatch', ...
+        'S-wave or P-wave data arrays must be vectors.') ;
+
+end
+
+function [XP,YP]=apply_projection(X,Y,Z,projection,ilower)
+%
+% Function to apply projections to the polefigure.
+%
+   lsign = (ilower*2)-1 ;
+
+   switch lower(projection)
+   case 'sphere'
+      XP=X ;
+      YP=Y ;
+   case 'angle'
+      XP=X./(1-lsign*Z) ;
+      YP=Y./(1-lsign*Z) ;        
+   case 'area'        
+      XP = (sqrt(2./(1-lsign*Z)).*X)./sqrt(2) ;
+      YP = (sqrt(2./(1-lsign*Z)).*Y)./sqrt(2) ;
+   otherwise
+      error(['Unknown projection: ' projection])
+   end   
+
 end

@@ -1,6 +1,26 @@
 MSAT Release Notes
 ==================
 
+Development - ongoing
+
+Enhancment to MS_plot including: 
+
+* Adding different projections (equal angle projection and equal area 
+projection - i.e. on a Wulff and Schmidt net, respectivly) with the new 
+keyword 'projection' (options are 'sphere' - the default - 'angle' and
+'area'.
+
+* Add the ability to plot lower hemisphere projections (rather than the
+default upper hemisphere). New keyword 'lower'.
+
+* Add the ability to plot "bands" around each of the axes (e.g. to show 
+the location of the SWS window). This adds the 'band' keyword that takes 
+a vector of axis labels and a vector of angles.
+
+* Handle non-row-vector input for sdata and pdata. We "flatten" any input 
+and turn it into a row vector (which is more or less what the documentation
+says). Input arguments just need the same number of elements.
+
 Version 1.1.1 - 12 December 2015
 --------------------------------
 
