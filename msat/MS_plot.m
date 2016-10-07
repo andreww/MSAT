@@ -185,6 +185,9 @@ function MS_plot(C,rh,varargin)
       plotmap = {'VP', 'AVS', 'AVSPOL'};
       sdata_plot = 0; % no sdata overlay
       pdata_plot = 0; % no pdata overlay      
+
+%  ** set default for band plot
+      band_plot=0 ;      
       
 %  ** process the optional arguments
       iarg = 1 ;
@@ -503,7 +506,7 @@ function MS_plot(C,rh,varargin)
                       
                       pol_pole(VS1_x,VS1_y,VS1_z, X, Y, Z, AZ, INC, ...
                           qwhite_scale, qblack_scale, qwhite_width, ...
-                          qblack_width, projection);
+                          qblack_width, projection, ilower);
                       
                       if sdata_plot
                           add_data(sdata_azi, sdata_inc, sdata_pol, ...
@@ -647,7 +650,7 @@ function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, projection, 
              [VR_xR(ip),VR_yR(ip),VR_zR(ip)] = ...
                         rotate_pm_vector(...
              VR_x(ip),VR_y(ip),VR_z(ip),...
-             data_azi(ip),data_inc(ip));          
+             data_azi(ip),data_inc(ip)+180*ilower);          
         end 
         
         h=quiver(X,Y,VR_xR,VR_yR,0.1,'w.') ;
@@ -716,7 +719,8 @@ function [VALmin, VALmax] = max_min_pole(AZ, INC, VAL)
 end
 
 function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
-          qwhite_scale, qblack_scale, qwhite_width, qblack_width, projection)
+          qwhite_scale, qblack_scale, qwhite_width, qblack_width, ...
+          projection, ilower)
       
 %  ** transform vectors
       [V_x,V_y,V_z] = vnormalise2(V_x,V_y,V_z) ;
@@ -779,7 +783,7 @@ function pol_pole(V_x,V_y,V_z, X, Y, Z, AZ, INC, ...
                     rotate_pm_vector(...
          VR_x(ind1(ip),ind2(ip)),VR_y(ind1(ip),...
                 ind2(ip)),VR_z(ind1(ip),ind2(ip)),...
-         AZ(ind1(ip),ind2(ip)),INC(ind1(ip),ind2(ip)));          
+         AZ(ind1(ip),ind2(ip)),INC(ind1(ip),ind2(ip))+(180*ilower));          
       end   
 
 %  ** form the subsets
