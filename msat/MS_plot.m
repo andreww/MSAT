@@ -93,7 +93,19 @@
 %          or %. In the case of S-wave anisotropy, the fast polarisation 
 %          direction is also shown. Each argument (azimuth, inclination, 
 %          vp, polarisation and avs) is an array and each must have the 
-%          same number of elements.
+%          same number of elements. By default only data points which
+%          have a positive inclination angle are plotted on a upper
+%          hemisphere plot, and negative are only plotted on a lower
+%          hemisphere. Other points are not plotted, and a warning is
+%          given. This behaviour is modified by the 'data_remap' flag
+%          (see below).
+%
+%     MS_plot(..., 'data_remap')
+%          Where data specified (through use of the 'sdata' or 'pdata' 
+%          flag) fall on the unplotted hemisphere (i.e., the lower 
+%          hemisphere by default) these data are remapped to the antipodal
+%          position on the plotted hemisphere. The default behaviour
+%          is to suppress plotting of these data with a warning. 
 %
 %     MS_plot(..., 'band', axis, angle)
 %          Draw a circle onto the sphere constant angle around the 
