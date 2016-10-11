@@ -93,7 +93,19 @@
 %          or %. In the case of S-wave anisotropy, the fast polarisation 
 %          direction is also shown. Each argument (azimuth, inclination, 
 %          vp, polarisation and avs) is an array and each must have the 
-%          same number of elements.
+%          same number of elements. By default only data points which
+%          have a positive inclination angle are plotted on a upper
+%          hemisphere plot, and negative are only plotted on a lower
+%          hemisphere. Other points are not plotted, and a warning is
+%          given. This behaviour is modified by the 'transform' flag
+%          (see below).
+%
+%     MS_plot(..., 'transform')
+%          Where data specified (through use of the 'sdata' or 'pdata' 
+%          flag) fall on the unplotted hemisphere (i.e., the lower 
+%          hemisphere by default) these data are remapped to the antipodal
+%          position on the plotted hemisphere. The default behaviour
+%          is to suppress plotting of these data with a warning. 
 %
 %     MS_plot(..., 'band', axis, angle)
 %          Draw a circle onto the sphere constant angle around the 
@@ -170,6 +182,9 @@ function MS_plot(C,rh,varargin)
 
 %  ** set lower hemisphere (upper hemisphere is default)
       ilower = 0 ;      
+
+%  ** set data remapping
+      itransform = 0 ;      
 
 %  ** configure colormap options
       cmap = jet(64) ;
@@ -261,6 +276,9 @@ function MS_plot(C,rh,varargin)
                pdata_mag = varargin{iarg+3};
                pdata_plot = 1;
                iarg = iarg + 4;
+            case 'transform'
+               itransform = 1;
+               iarg = iarg + 1;
             case 'band'
                band_axis = varargin{iarg+1};
                band_angle = varargin{iarg+2};
@@ -404,7 +422,8 @@ function MS_plot(C,rh,varargin)
                       [VPmin, VPmax] = max_min_pole(AZ, INC, VP);
                       
                       if pdata_plot
-                          add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0);
+                         add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0, ...
+                           projection, ilower, itransform);
                       end
                       
                       if band_plot
@@ -510,7 +529,7 @@ function MS_plot(C,rh,varargin)
                       
                       if sdata_plot
                           add_data(sdata_azi, sdata_inc, sdata_pol, ...
-                              sdata_mag, 1, projection, ilower);
+                              sdata_mag, 1, projection, ilower, itransform);
                       end
                       
                   otherwise
@@ -590,12 +609,59 @@ end
    end
 %===============================================================================
 
-function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, projection, ilower)
+function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, ...
+                  projection, ilower, itransform)
 
-    % Get data points as XYZ
-    % reverse so sph2cart() works properly
-    data_azi = -data_azi;
-    rad = pi./180 ;
+   % Get data points as XYZ
+   % reverse so sph2cart() works properly
+   data_azi = -data_azi;
+   rad = pi./180 ;
+
+   wstr = ['Suppressed plotting of datapoints on opposite (%s)' ...
+            'hemisphere.\n','         Use ''transform'' flag to ' ...
+            'transform and plot these points.'] ;
+
+    % Suppress data as appropriate 
+   if ~itransform
+      if ilower
+         ind = find(data_inc<=0) ;
+         if length(ind)~=length(data_inc)
+            warning('MS:PLOT:DATAONWRONGHEMIPHERE', ...
+            sprintf(wstr,'upper'));
+         end
+      else
+         ind = find(data_inc>=0) ;
+         if length(ind)~=length(data_inc)
+            warning('MS:PLOT:DATAONWRONGHEMIPHERE', ...
+            sprintf(wstr,'lower'));
+         end
+      end
+   else
+      % remap data
+      if ilower
+         ind = find(data_inc>=0) ;
+      else
+         ind = find(data_inc<=0) ;
+      end
+      data_azi(ind) = data_azi(ind)+180 ;
+      data_inc(ind) = -data_inc(ind) ;
+      if with_pol
+         data_pol(ind) = -data_pol(ind) ;
+      end
+
+      % set index to include all points      
+      ind = 1:length(data_inc) ;
+   end    
+
+   % drop extraneous data
+   data_azi = data_azi(ind) ;
+   data_inc = data_inc(ind) ;
+   if with_pol
+      data_pol = data_pol(ind) ;
+   end
+   data_mag = data_mag(ind) ;
+
+
     % Data points
     [X,Y,Z] = sph2cart(data_azi.*rad, data_inc.*rad, ones(size(data_azi)));
     
