@@ -21,6 +21,11 @@ a vector of axis labels and a vector of angles.
 and turn it into a row vector (which is more or less what the documentation
 says). Input arguments just need the same number of elements.
 
+* Only plot data ('sdata', 'pdata') on the upper or lower hemisphere 
+depending on the inclination. Add 'data_remap' to plot negative 
+inclination data on the upper hemisphere or positive data on the lower
+hemisphere.
+
 Version 1.1.1 - 12 December 2015
 --------------------------------
 
