@@ -97,10 +97,10 @@
 %          have a positive inclination angle are plotted on a upper
 %          hemisphere plot, and negative are only plotted on a lower
 %          hemisphere. Other points are not plotted, and a warning is
-%          given. This behaviour is modified by the 'data_remap' flag
+%          given. This behaviour is modified by the 'transform' flag
 %          (see below).
 %
-%     MS_plot(..., 'data_remap')
+%     MS_plot(..., 'transform')
 %          Where data specified (through use of the 'sdata' or 'pdata' 
 %          flag) fall on the unplotted hemisphere (i.e., the lower 
 %          hemisphere by default) these data are remapped to the antipodal
@@ -184,7 +184,7 @@ function MS_plot(C,rh,varargin)
       ilower = 0 ;      
 
 %  ** set data remapping
-      idremap = 0 ;      
+      itransform = 0 ;      
 
 %  ** configure colormap options
       cmap = jet(64) ;
@@ -276,8 +276,8 @@ function MS_plot(C,rh,varargin)
                pdata_mag = varargin{iarg+3};
                pdata_plot = 1;
                iarg = iarg + 4;
-            case 'data_remap'
-               idremap = 1;
+            case 'transform'
+               itransform = 1;
                iarg = iarg + 1;
             case 'band'
                band_axis = varargin{iarg+1};
@@ -423,7 +423,7 @@ function MS_plot(C,rh,varargin)
                       
                       if pdata_plot
                          add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0, ...
-                           projection, ilower, idremap);
+                           projection, ilower, itransform);
                       end
                       
                       if band_plot
@@ -529,7 +529,7 @@ function MS_plot(C,rh,varargin)
                       
                       if sdata_plot
                           add_data(sdata_azi, sdata_inc, sdata_pol, ...
-                              sdata_mag, 1, projection, ilower, idremap);
+                              sdata_mag, 1, projection, ilower, itransform);
                       end
                       
                   otherwise
@@ -610,26 +610,30 @@ end
 %===============================================================================
 
 function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, ...
-                  projection, ilower, idremap)
+                  projection, ilower, itransform)
 
    % Get data points as XYZ
    % reverse so sph2cart() works properly
    data_azi = -data_azi;
    rad = pi./180 ;
 
+   wstr = ['Suppressed plotting of datapoints on opposite (%s)' ...
+            'hemisphere.\n','         Use ''transform'' flag to ' ...
+            'transform and plot these points.'] ;
+
     % Suppress data as appropriate 
-   if ~idremap
+   if ~itransform
       if ilower
          ind = find(data_inc<=0) ;
          if length(ind)~=length(data_inc)
             warning('MS:PLOT:DATAONWRONGHEMIPHERE', ...
-            'Suppressed plotting of datapoints on unplotted (upper) hemisphere.');
+            sprintf(wstr,'upper'));
          end
       else
          ind = find(data_inc>=0) ;
          if length(ind)~=length(data_inc)
             warning('MS:PLOT:DATAONWRONGHEMIPHERE', ...
-            'Suppressed plotting of datapoints on unplotted (lower) hemisphere.');
+            sprintf(wstr,'lower'));
          end
       end
    else
