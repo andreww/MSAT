@@ -183,6 +183,9 @@ function MS_plot(C,rh,varargin)
 %  ** set lower hemisphere (upper hemisphere is default)
       ilower = 0 ;      
 
+%  ** set data remapping
+      idremap = 0 ;      
+
 %  ** configure colormap options
       cmap = jet(64) ;
       icmapflip = 1 ; % reverse the sense of the colourscale
@@ -273,6 +276,9 @@ function MS_plot(C,rh,varargin)
                pdata_mag = varargin{iarg+3};
                pdata_plot = 1;
                iarg = iarg + 4;
+            case 'data_remap'
+               idremap = 1;
+               iarg = iarg + 1;
             case 'band'
                band_axis = varargin{iarg+1};
                band_angle = varargin{iarg+2};
@@ -416,7 +422,8 @@ function MS_plot(C,rh,varargin)
                       [VPmin, VPmax] = max_min_pole(AZ, INC, VP);
                       
                       if pdata_plot
-                          add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0);
+                         add_data(pdata_azi, pdata_inc, 0, pdata_mag, 0, ...
+                           projection, ilower, idremap);
                       end
                       
                       if band_plot
@@ -522,7 +529,7 @@ function MS_plot(C,rh,varargin)
                       
                       if sdata_plot
                           add_data(sdata_azi, sdata_inc, sdata_pol, ...
-                              sdata_mag, 1, projection, ilower);
+                              sdata_mag, 1, projection, ilower, idremap);
                       end
                       
                   otherwise
@@ -602,12 +609,55 @@ end
    end
 %===============================================================================
 
-function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, projection, ilower)
+function add_data(data_azi, data_inc, data_pol, data_mag, with_pol, ...
+                  projection, ilower, idremap)
 
-    % Get data points as XYZ
-    % reverse so sph2cart() works properly
-    data_azi = -data_azi;
-    rad = pi./180 ;
+   % Get data points as XYZ
+   % reverse so sph2cart() works properly
+   data_azi = -data_azi;
+   rad = pi./180 ;
+
+    % Suppress data as appropriate 
+   if ~idremap
+      if ilower
+         ind = find(data_inc<=0) ;
+         if length(ind)~=length(data_inc)
+            warning('MS:PLOT:DATAONWRONGHEMIPHERE', ...
+            'Suppressed plotting of datapoints on unplotted (upper) hemisphere.');
+         end
+      else
+         ind = find(data_inc>=0) ;
+         if length(ind)~=length(data_inc)
+            warning('MS:PLOT:DATAONWRONGHEMIPHERE', ...
+            'Suppressed plotting of datapoints on unplotted (lower) hemisphere.');
+         end
+      end
+   else
+      % remap data
+      if ilower
+         ind = find(data_inc>=0) ;
+      else
+         ind = find(data_inc<=0) ;
+      end
+      data_azi(ind) = data_azi(ind)+180 ;
+      data_inc(ind) = -data_inc(ind) ;
+      if with_pol
+         data_pol(ind) = -data_pol(ind) ;
+      end
+
+      % set index to include all points      
+      ind = 1:length(data_inc) ;
+   end    
+
+   % drop extraneous data
+   data_azi = data_azi(ind) ;
+   data_inc = data_inc(ind) ;
+   if with_pol
+      data_pol = data_pol(ind) ;
+   end
+   data_mag = data_mag(ind) ;
+
+
     % Data points
     [X,Y,Z] = sph2cart(data_azi.*rad, data_inc.*rad, ones(size(data_azi)));
     
