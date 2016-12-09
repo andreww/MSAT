@@ -632,9 +632,10 @@ function create_modsimple_rsp(filename, dtts, dtbs, Cs, rhos)
 
     % Hard code X, Y and Z nodes here. We could make this
     % an argument, but I don't know what the rules are.
+    % (10 is the discritisation of the model)
     fprintf(fid, '%d %f %f\n', 10, 0.0, 10000.0);
     fprintf(fid, '%d %f %f\n', 10, -5000.0, -5000.0);
-    fprintf(fid, '%d %f %f\n', 10, 0.0, -dtbs(num_layers)); % Base of hole
+    fprintf(fid, '%d %f\n', 10, -dtbs(num_layers)); % Base of hole
     
     % Now add each layer in turn (remembering we need to go backwards)
     j = 0;
