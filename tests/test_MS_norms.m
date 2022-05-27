@@ -1,8 +1,4 @@
-function test_suite = test_MS_norms
-initTestSuite;
-end
-
-function test_MS_norms_olivine_lit
+%% test_MS_norms_olivine_lit
     % Test the olivine example in the paper gives the published results
     % Note that the decomposition is checked in test_MS_decomp
     
@@ -50,9 +46,8 @@ function test_MS_norms_olivine_lit
     assertElementsAlmostEqual((P(3)+P(4)), 0.055, 'absolute', 0.3);
     assertElementsAlmostEqual(P(5), 0.0, 'absolute', 0.3);
     assertElementsAlmostEqual(P(6), 0.0, 'absolute', 0.3);
-end
 
-function test_MS_norms_enst_lit
+%% test_MS_norms_enst_lit
     % Test the olivine example in the paper gives the published results
     
     % Published tensors... page 671 - note types fixes in C_ort and C_hex
@@ -100,5 +95,5 @@ function test_MS_norms_enst_lit
     assertElementsAlmostEqual((P(3)+P(4)), 0.049, 'absolute', 0.3);
     assertElementsAlmostEqual(P(5), 0.0, 'absolute', 0.3);
     assertElementsAlmostEqual(P(6), 0.0, 'absolute', 0.3);
-end
+
             

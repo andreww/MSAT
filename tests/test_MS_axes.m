@@ -1,8 +1,4 @@
-function test_suite = test_MS_axes
-initTestSuite;
-end
-
-function test_MS_axes_reference
+%% test_MS_axes_reference
     % Test the olivine example from page 671 of B&C
     % This checks that (for this case) the orentation
     % is correct (no permutation of axes).
@@ -33,9 +29,9 @@ function test_MS_axes_reference
 
       assertElementsAlmostEqual(MS_axes(C1),C_ref);
     end
-end
 
-function test_MS_axes_ortho
+
+%% test_MS_axes_ortho
     % Test the interpolator works for constant
     % matrices rotated about axies
  
@@ -55,9 +51,9 @@ function test_MS_axes_ortho
       assertElementsAlmostEqual(MS_axes(C1),MS_axes(C2));
     
    end
-end
 
-function test_MS_axes_triclin_weak
+
+%% test_MS_axes_triclin_weak
    % Test the interpolator works for constant
    % matrices rotated about axes
    close all
@@ -83,11 +79,11 @@ function test_MS_axes_triclin_weak
       assertElementsAlmostEqual(MS_axes(C1),MS_axes(C2));
     
    end
-end
 
-function test_MS_axes_triclin_strong
-%% Test the interpolator works for constant
-%% matrices rotated about axes
+
+%% test_MS_axes_triclin_strong
+% Test the interpolator works for constant
+% matrices rotated about axes
  
    [C, r] = MS_elasticDB('albite');
 
@@ -106,9 +102,9 @@ function test_MS_axes_triclin_strong
       assertElementsAlmostEqual(MS_axes(C1),MS_axes(C2));
     
    end
-end
 
-function test_MS_axes_triclin_strong_rots
+
+%% test_MS_axes_triclin_strong_rots
     % Test the interpolator works for constant
     % matrices rotated about axes
  
@@ -131,9 +127,9 @@ function test_MS_axes_triclin_strong_rots
       assertElementsAlmostEqual(C1,C3);
     
    end
-end
 
-function test_MS_axes_errors
+
+%% test_MS_axes_errors
 
     [C, ~] = MS_elasticDB('olivine');
     f = @()MS_axes(C, 'NotAnArgument');
@@ -152,4 +148,4 @@ function test_MS_axes_errors
        val = 1;
     end
     assert(val==1, 'No error thrown')
-end
+

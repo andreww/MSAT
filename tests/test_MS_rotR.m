@@ -1,8 +1,4 @@
-function test_suite = test_MS_rotR
-initTestSuite;
-end
-
-function test_MS_rotR_simple
+%% test_MS_rotR_simple
 
   C_ol = [320.5000   68.1000   71.6000         0         0         0; ...
            68.1000  196.5000   76.8000         0         0         0; ...
@@ -26,4 +22,3 @@ function test_MS_rotR_simple
                    0         0         0         0         0   77.0000];
   assertElementsAlmostEqual(C_ol_A, MS_rotR(C_ol, A));
          
-end

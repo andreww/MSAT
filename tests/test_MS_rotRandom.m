@@ -1,8 +1,4 @@
-function test_suite = test_MS_rotRandom
-initTestSuite;
-end
-
-function test_MS_rotRandom_isotropic
+%% test_MS_rotRandom_isotropic
 
   % Check that a large number of randomly oriented crystals gives
   % an isotropic avarage. Can we think of better tests?
@@ -17,9 +13,7 @@ function test_MS_rotRandom_isotropic
                    ), ones(10000,1)));
   assert(uA<1E-4, 'Not isotropic')
   
-end
-
-function test_MS_rotRandom_euler
+%% test_MS_rotRandom_euler
 
   % Check that the output Euler angles give CC and vica versa.
   C = MS_elasticDB('ol');
@@ -34,4 +28,4 @@ function test_MS_rotRandom_euler
       assertElementsAlmostEqual(C, C_check)
   end
   
-end
+

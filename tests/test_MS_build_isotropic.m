@@ -1,8 +1,4 @@
-function test_suite = test_MS_build_isotropic
-initTestSuite;
-end
-
-function test_MS_build_isotropic_inputs
+%% test_MS_build_isotropic_inputs
 
     [C r] = MS_elasticDB('ol');
     [K_vrh, G_vrh] = MS_polyaverage(C);
@@ -30,10 +26,10 @@ function test_MS_build_isotropic_inputs
     assertElementsAlmostEqual(MS_build_isotropic('e', E,'K',K), C);
     assertElementsAlmostEqual(MS_build_isotropic('M', M,'mu',mu), C);
     assertElementsAlmostEqual(MS_build_isotropic('mu', mu,'M',M), C);
-end
 
 
-function test_MS_build_isotropic_errors
+
+%% test_MS_build_isotropic_errors
 
     [C r] = MS_elasticDB('ol');
     [K_vrh, G_vrh] = MS_polyaverage(C);
@@ -48,4 +44,3 @@ function test_MS_build_isotropic_errors
     f = @()MS_build_isotropic('lam', C(1,2),'bob',C(1,2));
     assertExceptionThrown(f, 'MS:buildiso:wrongargs');
     
-end

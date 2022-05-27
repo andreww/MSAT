@@ -1,8 +1,4 @@
-function test_suite = test_MS_poisson
-initTestSuite;
-end
-
-function test_MS_poisson_isotropic
+%% test_MS_poisson_isotropic
     
     Ciso = MS_build_isotropic('e', 300,'nu',0.2);
     % Do we always get the answer we expect for an isotropic case?
@@ -14,9 +10,8 @@ function test_MS_poisson_isotropic
     assertElementsAlmostEqual(MS_poisson( Ciso, [0 1 0], [1 0 0] ), 0.2);
     assertElementsAlmostEqual(MS_poisson( Ciso, [0 0 1], [0 1 0] ), 0.2);
     assertElementsAlmostEqual(MS_poisson( Ciso, [0 0 1], [1 0 0] ), 0.2);
-end 
 
-function test_MS_poisson_errors
+%% test_MS_poisson_errors
 
     Ciso = MS_build_isotropic('e', 300,'nu',0.2);
     % N not a unit vector
@@ -56,4 +51,3 @@ function test_MS_poisson_errors
     assertExceptionThrown(f, 'MS:CHECKUNITNotVec');
     f = @()MS_poisson( Ciso, [1 0 0 0], [0 0 1]);
     assertExceptionThrown(f, 'MS:CHECKUNITNotVec');
-end

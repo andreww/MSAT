@@ -1,23 +1,19 @@
-function test_suite = test_MS_VTI
-initTestSuite;
-end
+%% test_MS_VTI_crosscheck
 
-function test_MS_VTI_crosscheck
-
-%% Check we get the same results from the two VTI routines. 
+% Check we get the same results from the two VTI routines. 
     
-%% generate elasticities from thomsen parameters.
+% generate elasticities from thomsen parameters.
    rh = 4000 ; 
    vpv = 8 ;
    vsv = 5 ;
    
    C = MS_VTI(vpv,vsv,4000,0.05,0.05,0.00) ;
    
-%% calculate parameters for VTI2
+% calculate parameters for VTI2
    vph = sqrt(C(1,1)*1e9./rh)./1e3 ;
    vsh = sqrt(C(6,6)*1e9./rh)./1e3 ;
    
-%% average velocities
+% average velocities
    vpa = sqrt((vpv.^2+4.*vph.^2)./5) ;
    vsa = sqrt((2.*vsv.^2+vsh.^2)./3) ;
    
@@ -28,5 +24,3 @@ function test_MS_VTI_crosscheck
    Cl = MS_VTI2(vpa,vsa,rh,xi,phi,eta) ;
    
    assertElementsAlmostEqual(C, Cl) ;
-
-end 

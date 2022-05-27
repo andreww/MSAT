@@ -1,8 +1,4 @@
-function test_suite = test_MS_splitting_misfit
-   initTestSuite;
-end
-
-function test_MS_splitting_misfit_Zero_cases
+%% test_MS_splitting_misfit_Zero_cases
    % check misfit between two identical splitting operators is zero for different
    % polarisations, frequencies and operators. 
 
@@ -16,9 +12,7 @@ function test_MS_splitting_misfit_Zero_cases
       assertElementsAlmostEqual(misfit, 0, 'absolute',0.001) ;
    end
 
-end 
-
-function test_MS_splitting_misfit_lam2S
+%% test_MS_splitting_misfit_lam2S
    % Check that the symmetrical mode works properly. 
    
    fast1 = 30  ;
@@ -32,9 +26,7 @@ function test_MS_splitting_misfit_lam2S
 
    assertElementsAlmostEqual(misfit1, misfit2, 'absolute',0.001) ;
 
-end 
-
-function test_MS_splitting_misfit_intensity
+%% test_MS_splitting_misfit_intensity
    % Check that the intensity mode works properly. This has a 
    % different periodicity to the other misfit measures.
    
@@ -48,9 +40,7 @@ function test_MS_splitting_misfit_intensity
 
    assertElementsAlmostEqual(misfit,0,'absolute',0.001) ;
 
-end 
-
-function test_MS_splitting_misfit_simple
+%% test_MS_splitting_misfit_simple
    % Check that the simple mode works properly. 
    
    fast1 = 90  ;
@@ -63,9 +53,7 @@ function test_MS_splitting_misfit_simple
 
    assertElementsAlmostEqual(misfit,0,'absolute',0.001) ;
 
-end 
-
-function test_MS_splitting_misfit_Worst_case
+%% test_MS_splitting_misfit_Worst_case
    % check misfit between two identical splitting operators is unity for
    % opposite parameters
 
@@ -76,9 +64,8 @@ function test_MS_splitting_misfit_Worst_case
    
    misfit = MS_splitting_misfit(fast1,tlag1,fast2,tlag2,spol,freq) ;
    assertElementsAlmostEqual(misfit, 1, 'absolute',0.001) ;
-end 
 
-function test_MS_splitting_misfit_analytical
+%% test_MS_splitting_misfit_analytical
    % Check that the misfit for a given parameter pair and a null result is
    % the same as the 2nd eigenvalue from an analytically constructed split
    % wave. 
@@ -100,7 +87,7 @@ function test_MS_splitting_misfit_analytical
    misfit = MS_splitting_misfit(fast,10,90,0.0,75,0.2) ;
    assertElementsAlmostEqual(misfit, lam2, 'absolute',0.001) ;
 
-end 
+ 
 
 function [amp] = FDGaussian(dt,T,padf)
 %function [A,t] = GaussWin(dt, T)

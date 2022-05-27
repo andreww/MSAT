@@ -1,8 +1,4 @@
-function test_suite = test_MS_decomp
-initTestSuite;
-end
-
-function test_MS_decomp_olivine_lit
+%% test_MS_decomp_olivine_lit
     % Test the olivine example in the paper gives the published results
     
     % Published tensors... page 671
@@ -48,9 +44,9 @@ function test_MS_decomp_olivine_lit
     assertElementsAlmostEqual(C_ortc, C_ort, 'absolute', 0.1);
     assertElementsAlmostEqual(C_monc, C_mon, 'absolute', 0.1);
     assertElementsAlmostEqual(C_tric, C_tri, 'absolute', 0.1);
-end
 
-function test_MS_decomp_enst_lit
+
+%% test_MS_decomp_enst_lit
     % Test the olivine example in the paper gives the published results
     
     % Published tensors... page 671 - note types fixes in C_ort and C_hex
@@ -97,9 +93,9 @@ function test_MS_decomp_enst_lit
     assertElementsAlmostEqual(C_ortc, C_ort, 'absolute', 0.1);
     assertElementsAlmostEqual(C_monc, C_mon, 'absolute', 0.1);
     assertElementsAlmostEqual(C_tric, C_tri, 'absolute', 0.1);
-end
 
-function test_MS_decomp_DB
+
+%% test_MS_decomp_DB
     % Check that when we decompose things in the database, the sum of the 
     % elements add up to what we started with.
     
@@ -112,4 +108,3 @@ function test_MS_decomp_DB
         assertElementsAlmostEqual(C, Ctot);
     end
 
-end

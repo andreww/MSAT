@@ -16,5 +16,5 @@ Functions should be documented in a comment block at the start of each Matlab fi
 Testing
 -------
 
-MSAT is distributed with a large number of test cases. These are run using the link: http://www.mathworks.com/matlabcentral/fileexchange/22846-matlab-xunit-test-framework[xUnit test framework]. This must be installed and present in the Matlab path for the tests to be run. Once this is done the tests can be run from within Matlab by navigating to the tests subdirectory and executing the "runtests" command. Tests for new functions (and new tests for existing functions) should be added to this directory.
+MSAT is distributed with a large number of test cases. These are run using the Matlab `runtests()` built in function with tests being found in the `tests` directory. However, we make use of the xUnit test framework to access floating point aware assert statments. This must therefore be installed and present in the Matlab path for the tests to be run. Make sure a new(ish) version of the package is installed to avoid overloading the runtests built in. Tests for new functions (and new tests for existing functions) should be added to the tests directory.
 

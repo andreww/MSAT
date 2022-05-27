@@ -1,8 +1,4 @@
-function test_suite = test_MS_load
-initTestSuite;
-end
-
-function test_MS_load_default
+%% test_MS_load_default
 
    [Cp,rp] = C_Ol() ;
    
@@ -28,9 +24,7 @@ function test_MS_load_default
    assertElementsAlmostEqual(Cp, Cl, 'absolute',0.001) ;
    assertElementsAlmostEqual(rp, rl, 'absolute',0.001) ;
 
-end
-
-function test_MS_load_Aij
+%% test_MS_load_Aij
 
    [Cp,rp] = C_Ol() ;
    
@@ -56,9 +50,7 @@ function test_MS_load_Aij
    assertElementsAlmostEqual(Cp, Cl, 'absolute',0.001) ;
    assertElementsAlmostEqual(rp, rl, 'absolute',0.001) ;
 
-end
-
-function test_MS_load_ematrix
+%% test_MS_load_ematrix
 
    [Cp,rp] = C_Ol() ;
    
@@ -81,9 +73,7 @@ function test_MS_load_ematrix
 
    assertElementsAlmostEqual(Cp, Cl, 'absolute',0.001) ;
 
-end
-
-function test_MS_load_iso
+%% test_MS_load_iso
 
    C33 = 237.5533 ;
    C66 = 79.5400 ;
@@ -104,9 +94,6 @@ function test_MS_load_iso
    assertElementsAlmostEqual(C33, Cl(3,3), 'absolute',0.001) ;
    assertElementsAlmostEqual(C66, Cl(6,6), 'absolute',0.001) ;
    assertElementsAlmostEqual(rho, rl, 'absolute',0.001) ;
-
-end
-
 
 function [C,r] = C_Ol()
 

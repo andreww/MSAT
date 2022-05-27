@@ -1,8 +1,4 @@
-function test_suite = test_MS_splitting
-   initTestSuite;
-end
-
-function test_MS_measure_no_splitting_dfreq
+%% test_MS_measure_no_splitting_dfreq
   
    % If we measure the splitting of an unsplit wave it should always
    % be 0 for tlag... this checks the dominant freq
@@ -20,9 +16,8 @@ function test_MS_measure_no_splitting_dfreq
    [~, tlag] = MS_measure_trace_splitting(time, T00, T90, 5.0, ...
       0.5, 4.0);
    assertElementsAlmostEqual([0.0 tlag], [0.0 0.0]) ;
-end
 
-function test_MS_measure_no_splitting_pol
+%% test_MS_measure_no_splitting_pol
   
    % If we measure the splitting of an unsplit wave it should always
    % be 0 for tlag... this checks the init_pol freq
@@ -45,9 +40,8 @@ function test_MS_measure_no_splitting_pol
    [~, tlag] = MS_measure_trace_splitting(time, T00, T90, 5.0, ...
       0.5, 4.0);
    assertElementsAlmostEqual([0.0 tlag], [0.0 0.0]) ;
-end
 
-function test_MS_measure_small_splitting_pol_1
+%% test_MS_measure_small_splitting_pol_1
   
    % We should recover the splitting we impose
    [time, T00, T90] = MS_make_trace(15.0, 0.2, 4.0);
@@ -56,9 +50,7 @@ function test_MS_measure_small_splitting_pol_1
       0.5, 4.0);
    assertElementsAlmostEqual([fast tlag], [25.0 0.2], 'absolute',0.0001) ;
    
-end
-
-function test_MS_measure_small_splitting_pol_2
+%% test_MS_measure_small_splitting_pol_2
   
    % We should recover the splitting we impose
    [time, T00, T90] = MS_make_trace(15.0, 0.2, 4.0);
@@ -67,9 +59,7 @@ function test_MS_measure_small_splitting_pol_2
       0.5, 4.0);
    assertElementsAlmostEqual([fast tlag], [25.0 0.02], 'absolute',0.1) ;
    
-end
-
-function test_MS_measure_small_splitting_pol_3
+%% test_MS_measure_small_splitting_pol_3
   
    % We should recover the splitting we impose
    [time, T00, T90] = MS_make_trace(15.0, 0.2, 4.0);
@@ -78,9 +68,7 @@ function test_MS_measure_small_splitting_pol_3
       0.5, 4.0);
    assertElementsAlmostEqual([fast tlag], [75.0 0.2], 'absolute',0.0001) ;
    
-end
-
-function test_MS_measure_small_splitting_pol_4
+%% test_MS_measure_small_splitting_pol_4
   
    % We should recover the splitting we impose
    [time, T00, T90] = MS_make_trace(15.0, 0.2, 4.0);
@@ -90,9 +78,7 @@ function test_MS_measure_small_splitting_pol_4
    % Errors go up close to null.
    assertElementsAlmostEqual([fast tlag], [16.0 0.1], 'absolute',0.1) ;
    
-end
-
-function test_MS_remove_splitting
+%% test_MS_remove_splitting
 
    % If we apply and remove splitting from a trace we should
    % get back what we started
@@ -130,4 +116,3 @@ function test_MS_remove_splitting
    [T00r T90r] = MS_split_trace(time, T00, T90, 82.0, 0.2);
    [T00r T90r] = MS_split_trace(time, T00r, T90r, 82.0, -0.2);
    assertElementsAlmostEqual([T00 T90], [T00r, T90r]);
-end

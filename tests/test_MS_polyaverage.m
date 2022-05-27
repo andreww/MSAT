@@ -1,8 +1,4 @@
-function test_suite = test_MS_polyaverage
-initTestSuite;
-end
-
-function test_MS_polyaverage_stishovite
+%% test_MS_polyaverage_stishovite
 
 
    % Do we get the same numbers as WEIDNER et al. table 5?
@@ -14,6 +10,6 @@ function test_MS_polyaverage_stishovite
    assertElementsAlmostEqual([G_r], [208], 'absolute', 0.5);
    assertElementsAlmostEqual([K_v], [324], 'absolute', 0.5);
    assertElementsAlmostEqual([G_v], [232], 'absolute', 0.5);   
-end
+
 
 % No error cases to check!

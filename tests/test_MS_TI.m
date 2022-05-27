@@ -1,8 +1,4 @@
-function test_suite = test_MS_TI
-initTestSuite;
-end
-
-function test_MS_TI_crosscheck
+%% test_MS_TI_crosscheck
 
 % Check we get the same results from the two VTI routines. 
     
@@ -32,9 +28,7 @@ function test_MS_TI_crosscheck
    
    assertElementsAlmostEqual(C, Cl) ;
 
-end 
-
-function test_MS_TI_parameters_1
+%% test_MS_TI_parameters_1
 
 % Check we get the same results from the two VTI routines. 
     
@@ -63,9 +57,7 @@ function test_MS_TI_parameters_1
    C3 = MS_TI(vpa, vsa, rh_in, xi, phi, eta,'global') ;
    assertElementsAlmostEqual(C, C3);
 
-end
-
-function test_MS_TI_parameters_errors
+%% test_MS_TI_parameters_errors
 
     [C, rh] = MS_elasticDB('stishovite');
     
@@ -77,10 +69,8 @@ function test_MS_TI_parameters_errors
     
     f = @()MS_TI_parameters(MS_rot3(C, 0.0, 90.0, 0.0), rh);
         assertExceptionThrown(f, 'MS:BadTIelasticity');
-end
 
-
-function test_MS_TI_apatite
+%% test_MS_TI_apatite
 
     [C, rh] = MS_elasticDB('apatite');
     
@@ -95,9 +85,7 @@ function test_MS_TI_apatite
     assertElementsAlmostEqual(C, C2);
     assertElementsAlmostEqual(C, C3);
     
-end
-
-function test_MS_TI_apatite_units
+%% test_MS_TI_apatite_units
 
     [C, rh] = MS_elasticDB('apatite');
     
@@ -133,4 +121,3 @@ function test_MS_TI_apatite_units
     assertElementsAlmostEqual(eps, eps1);
     assertElementsAlmostEqual(gam, gam1);
     assertElementsAlmostEqual(del, del1);
-end

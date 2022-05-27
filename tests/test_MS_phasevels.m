@@ -1,8 +1,4 @@
-function test_suite = test_MS_phasevels
-initTestSuite;
-end
-
-function test_MS_phasevels_stishovite_graph
+%% test_MS_phasevels_stishovite_graph
 
     % Check we get the same results as those given in Mainprices review 
     % (Figure 3).
@@ -33,9 +29,7 @@ function test_MS_phasevels_stishovite_graph
     assert((vs1-8.4)^2<0.1^2, 'vs wrong'); % From graph
     assert((vs2-7.7)^2<0.1^2, 'vs wrong'); % From graph
 
-end 
-
-function test_MS_phasevels_stishovite_list
+%% test_MS_phasevels_stishovite_list
 
     [C, rh] = MS_elasticDB('stishovite');
     
@@ -48,9 +42,7 @@ function test_MS_phasevels_stishovite_list
     assertElementsAlmostEqual(vs1, [7.7, 7.7, 7.7]', 'absolute', 0.5); % From graph
     
 
-end
-
-function test_MS_phasevels_stishovite_errors
+%% test_MS_phasevels_stishovite_errors
 
     [C, rh] = MS_elasticDB('stishovite');
     
@@ -62,9 +54,7 @@ function test_MS_phasevels_stishovite_errors
     
     % How shoould we test MS:PHASEVELS:vectornotreal
     
-end
-
-function test_MS_phasevels_Cinvalid
+%% test_MS_phasevels_Cinvalid
 
     [C, rh] = MS_elasticDB('stishovite');
     C(3,6) = -675.0;
@@ -72,4 +62,3 @@ function test_MS_phasevels_Cinvalid
     f = @()MS_phasevels(C, rh, [90 90], [0 0]);
     assertExceptionThrown(f, 'MS:CHECKCnotsym');
     
-end

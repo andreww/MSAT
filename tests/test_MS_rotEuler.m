@@ -1,8 +1,4 @@
-function test_suite = test_MS_rotEuler
-initTestSuite;
-end
-
-function test_MS_rot_Euler_scalar_vector
+%% test_MS_rot_Euler_scalar_vector
 
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
@@ -28,9 +24,7 @@ function test_MS_rot_Euler_scalar_vector
     assertElementsAlmostEqual(Cs_in, MS_rotEuler(C_in, phi1s, thetas, phi2s))
     assertElementsAlmostEqual(Cs_in, MS_rotEuler(Cs_in, phi1s, thetas, phi2s))
     
-end
-
-function test_MS_rot_Euler_scalar_vector_opts
+%% test_MS_rot_Euler_scalar_vector_opts
 
     % Note that for these rotations passive and active rotatiosn give the 
     % same result.
@@ -74,9 +68,7 @@ function test_MS_rot_Euler_scalar_vector_opts
     assertElementsAlmostEqual(Cs_in, MS_rotEuler(Cs_in, phi1s, thetas, phi2s, ...
         'sense', 'passive'))
     
-end
-
-function test_MS_rot_Euler_errors
+%% test_MS_rot_Euler_errors
 
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
@@ -114,9 +106,7 @@ function test_MS_rot_Euler_errors
     f = @()MS_rotEuler(Cs_in, phi1s, thetas, phi2, 'sense', 'bob');
     assertExceptionThrown(f, 'MS:ROTE:UnknownOption')
     
-end
-
-function test_MS_rot_Euler_VPSC
+%% test_MS_rot_Euler_VPSC
 
     % The VPSC code (version 6c) allows the calculation of texture (given
     % by sets of Euler angles) following deformation. It also calculates
@@ -191,5 +181,5 @@ function test_MS_rot_Euler_VPSC
     % Check result - only know VPSC result to 0.01 GPa
     assertElementsAlmostEqual(C_vpsc_voigt, C_voigt, 'absolute', 0.01)
 
-end
+
 

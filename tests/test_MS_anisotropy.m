@@ -1,8 +1,4 @@
-function test_suite = test_MS_anisotropy
-initTestSuite;
-end
-
-function test_MS_anisotropy_isotropic
+%% test_MS_anisotropy_isotropic
 
   Ciso = [166.6667   66.6667   66.6667         0         0         0; ...
            66.6667  166.6667   66.6667         0         0         0; ...
@@ -17,5 +13,5 @@ function test_MS_anisotropy_isotropic
   assertElementsAlmostEqual(lma, 1.0);
   assertElementsAlmostEqual(zA, 1.0);
   assertElementsAlmostEqual(cbA, 0.0);
-end
+
 

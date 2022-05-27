@@ -1,8 +1,4 @@
-function test_suite = test_MS_info
-initTestSuite;
-end
-
-function test_MS_info_string
+%% test_MS_info_string
 
     [C, rh] = MS_elasticDB('ol');
     res = sprintf('\n---ROTATIONAL INFORMATION \n\n   Elasticity matrix appears unrotated.\n');  
@@ -17,9 +13,8 @@ function test_MS_info_string
         '          X3   8.343  4.791  4.368  9.240 \n']);
     S = MS_info(C, rh);
     assert(strcmp(res,S));
-end
 
-function test_MS_info_args
+%% test_MS_info_args
 
     [C, rh] = MS_elasticDB('ol');
     res = sprintf('\n---ROTATIONAL INFORMATION \n\n   Elasticity matrix appears unrotated.\n');  
@@ -43,9 +38,8 @@ function test_MS_info_args
         '          X3   8.343  4.791  4.368  9.240 \n']);
     S = MS_info(C, rh, 'mode', 'vel');
     assert(strcmp(res,S));
-end
 
-function test_MS_info_errors
+%% test_MS_info_errors
 
     [C, rh] = MS_elasticDB('ol');
     
@@ -63,4 +57,4 @@ function test_MS_info_errors
     
     f = @()MS_info(C, 'mode', 'vel');
     assertExceptionThrown(f, 'MS:INFO:NoVelocityInfo');
-end
+

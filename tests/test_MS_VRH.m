@@ -1,8 +1,4 @@
-function test_suite = test_MS_VRH
-initTestSuite;
-end
-
-function test_MS_VRH_onephase
+%% test_MS_VRH_onephase
     % Test the Voigt-Reuss-Hill avarage does not
     % change the result for a single phase 
     % calculation
@@ -17,9 +13,8 @@ function test_MS_VRH_onephase
     assertElementsAlmostEqual(MS_VRH([50,50],C_in,10,C_in,10), C_in);
     assertElementsAlmostEqual(MS_VRH([9987,932],C_in,10,C_in,10), C_in);
     assertElementsAlmostEqual(MS_VRH([9987 932 5],C_in,10,C_in,10,C_in,10), C_in);
-end
 
-function test_MS_VRH_badinput
+%% test_MS_VRH_badinput
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
               13.18  13.18   49.67   000.0   000.0   000.0
@@ -28,9 +23,8 @@ function test_MS_VRH_badinput
               000.0  000.0   000.0   000.0   000.0   12.78];
     f = @()MS_VRH([0.333,0.333,0.333],C_in,10,C_in,10);
     assertExceptionThrown(f, 'MS:VRH:args');
-end
 
-function test_MS_VRH_onephase_vectors
+%% test_MS_VRH_onephase_vectors
     % Test the Voigt-Reuss-Hill avarage does not
     % change the result for a single phase 
     % calculation - vector form
@@ -52,9 +46,8 @@ function test_MS_VRH_onephase_vectors
     Cs(:,:,2) = C_in;
     Cs(:,:,3) = C_in;
     assertElementsAlmostEqual(MS_VRH([9987 932 5],Cs,[10 10 10]), C_in);
-end
 
-function test_MS_VRH_badinput_vectors
+%% test_MS_VRH_badinput_vectors
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
               13.18  13.18   49.67   000.0   000.0   000.0
@@ -75,4 +68,4 @@ function test_MS_VRH_badinput_vectors
     assertExceptionThrown(f, 'MS:VRH:args');
     f = @()MS_VRH([0.333,0.333,0.333],ones(5,6,3),[10 10 10]);
     assertExceptionThrown(f, 'MS:VRH:args');
-end
+

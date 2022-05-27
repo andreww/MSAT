@@ -1,13 +1,5 @@
-function test_suite = test_MS_interpolate
-initTestSuite;
-end
 
-function [Cint] = mock_MS_interpolate(C1, C2, frac)
-    % Mockup of MS_interpolate that does not care about density.
-    [ Cint, ~ ] = MS_interpolate(C1, 1.0, C2, 1.0, frac);
-end
-
-function test_MS_interpolate_angs_ortho
+%% test_MS_interpolate_angs_ortho
     % Test the interpolator works for constant
     % matrices rotated about axies
  
@@ -34,9 +26,9 @@ function test_MS_interpolate_angs_ortho
     assertElementsAlmostEqual(mock_MS_interpolate(C110z, C10z, 0.5), C60z);
     assertElementsAlmostEqual(mock_MS_interpolate(C110z, C10z, 1.0), C110z);
     assertElementsAlmostEqual(mock_MS_interpolate(C110z, C10z, 0.0), C10z);
-end
 
-function test_MS_interpolate_angs_triclin
+
+%% test_MS_interpolate_angs_triclin
     % Test the interpolator works for constant
     % matrices rotated about axies
  
@@ -71,9 +63,9 @@ function test_MS_interpolate_angs_triclin
     assertElementsAlmostEqual(mock_MS_interpolate(C110z, C10z, 0.5), C60z);
     assertElementsAlmostEqual(mock_MS_interpolate(C110z, C10z, 1.0), C110z);
     assertElementsAlmostEqual(mock_MS_interpolate(C110z, C10z, 0.0), C10z);
-end
 
-function test_MS_interpolate_forst_fay
+
+%% test_MS_interpolate_forst_fay
     % Test the interpolator works for constant
     % matrices rotated about axies
  
@@ -92,4 +84,8 @@ function test_MS_interpolate_forst_fay
         assertElementsAlmostEqual(rho_common, r_int);
         
     end
+
+function [Cint] = mock_MS_interpolate(C1, C2, frac)
+    % Mockup of MS_interpolate that does not care about density.
+    [ Cint, ~ ] = MS_interpolate(C1, 1.0, C2, 1.0, frac);
 end

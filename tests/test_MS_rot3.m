@@ -1,8 +1,4 @@
-function test_suite = test_MS_rot3
-initTestSuite;
-end
-
-function test_MS_rot_3_triclinic
+%% test_MS_rot_3_triclinic
 
     [C,r] = MS_elasticDB('alb') ;
     C1 = MS_rot3(C,30,45,60) ;
@@ -15,9 +11,7 @@ function test_MS_rot_3_triclinic
     assertElementsAlmostEqual(C, C2) ;
     assertElementsAlmostEqual(C1, C3) ;
 
-end
-
-function test_MS_rot_3_fuse
+%% test_MS_rot_3_fuse
 
     % Check out matrix method works like the explicit sum 
     % ususally given for tensor rotation.
@@ -56,9 +50,7 @@ function test_MS_rot_3_fuse
             
     end
     
-end
-
-function test_MS_rot_3_scalar_vector
+%% test_MS_rot_3_scalar_vector
 
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
@@ -83,9 +75,8 @@ function test_MS_rot_3_scalar_vector
     assertElementsAlmostEqual(Cs_in, MS_rot3(Cs_in, a, b, g))
     assertElementsAlmostEqual(Cs_in, MS_rot3(C_in, as, bs, gs))
     assertElementsAlmostEqual(Cs_in, MS_rot3(Cs_in, as, bs, gs))
-end
 
-function test_MS_rot_3_errors
+%% test_MS_rot_3_errors
 
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
@@ -116,9 +107,7 @@ function test_MS_rot_3_errors
     assertExceptionThrown(f, 'MS:ROT3:UnknownOption')
     
    
-end
-
-function test_MS_rot_3_vecerrors
+%% test_MS_rot_3_vecerrors
 
     C_in = [  49.67  13.18   13.18   000.0   000.0   000.0
               13.18  49.67   13.18   000.0   000.0   000.0
@@ -150,7 +139,7 @@ function test_MS_rot_3_vecerrors
     f = @()MS_rot3(Cs_in, as, bs, g);
     assertExceptionThrown(f, 'MS:ListsMustMatch')
     
-end
+
 
 
 % Direct way to rotate (Cij) by a rotation matrix

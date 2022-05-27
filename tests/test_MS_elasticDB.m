@@ -1,8 +1,4 @@
-function test_suite = test_MS_elasticDB
-initTestSuite;
-end
-
-function test_MS_elasticDB_run
+%% test_MS_elasticDB_run
 
     infol = 'Single crystal olivine (Abramson et al, JGR, 1997; doi:10.1029/97JB00682)' ; 
     Cl = [320.5  68.1  71.6   0.0   0.0   0.0 ; ...
@@ -25,9 +21,7 @@ function test_MS_elasticDB_run
     assertElementsAlmostEqual(rh, rhl)
     assert(all(info == infol))
     
-end
-
-function test_MS_elasticDB_errors
+%% test_MS_elasticDB_errors
 
     f = @()MS_elasticDB('badname');
     assertExceptionThrown(f, 'MS:ELASTICDB:UNKNOWN')
@@ -45,5 +39,3 @@ function test_MS_elasticDB_errors
        val = 1;
     end
     assert(val==1, 'No error thrown')
-
-end

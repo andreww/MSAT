@@ -1,8 +1,4 @@
-function test_suite = test_MS_expand
-   initTestSuite;
-end
-
-function test_MS_expand_isotropic
+%% test_MS_expand_isotropic
 
     C_in = [  0.0 0.0 0.0 0.0 0.0 0.0 ; ...
               0.0 0.0 0.0 0.0 0.0 0.0 ; ...
@@ -21,9 +17,7 @@ function test_MS_expand_isotropic
     assertElementsAlmostEqual(MS_expand(C_in, 'iso'), C_out);
     assertElementsAlmostEqual(MS_expand(C_in, 'auto'), C_out);
     
-end
-
-function test_MS_expand_cubic
+%% test_MS_expand_cubic
 
     C_in = [  0.0 66.6667 0.0 0.0 0.0 0.0 ; ...
               0.0 0.0 0.0 0.0 0.0 0.0 ; ...
@@ -42,9 +36,7 @@ function test_MS_expand_cubic
     assertElementsAlmostEqual(MS_expand(C_in, 'cubic'), C_out);
     assertElementsAlmostEqual(MS_expand(C_in, 'auto'), C_out);
     
-end
-
-function test_MS_expand_hexagonal
+%% test_MS_expand_hexagonal
 
     C_in = [ 153.6000         0   76.0444         0         0         0 ; ...
                     0         0         0         0         0         0 ; ...
@@ -64,9 +56,7 @@ function test_MS_expand_hexagonal
     assertElementsAlmostEqual(MS_expand(C_in, 'vti'), C_out);
     assertElementsAlmostEqual(MS_expand(C_in, 'auto'), C_out);
     
-end
-
-function test_MS_expand_orthorhombic
+%% test_MS_expand_orthorhombic
 
     C_in = [ 153.6000   76.8200   76.0444         0         0         0 ; ...
                     0  155.6000   76.1444         0         0         0 ; ...
@@ -86,9 +76,7 @@ function test_MS_expand_orthorhombic
     assertElementsAlmostEqual(MS_expand(C_in, 'orthorhombic'), C_out);
     assertElementsAlmostEqual(MS_expand(C_in, 'auto'), C_out);
     
-end
-
-function test_MS_expand_errors
+%% test_MS_expand_errors
 
 
 
@@ -138,6 +126,6 @@ function test_MS_expand_errors
               0.0 0.0 0.0 0.0 0.0 0.0 ];
     f = @()MS_expand(C_in, 'iso');
     assertExceptionThrown(f, 'MS:EXPANDbadiso')
-end
+
 
 

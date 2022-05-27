@@ -1,10 +1,4 @@
-function test_suite = test_MS_effective_medium
-initTestSuite;
-end
-
-
-
-function test_MS_effective_medium_TW
+%% test_MS_effective_medium_TW
 
    Ceff = [6.4667    3.5875    3.5875         0         0         0 ; ...
            3.5875    7.3026    3.7466         0         0         0 ; ...
@@ -32,9 +26,7 @@ function test_MS_effective_medium_TW
    assertElementsAlmostEqual(rheff, rheff1, 'absolute',0.001) ;
    assertElementsAlmostEqual(rheff, rheff2, 'absolute',0.001) ;
 
-end
-
-function test_MS_effective_medium_Hudson
+%% test_MS_effective_medium_Hudson
 
 %  water saturated cracks (HCS1) case from Crampin, 1984 (GJRAS, 76, pp 135-145)
 %  see table 1, page 139
@@ -87,9 +79,7 @@ function test_MS_effective_medium_Hudson
    assertElementsAlmostEqual(Ceff, Ceff2, 'absolute',0.01) ;
    assertElementsAlmostEqual(rheff, rheff2, 'absolute',0.01) ;
 
-end
-
-function test_MS_effective_medium_Backus
+%% test_MS_effective_medium_Backus
    
    [h,vp,vs,rh] = example_layering()  ;
    
@@ -121,8 +111,6 @@ function test_MS_effective_medium_Backus
    assertElementsAlmostEqual(Rho, rheff1, 'absolute',0.001) ;
    assertElementsAlmostEqual(Rho, rheff2, 'absolute',0.001) ;
    
-end
-
 function [h,vp,vs,rh] = example_layering()
 
    data = [ 5.0  2659.99    1319.64    2265.49 ; ...
@@ -153,4 +141,6 @@ function [h,vp,vs,rh] = example_layering()
    rh = data(:,4) ;
 
 end
+
+
 
