@@ -199,7 +199,7 @@ end
                nofig = 0 ;
                iarg = iarg + 1 ;
             case 'nocbar'
-               nocbar = 0 ;
+               nocbar = 1 ;
                iarg = iarg + 1 ;
             case 'cmap'
                cmarg = varargin{iarg+1} ;
