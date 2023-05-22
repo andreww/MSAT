@@ -196,7 +196,7 @@ end
                plotaxes = 0 ;
                iarg = iarg + 1 ;
             case 'nofig'
-               nofig = 0 ;
+               nofig = 1 ;
                iarg = iarg + 1 ;
             case 'nocbar'
                nocbar = 0 ;
